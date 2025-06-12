@@ -7,7 +7,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.4.0] - 2025-01-09
+## [0.5.0] - 2025-06-13
+
+### Added
+- 🤖 **Claude AI統合機能** - AgentへのClaude API統合とAI協調開発支援機能
+- 📊 **tmuxモニタリングシステム** - セッション状態の監視とリアルタイム状態取得
+- ⚖️ **法的フレームワーク** - プロジェクト管理とコンプライアンス機能
+- 🏢 **組織管理システム** - 複数組織の階層管理とロール割り当て機能
+- 🏗️ **スペース管理大幅拡充** - グリッドレイアウトと32ペイン対応、マルチルーム機能
+- 📋 **YAML設定システム** - 複数の事前定義済み設定ファイルセット
+- 🧪 **包括的テストスイート** - 統合テスト、ユニットテスト、シナリオテストの大幅拡充
+- 🔄 **GitHub Actions CI/CD** - 継続的統合とシナリオテスト自動化
+- 📜 **検証スクリプト群** - tmuxセッション、ペインボーダー、Claude実行検証
+- 🤖 **Claude AI Integration** - Claude API integration for agents and AI-assisted collaborative development
+- 📊 **tmux Monitoring System** - Session state monitoring and real-time status retrieval
+- ⚖️ **Legal Framework** - Project management and compliance functionality
+- 🏢 **Organization Management System** - Hierarchical management of multiple organizations and role assignments
+- 🏗️ **Enhanced Space Management** - Grid layout with 32-pane support and multi-room functionality
+- 📋 **YAML Configuration System** - Multiple pre-defined configuration file sets
+- 🧪 **Comprehensive Test Suite** - Extensive integration, unit, and scenario test coverage
+- 🔄 **GitHub Actions CI/CD** - Continuous integration and automated scenario testing
+- 📜 **Verification Script Collection** - tmux session, pane border, and Claude execution verification
+- 📖 **Enhanced Documentation** - Comprehensive README updates in both Japanese and English
+
+### Changed
+- 🔧 **CLI機能大幅拡張** - apply, init, policy, space, tool コマンドの機能強化
+- 📁 **プロジェクト構造再編** - モジュラー設計とコンポーネント分離
+- 🏷️ **設定ファイル体系化** - 用途別YAML設定ファイルの整理と標準化
+- 🔧 **Extensive CLI Enhancement** - Enhanced functionality for apply, init, policy, space, tool commands
+- 📁 **Project Structure Reorganization** - Modular design and component separation
+- 🏷️ **Configuration File Systematization** - Organization and standardization of purpose-specific YAML files
+
+### Fixed
+- 🔗 **タスクブランチ管理** - デフォルトブランチからの正しいブランチ作成
+- 🎯 **エージェント属性マッピング** - 自動ID割り当てとエージェント管理の修正
+- 🧹 **不要ファイル削除** - fix_pane_titles.pyなど古いスクリプトの削除
+- 🔗 **Task Branch Management** - Proper branch creation from default branches
+- 🎯 **Agent Attribute Mapping** - Fixed automatic ID assignment and agent management
+- 🧹 **Legacy File Cleanup** - Removal of outdated scripts like fix_pane_titles.py
+
+### Technical
+- 🎯 **54ファイル変更** - 14,432行追加、592行削除の大規模リファクタリング
+- 🏗️ **Core Applier機能拡張** - YAML適用とCRD処理の大幅改善
+- 📋 **CRDモデル拡充** - 6種類のCRD対応とパーサー機能強化
+- 🔧 **Task Manager改良** - ワークツリー管理とブランチ戦略の最適化
+- 🎯 **Massive Codebase Update** - 54 files changed, 14,432 additions, 592 deletions
+- 🏗️ **Core Applier Enhancement** - Significant improvements to YAML application and CRD processing
+- 📋 **Extended CRD Models** - Support for 6 CRD types and enhanced parser functionality
+- 🔧 **Improved Task Manager** - Optimized worktree management and branching strategy
+
+## [0.4.0] - 2025-06-12
 
 ### Added
 - 🚀 **`--no-attach` option** for apply command - allows YAML application without auto-attaching to session
@@ -30,13 +79,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 🧪 **Improved test infrastructure** for lifecycle testing patterns
 - 📝 **Better error messaging** and validation in apply command workflows
 
-## [0.2.1] - 2025-01-08
+## [0.2.1] - 2025-06-11
 
 ### Fixed
 - 🐛 **ConfigFileHandler AttributeError**: Fixed missing `config_path` attribute in watchdog file handler
 - 🔧 **Hot reload functionality**: Corrected scope access for config file monitoring
 
-## [0.2.0] - 2025-01-08
+## [0.2.0] - 2025-06-10
 
 ### Added
 - 🗑️ **Directory cleanup functionality** for `haconiwa company kill` command
@@ -57,7 +106,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 🧪 **Integration tests** covering full cleanup workflow
 - 🛡️ **Error handling** for permission issues and missing paths
 
-## [0.1.4] - 2025-01-06
+## [0.1.4] - 2025-06-09
 
 ### Added
 - 📖 **Ready-to-Use Features section** in README (both Japanese and English)
@@ -75,8 +124,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 📝 Missing `--base-path` parameter in usage examples
 - 🏷️ Inconsistent terminology between session and company
 
-
-## [0.1.3] - 2025-01-06
+## [0.1.3] - 2025-06-08
 
 ### Added
 - 🚀 **Complete tmux multiagent environment** (4x4 grid layout)
@@ -98,7 +146,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 📋 **List command accuracy**: Improved session status detection
 - 🔄 **Update mode safety**: Preserves running processes during title updates
 
-## [0.1.2] - 2025-01-05
+## [0.1.2] - 2025-06-07
 
 ### Added
 - 🏗️ **Basic tmux session integration** foundation
@@ -110,7 +158,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 🔧 **Package installation** issues
 - 📦 **PyPI distribution** configuration
 
-## [0.1.1] - 2025-01-05
+## [0.1.1] - 2025-06-06
 
 ### Added
 - 🚀 **Initial PyPI release**
@@ -123,7 +171,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 📦 **PyPI package** distribution setup
 - 🔧 **Development tools** configuration (pytest, black, flake8, etc.)
 
-## [0.1.0] - 2025-01-05
+## [0.1.0] - 2025-06-05
 
 ### Added
 - 🎯 **Initial project setup**
@@ -131,7 +179,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 🏗️ **Basic project structure**
 - 📄 **License and documentation** foundation
 
-[Unreleased]: https://github.com/dai-motoki/haconiwa/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/dai-motoki/haconiwa/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/dai-motoki/haconiwa/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/dai-motoki/haconiwa/compare/v0.2.1...v0.4.0
 [0.2.1]: https://github.com/dai-motoki/haconiwa/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/dai-motoki/haconiwa/compare/v0.1.4...v0.2.0
