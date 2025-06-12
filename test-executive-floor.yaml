@@ -1,0 +1,370 @@
+apiVersion: haconiwa.dev/v1
+kind: Organization
+metadata:
+  name: test-executive-org
+spec:
+  companyName: "Test Executive Company"
+  industry: "Software Development"
+  basePath: "./test-executive-company"
+  legalFramework:
+    enabled: true
+    lawDirectory: "law"
+    organizationRules: "organization-rules.md"
+    systemPrompts: "system-prompts"
+    permissions: "permissions"
+  hierarchy:
+    legalFramework:
+      enabled: true
+      lawDirectory: "law"
+      globalRules: "global-rules.md"
+      systemPrompts: "system-prompts"
+      permissions: "permissions"
+    departments:
+    - id: "executive"
+      name: "Executive Leadership"
+      description: "C-level executives and strategic leadership"
+      roles:
+      - roleType: "executive"
+        title: "CEO"
+        responsibilities: ["Overall company strategy"]
+        reportsTo: "Board of Directors"
+      - roleType: "executive"
+        title: "CTO"
+        responsibilities: ["Technology strategy"]
+        reportsTo: "CEO"
+      - roleType: "executive"
+        title: "COO"
+        responsibilities: ["Operations management"]
+        reportsTo: "CEO"
+    - id: "frontend"
+      name: "Frontend Development Team"
+      description: "UI/UX development"
+      roles:
+      - roleType: "management"
+        title: "Frontend Team Lead"
+        responsibilities: ["Team coordination"]
+        reportsTo: "CTO"
+      - roleType: "engineering"
+        title: "Senior Frontend Developer"
+        responsibilities: ["Complex UI development"]
+        reportsTo: "Frontend Team Lead"
+      - roleType: "engineering"
+        title: "Frontend Developer"
+        responsibilities: ["Feature implementation"]
+        reportsTo: "Senior Frontend Developer"
+    - id: "backend"
+      name: "Backend Development Team"
+      description: "Server-side development"
+      roles:
+      - roleType: "management"
+        title: "Backend Team Lead"
+        responsibilities: ["Backend architecture"]
+        reportsTo: "CTO"
+      - roleType: "engineering"
+        title: "Senior Backend Developer"
+        responsibilities: ["Microservices architecture"]
+        reportsTo: "Backend Team Lead"
+      - roleType: "engineering"
+        title: "Backend Developer"
+        responsibilities: ["API implementation"]
+        reportsTo: "Senior Backend Developer"
+    - id: "devops"
+      name: "DevOps Infrastructure Team"
+      description: "Infrastructure and deployment"
+      roles:
+      - roleType: "management"
+        title: "DevOps Team Lead"
+        responsibilities: ["Infrastructure strategy"]
+        reportsTo: "CTO"
+      - roleType: "engineering"
+        title: "Senior DevOps Engineer"
+        responsibilities: ["Infrastructure as Code"]
+        reportsTo: "DevOps Team Lead"
+      - roleType: "engineering"
+        title: "DevOps Engineer"
+        responsibilities: ["CI/CD maintenance"]
+        reportsTo: "Senior DevOps Engineer"
+    - id: "qa"
+      name: "Quality Assurance Team"
+      description: "Testing and quality control"
+      roles:
+      - roleType: "management"
+        title: "QA Team Lead"
+        responsibilities: ["Testing strategy"]
+        reportsTo: "CTO"
+      - roleType: "engineering"
+        title: "Senior QA Engineer"
+        responsibilities: ["Test automation"]
+        reportsTo: "QA Team Lead"
+      - roleType: "engineering"
+        title: "QA Engineer"
+        responsibilities: ["Manual testing"]
+        reportsTo: "Senior QA Engineer"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Space
+metadata:
+  name: test-executive-space
+spec:
+  nations:
+  - id: jp
+    name: Japan
+    cities:
+    - id: tokyo
+      name: Tokyo
+      villages:
+      - id: harmony-village
+        name: Harmony Village
+        companies:
+        - name: test-executive-company
+          grid: 8x4
+          organizationRef: "test-executive-org"
+          buildings:
+          - id: headquarters
+            name: Headquarters
+            floors:
+            - id: floor-1
+              name: Engineering Floor
+              rooms:
+              - id: room-01
+                name: Alpha Development Room
+                description: "Main development environment"
+              - id: room-02
+                name: Beta Testing Room
+                description: "Testing and QA environment"
+            - id: floor-2
+              name: Executive Floor
+              rooms:
+              - id: room-executive
+                name: Executive Leadership Room
+                description: "C-level executives workspace on the 2nd floor"
+
+---
+# タスク割り当て（18エージェントに配布）
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task01_frontend_ui_design
+spec:
+  branch: task01_frontend_ui_design
+  worktree: true
+  assignee: org01-pm-r1
+  spaceRef: test-executive-company
+  description: "フロントエンドUI設計"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task02_backend_api_dev
+spec:
+  branch: task02_backend_api_dev
+  worktree: true
+  assignee: org02-pm-r1
+  spaceRef: test-executive-company
+  description: "バックエンドAPI開発"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task03_database_design
+spec:
+  branch: task03_database_design
+  worktree: true
+  assignee: org03-pm-r1
+  spaceRef: test-executive-company
+  description: "データベース設計"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task04_devops_pipeline
+spec:
+  branch: task04_devops_pipeline
+  worktree: true
+  assignee: org04-pm-r1
+  spaceRef: test-executive-company
+  description: "DevOpsパイプライン"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task05_mobile_responsive
+spec:
+  branch: task05_mobile_responsive
+  worktree: true
+  assignee: org01-wk-a-r1
+  spaceRef: test-executive-company
+  description: "モバイル対応"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task06_api_security
+spec:
+  branch: task06_api_security
+  worktree: true
+  assignee: org02-wk-a-r1
+  spaceRef: test-executive-company
+  description: "APIセキュリティ"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task07_testing_framework
+spec:
+  branch: task07_testing_framework
+  worktree: true
+  assignee: org03-wk-a-r1
+  spaceRef: test-executive-company
+  description: "テストフレームワーク"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task08_monitoring
+spec:
+  branch: task08_monitoring
+  worktree: true
+  assignee: org04-wk-a-r1
+  spaceRef: test-executive-company
+  description: "監視システム"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task09_data_analytics
+spec:
+  branch: task09_data_analytics
+  worktree: true
+  assignee: org01-wk-b-r1
+  spaceRef: test-executive-company
+  description: "データ分析"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task10_microservices
+spec:
+  branch: task10_microservices
+  worktree: true
+  assignee: org02-wk-b-r1
+  spaceRef: test-executive-company
+  description: "マイクロサービス"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task11_load_testing
+spec:
+  branch: task11_load_testing
+  worktree: true
+  assignee: org03-wk-b-r1
+  spaceRef: test-executive-company
+  description: "負荷テスト"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task12_docker_containerization
+spec:
+  branch: task12_docker_containerization
+  worktree: true
+  assignee: org04-wk-b-r1
+  spaceRef: test-executive-company
+  description: "Docker化"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task13_user_experience
+spec:
+  branch: task13_user_experience
+  worktree: true
+  assignee: org01-wk-c-r1
+  spaceRef: test-executive-company
+  description: "UX最適化"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task14_payment_integration
+spec:
+  branch: task14_payment_integration
+  worktree: true
+  assignee: org02-wk-c-r1
+  spaceRef: test-executive-company
+  description: "決済統合"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task15_cloud_migration
+spec:
+  branch: task15_cloud_migration
+  worktree: true
+  assignee: org03-wk-c-r1
+  spaceRef: test-executive-company
+  description: "クラウド移行"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task16_real_time_notifications
+spec:
+  branch: task16_real_time_notifications
+  worktree: true
+  assignee: org04-wk-c-r1
+  spaceRef: test-executive-company
+  description: "リアルタイム通知"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task17_executive_dashboard
+spec:
+  branch: task17_executive_dashboard
+  worktree: true
+  assignee: org05-ceo-re
+  spaceRef: test-executive-company
+  description: "経営ダッシュボード"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task18_business_intelligence
+spec:
+  branch: task18_business_intelligence
+  worktree: true
+  assignee: org05-cto-re
+  spaceRef: test-executive-company
+  description: "ビジネスインテリジェンス"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task19_operations_automation
+spec:
+  branch: task19_operations_automation
+  worktree: true
+  assignee: org05-coo-re
+  spaceRef: test-executive-company
+  description: "業務自動化" 

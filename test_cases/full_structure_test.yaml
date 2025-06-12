@@ -1,0 +1,458 @@
+apiVersion: haconiwa.dev/v1
+kind: Organization
+metadata:
+  name: full-structure-org
+spec:
+  companyName: "Full Structure Test Company"
+  industry: "Software Development"
+  basePath: "./test_output/full_structure"
+  legalFramework:
+    enabled: true
+    lawDirectory: "law"
+    organizationRules: "organization-rules.md"
+    systemPrompts: "system-prompts"
+    permissions: "permissions"
+  hierarchy:
+    legalFramework:
+      enabled: true
+      lawDirectory: "law"
+      globalRules: "global-rules.md"
+      systemPrompts: "system-prompts"
+      permissions: "permissions"
+    departments:
+    - id: "executive"
+      name: "Executive Leadership"
+      description: "C-level executives and strategic leadership"
+      legalFramework:
+        enabled: true
+        lawDirectory: "law"
+        departmentRules: "executive-rules.md"
+        systemPrompts: "system-prompts"
+        permissions: "permissions"
+      roles:
+      - roleType: "executive"
+        title: "CEO"
+        responsibilities:
+          - "Overall company strategy and vision"
+          - "Board communication and governance"
+          - "Major business decisions"
+          - "Company culture and values"
+        reportsTo: "Board of Directors"
+      - roleType: "executive"
+        title: "CTO"
+        responsibilities:
+          - "Technology strategy and roadmap"
+          - "Technical architecture decisions"
+          - "Engineering team leadership"
+          - "Innovation and R&D oversight"
+        reportsTo: "CEO"
+      - roleType: "executive"
+        title: "COO"
+        responsibilities:
+          - "Day-to-day operations management"
+          - "Process optimization"
+          - "Resource allocation"
+          - "Cross-department coordination"
+        reportsTo: "CEO"
+    
+    - id: "frontend"
+      name: "Frontend Development Team"
+      description: "UI/UX development and user interface engineering"
+      parentDepartment: "engineering"
+      legalFramework:
+        enabled: true
+        lawDirectory: "law"
+        departmentRules: "frontend-rules.md"
+        systemPrompts: "system-prompts"
+        permissions: "permissions"
+      roles:
+      - roleType: "management"
+        title: "Frontend Team Lead"
+        responsibilities:
+          - "Frontend architecture decisions"
+          - "Team coordination and planning"
+          - "Code review and quality assurance"
+          - "Technology stack evaluation"
+        reportsTo: "CTO"
+      - roleType: "engineering"
+        title: "Senior Frontend Developer"
+        responsibilities:
+          - "Complex UI component development"
+          - "Performance optimization"
+          - "Mentoring junior developers"
+          - "Technical documentation"
+        reportsTo: "Frontend Team Lead"
+      - roleType: "engineering"
+        title: "Frontend Developer"
+        responsibilities:
+          - "Feature implementation"
+          - "Bug fixes and maintenance"
+          - "Unit testing"
+          - "Cross-browser compatibility"
+        reportsTo: "Senior Frontend Developer"
+    
+    - id: "backend"
+      name: "Backend Development Team"
+      description: "Server-side development and API engineering"
+      parentDepartment: "engineering"
+      legalFramework:
+        enabled: true
+        lawDirectory: "law"
+        departmentRules: "backend-rules.md"
+        systemPrompts: "system-prompts"
+        permissions: "permissions"
+      roles:
+      - roleType: "management"
+        title: "Backend Team Lead"
+        responsibilities:
+          - "Backend architecture design"
+          - "API strategy and standards"
+          - "Database optimization"
+          - "Team coordination"
+        reportsTo: "CTO"
+      - roleType: "engineering"
+        title: "Senior Backend Developer"
+        responsibilities:
+          - "Microservices architecture"
+          - "Database design and optimization"
+          - "API development and documentation"
+          - "Security implementation"
+        reportsTo: "Backend Team Lead"
+      - roleType: "engineering"
+        title: "Backend Developer"
+        responsibilities:
+          - "REST API implementation"
+          - "Database queries and optimization"
+          - "Integration testing"
+          - "Documentation maintenance"
+        reportsTo: "Senior Backend Developer"
+    
+    - id: "devops"
+      name: "DevOps Infrastructure Team"
+      description: "Infrastructure, deployment, and operations"
+      parentDepartment: "engineering"
+      legalFramework:
+        enabled: true
+        lawDirectory: "law"
+        departmentRules: "devops-rules.md"
+        systemPrompts: "system-prompts"
+        permissions: "permissions"
+      roles:
+      - roleType: "management"
+        title: "DevOps Team Lead"
+        responsibilities:
+          - "Infrastructure strategy"
+          - "CI/CD pipeline design"
+          - "Cloud architecture"
+          - "Security and compliance"
+        reportsTo: "CTO"
+      - roleType: "engineering"
+        title: "Senior DevOps Engineer"
+        responsibilities:
+          - "Infrastructure as Code"
+          - "Monitoring and alerting"
+          - "Container orchestration"
+          - "Performance optimization"
+        reportsTo: "DevOps Team Lead"
+      - roleType: "engineering"
+        title: "DevOps Engineer"
+        responsibilities:
+          - "CI/CD maintenance"
+          - "Deployment automation"
+          - "System monitoring"
+          - "Incident response"
+        reportsTo: "Senior DevOps Engineer"
+    
+    - id: "qa"
+      name: "Quality Assurance Team"
+      description: "Testing, quality control, and release management"
+      parentDepartment: "engineering"
+      legalFramework:
+        enabled: true
+        lawDirectory: "law"
+        departmentRules: "qa-rules.md"
+        systemPrompts: "system-prompts"
+        permissions: "permissions"
+      roles:
+      - roleType: "management"
+        title: "QA Team Lead"
+        responsibilities:
+          - "Testing strategy and planning"
+          - "Quality standards definition"
+          - "Release coordination"
+          - "Team management"
+        reportsTo: "CTO"
+      - roleType: "engineering"
+        title: "Senior QA Engineer"
+        responsibilities:
+          - "Test automation framework"
+          - "Performance testing"
+          - "Security testing"
+          - "Test case design"
+        reportsTo: "QA Team Lead"
+      - roleType: "engineering"
+        title: "QA Engineer"
+        responsibilities:
+          - "Manual testing"
+          - "Bug reporting and tracking"
+          - "Test execution"
+          - "Documentation testing"
+        reportsTo: "Senior QA Engineer"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Space
+metadata:
+  name: full-structure-space
+spec:
+  nations:
+  - id: jp
+    name: Japan
+    legalFramework:
+      enabled: true
+      lawDirectory: "law"
+      globalRules: "global-rules.md"
+      systemPrompts: "system-prompts"
+      permissions: "permissions"
+    cities:
+    - id: tokyo
+      name: Tokyo
+      legalFramework:
+        enabled: true
+        lawDirectory: "law"
+        regionalRules: "regional-rules.md"
+        systemPrompts: "system-prompts"
+        permissions: "permissions"
+      villages:
+      - id: test-village
+        name: Test Village
+        legalFramework:
+          enabled: true
+          lawDirectory: "law"
+          localRules: "local-rules.md"
+          systemPrompts: "system-prompts"
+          permissions: "permissions"
+        companies:
+        - name: full-structure-company
+          grid: 8x4
+          legalFramework:
+            enabled: true
+            lawDirectory: "law"
+            projectRules: "project-rules.md"
+            systemPrompts: "system-prompts"
+            permissions: "permissions"
+          agentDefaults:
+            type: "claude-code"
+            permissions:
+              allow:
+                - "Bash(npm run lint)"
+                - "Bash(npm run test:*)"
+                - "Bash(npm run build)"
+                - "Read(~/.zshrc)"
+                - "Read(package.json)"
+                - "Read(tsconfig.json)"
+              deny:
+                - "Bash(curl:*)"
+                - "Bash(rm -rf *)"
+            env:
+              CLAUDE_CODE_ENABLE_TELEMETRY: "1"
+              OTEL_METRICS_EXPORTER: "otlp"
+          organizationRef: "full-structure-org"
+          gitRepo:
+            url: "https://github.com/dai-motoki/haconiwa"
+            defaultBranch: "main"
+            auth: "https"
+          buildings:
+          - id: headquarters
+            name: Headquarters
+            legalFramework:
+              enabled: true
+              lawDirectory: "law"
+              buildingRules: "building-rules.md"
+              systemPrompts: "system-prompts"
+              permissions: "permissions"
+            floors:
+            - id: floor-1
+              name: Engineering Floor
+              legalFramework:
+                enabled: true
+                lawDirectory: "law"
+                floorRules: "engineering-floor-rules.md"
+                systemPrompts: "system-prompts"
+                permissions: "permissions"
+              rooms:
+              - id: room-01
+                name: Alpha Development Room
+                description: "Main development environment for active features"
+                legalFramework:
+                  enabled: true
+                  lawDirectory: "law"
+                  teamRules: "team-rules.md"
+                  systemPrompts: "system-prompts"
+                  permissions: "permissions"
+                  desksLaw:
+                    enabled: true
+                    lawDirectory: "law"
+                    agentRules: "agent-rules.md"
+                    systemPrompts: "system-prompts"
+                    permissions: "permissions"
+              - id: room-02
+                name: Beta Testing Room
+                description: "Testing and QA environment for feature validation"
+                legalFramework:
+                  enabled: true
+                  lawDirectory: "law"
+                  teamRules: "team-rules.md"
+                  systemPrompts: "system-prompts"
+                  permissions: "permissions"
+                  desksLaw:
+                    enabled: true
+                    lawDirectory: "law"
+                    agentRules: "agent-rules.md"
+                    systemPrompts: "system-prompts"
+                    permissions: "permissions"
+            - id: floor-2
+              name: Executive Floor
+              legalFramework:
+                enabled: true
+                lawDirectory: "law"
+                floorRules: "executive-floor-rules.md"
+                systemPrompts: "system-prompts"
+                permissions: "permissions"
+              rooms:
+              - id: room-executive
+                name: Executive Leadership Room
+                description: "C-level executives and strategic leadership workspace"
+                legalFramework:
+                  enabled: true
+                  lawDirectory: "law"
+                  teamRules: "executive-team-rules.md"
+                  systemPrompts: "system-prompts"
+                  permissions: "permissions"
+                  desksLaw:
+                    enabled: true
+                    lawDirectory: "law"
+                    agentRules: "executive-agent-rules.md"
+                    systemPrompts: "system-prompts"
+                    permissions: "permissions"
+
+---
+# Task CRDs - 日時時間スタイル命名規則（YYYYMMDDHHMMSS_task-content_識別番号）
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20241210101500_frontend-component-library_01
+spec:
+  branch: 20241210101500_frontend-component-library_01
+  worktree: true
+  assignee: org01-pm-r1
+  spaceRef: full-structure-company
+  description: "フロントエンドコンポーネントライブラリ構築"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20241210101501_backend-microservices_02
+spec:
+  branch: 20241210101501_backend-microservices_02
+  worktree: true
+  assignee: org02-pm-r1
+  spaceRef: full-structure-company
+  description: "マイクロサービスアーキテクチャ実装"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20241210101502_devops-kubernetes-setup_03
+spec:
+  branch: 20241210101502_devops-kubernetes-setup_03
+  worktree: true
+  assignee: org03-pm-r2
+  spaceRef: full-structure-company
+  description: "Kubernetesクラスター構築と運用"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20241210101503_qa-automation-framework_04
+spec:
+  branch: 20241210101503_qa-automation-framework_04
+  worktree: true
+  assignee: org04-pm-r2
+  spaceRef: full-structure-company
+  description: "テスト自動化フレームワーク構築"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20241210101504_executive-strategic-planning_05
+spec:
+  branch: 20241210101504_executive-strategic-planning_05
+  worktree: true
+  assignee: org05-ceo-re
+  spaceRef: full-structure-company
+  description: "戦略的企画立案と実行計画"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20241210101505_technology-roadmap-2025_06
+spec:
+  branch: 20241210101505_technology-roadmap-2025_06
+  worktree: true
+  assignee: org05-cto-re
+  spaceRef: full-structure-company
+  description: "2025年技術ロードマップ策定"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20241210101506_operational-excellence_07
+spec:
+  branch: 20241210101506_operational-excellence_07
+  worktree: true
+  assignee: org05-coo-re
+  spaceRef: full-structure-company
+  description: "オペレーショナル・エクセレンス推進"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20241210101507_responsive-design-system_08
+spec:
+  branch: 20241210101507_responsive-design-system_08
+  worktree: true
+  assignee: org01-wk-a-r1
+  spaceRef: full-structure-company
+  description: "レスポンシブデザインシステム構築"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20241210101508_api-security-enhancement_09
+spec:
+  branch: 20241210101508_api-security-enhancement_09
+  worktree: true
+  assignee: org02-wk-a-r1
+  spaceRef: full-structure-company
+  description: "APIセキュリティ強化とペネトレーションテスト"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20241210101509_infrastructure-monitoring_10
+spec:
+  branch: 20241210101509_infrastructure-monitoring_10
+  worktree: true
+  assignee: org03-wk-a-r2
+  spaceRef: full-structure-company
+  description: "インフラストラクチャ監視とアラート体制構築" 

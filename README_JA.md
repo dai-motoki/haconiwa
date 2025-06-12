@@ -7,9 +7,26 @@
 
 **箱庭 (Haconiwa)** は、AI協調開発支援Python CLIツールです。tmux会社管理、git-worktree連携、タスク管理、AIエージェント調整機能を統合し、効率的な開発環境を提供する次世代ツールです。
 
-> ⚠️ **注意**: このプロジェクトは現在活発に開発中です。機能やAPIは頻繁に変更される可能性があります。
-
 [🇺🇸 English README](README.md)
+
+## ⚠️ 免責事項
+
+このプロジェクトは初期アルファ開発段階かつ**デモンストレーションフェーズ**にあります。現在のCLIコマンドは主に意図されたインターフェースデザインを示すプレースホルダーです。ほとんどの機能は活発に開発中でまだ実装されていません。
+
+**現在動作するもの:**
+- CLIのインストールとコマンド構造
+- ヘルプシステムとドキュメント
+- 基本的なコマンドルーティング
+
+**今後実装予定:**
+- 宣伝されている全機能の完全実装
+- AIエージェント協調機能
+- 開発ツールとの統合
+- 実際のタスクと会社管理
+
+現時点では本番環境での使用は推奨されません。これは意図されたユーザーエクスペリエンスを示す開発プレビューです。
+
+> ⚠️ **注意**: このプロジェクトは現在活発に開発中です。機能やAPIは頻繁に変更される可能性があります。
 
 ## 📋 バージョン管理
 
@@ -19,6 +36,358 @@
 - **🏷️ 最新バージョン**: 0.4.0
 - **📦 PyPI**: [haconiwa](https://pypi.org/project/haconiwa/)
 - **🔖 GitHubリリース**: [Releases](https://github.com/dai-motoki/haconiwa/releases)
+
+## 🔧 最近の更新 (2025-06-13)
+
+**タスクブランチの修正**: YAMLで指定された`defaultBranch`ではなく`main`ブランチからタスクブランチが作成される問題を修正しました。YAML設定で`defaultBranch: "dev"`を指定すると、すべてのタスクワークツリーが正しく`dev`ブランチから作成されるようになりました。
+
+- ✅ Task CRDが関連するSpace CRDから`defaultBranch`を適切に継承
+- ✅ 既存の誤ったブランチを自動的に検出し、正しいブランチから再作成
+- ✅ ハードコードされた`main`ブランチへのすべての参照を設定可能なデフォルトに置き換え
+
+## 🛠️ 事前準備
+
+**必要な環境のセットアップ**
+
+```bash
+# 1. tmuxのインストール
+# macOS
+brew install tmux
+
+# Ubuntu/Debian
+sudo apt-get install tmux
+
+# 2. Python環境のセットアップ（3.8以上）
+python --version  # バージョン確認
+
+# 3. pipのアップグレード
+pip install --upgrade pip
+
+# 4. Claude Codeのセットアップ
+# 詳細な手順はこちらを参照: https://docs.anthropic.com/en/docs/claude-code/getting-started
+# 環境変数の設定（必要に応じて）
+export ANTHROPIC_API_KEY="your-api-key"
+
+# 5. Haconiwaのインストール
+pip install haconiwa --upgrade
+```
+
+## 📚 基本的なワークフロー
+
+**1. YAMLファイルの取得とプロジェクト立ち上げ**
+
+```bash
+# YAMLファイルダウンロード（GitHubから直接取得）
+wget https://raw.githubusercontent.com/dai-motoki/haconiwa/main/haconiwa-dev-company.yaml
+
+# または curlでダウンロード
+curl -O https://raw.githubusercontent.com/dai-motoki/haconiwa/main/haconiwa-dev-company.yaml
+
+# YAML適用（デフォルトで自動的にtmuxセッションにアタッチ）
+haconiwa apply -f haconiwa-dev-company.yaml
+# tmuxセッションから離脱: Ctrl+b, d
+
+# または、アタッチしない場合
+haconiwa apply -f haconiwa-dev-company.yaml --no-attach
+
+# アタッチしなかった場合は、明示的にアタッチ
+haconiwa space attach -c haconiwa-dev-company
+```
+
+**2. プロジェクトの操作**
+
+```bash
+# tmuxセッションから離脱: Ctrl+b, d
+
+# 別のターミナルでリアルタイム監視
+haconiwa monitor -c haconiwa-dev-company --japanese
+
+# プロジェクト一覧を確認
+haconiwa space list
+
+# プロジェクトに再接続
+haconiwa space attach -c haconiwa-dev-company
+```
+
+**3. プロジェクトの削除**
+
+```bash
+# スペースとディレクトリを完全削除
+haconiwa space delete -c haconiwa-dev-company --clean-dirs --force
+```
+
+## 📝 YAML文法詳細解説
+
+Haconiwaの宣言型YAML設定は、複数のCRD (Custom Resource Definition) をマルチドキュメント形式で記述します。
+
+### 1. Organization CRD（組織定義）
+
+```yaml
+apiVersion: haconiwa.dev/v1
+kind: Organization
+metadata:
+  name: haconiwa-dev-company-org  # 組織の一意識別子
+spec:
+  companyName: "Haconiwa Development Company"  # 会社名
+  industry: "AI Development Tools & Infrastructure"  # 業界
+  basePath: "./haconiwa-dev-company"  # 組織のベースパス
+  hierarchy:
+    departments:  # 部門定義
+    - id: "executive"  # 部門ID（ルーム割り当てに使用）
+      name: "Executive Team"
+      description: "Company leadership and strategic decision making"
+      roles:  # 役割定義
+      - roleType: "management"  # 管理職
+        title: "Chief Executive Officer"
+        agentId: "ceo-motoki"  # エージェントID
+        responsibilities:
+          - "Strategic vision and direction"
+          - "Company-wide decision making"
+      - roleType: "engineering"  # エンジニア
+        title: "Senior AI Engineer"
+        agentId: "ai-lead-nakamura"
+        responsibilities:
+          - "AI/ML model development"
+          - "Algorithm optimization"
+```
+
+**Organization CRDの主要要素:**
+- `metadata.name`: 組織の一意識別子（Space CRDから参照される）
+- `spec.hierarchy.departments`: 部門の定義（各部門がtmuxのルームに対応）
+- `spec.hierarchy.departments[].roles`: 各部門の役割定義（4つの役割で16ペインを構成）
+
+### 2. Space CRD（空間定義）
+
+```yaml
+apiVersion: haconiwa.dev/v1
+kind: Space
+metadata:
+  name: haconiwa-dev-world  # スペースの一意識別子
+spec:
+  nations:  # 国レベル（最上位階層）
+  - id: jp
+    name: Japan
+    cities:  # 市レベル
+    - id: tokyo
+      name: Tokyo
+      villages:  # 村レベル
+      - id: haconiwa-village
+        name: "Haconiwa Village"
+        companies:  # 会社レベル（tmuxセッション）
+        - name: haconiwa-dev-company  # セッション名
+          grid: "8x4"  # グリッドサイズ（8列×4行=32ペイン）
+          basePath: "./haconiwa-dev-world"
+          organizationRef: "haconiwa-dev-company-org"  # 組織参照
+          gitRepo:  # Gitリポジトリ設定
+            url: "https://github.com/dai-motoki/haconiwa"
+            defaultBranch: "dev"  # タスクブランチの基となるブランチ
+            auth: "https"
+          agentDefaults:  # エージェントのデフォルト設定（開発予定）
+            type: "claude-code"
+            permissions:  # 権限設定（開発予定機能）
+              allow:
+                - "Bash(python -m pytest)"
+                - "Bash(python -m ruff)"
+                - "Bash(python -m mypy)"
+                - "Read(src/**/*.py)"
+                - "Write(src/**/*.py)"
+              deny:
+                - "Bash(rm -rf /)"
+          buildings:  # 建物レベル
+          - id: "hq-tower"
+            name: "Haconiwa HQ Tower"
+            floors:  # 階層レベル
+            - id: "executive-floor"
+              name: "Executive Floor"
+              rooms:  # 部屋レベル（tmuxウィンドウ）
+              - id: room-executive  # Executive用ウィンドウ
+                name: "Executive Room"
+                description: "C-level executives and senior leadership"
+              - id: room-standby  # Standby用ウィンドウ
+                name: "Standby Room"
+                description: "Ready-to-deploy talent pool"
+```
+
+**Space CRDの階層構造:**
+- `nations` > `cities` > `villages` > `companies` > `buildings` > `floors` > `rooms`
+- 各階層に法的フレームワーク（law/）を配置可能
+- `companies`がtmuxセッションに対応
+- `rooms`がtmuxウィンドウに対応
+
+**gitRepo設定の詳細解説:**
+- `url`: クローンするGitリポジトリのURL
+- `defaultBranch`: タスクブランチを作成する際の基準となるブランチ
+  - 例: `defaultBranch: "dev"` の場合、すべてのタスクブランチは`dev`ブランチから作成される
+  - これにより、`main`ブランチを保護しながら、開発ブランチからフィーチャーブランチを派生させることが可能
+- `auth`: 認証方式（"https" または "ssh"）
+
+**重要**: `defaultBranch`の設定により、Task CRDで`worktree: true`が指定されたタスクは、このブランチから新しいブランチとworktreeが作成されます。Git worktreeを使用することで、各タスクは独立したディレクトリに隔離され、以下のメリットがあります：
+- 各タスクが専用のワーキングディレクトリを持つため、並行開発が可能
+- ブランチの切り替えなしに複数のタスクを同時進行できる
+- 各エージェントが他のタスクの作業に影響を与えることなく開発可能
+- 例: `task_ai_strategy_01`は`./haconiwa-dev-world/tasks/task_ai_strategy_01/`に独立した作業環境として作成される
+
+**agentDefaults.permissions（開発予定機能）:**
+- エージェントが実行できるコマンドや操作を制限する機能
+- `allow`: 許可されるコマンドパターン
+- `deny`: 禁止されるコマンドパターン
+- 現在は設定値として記述可能だが、実際の権限制御は未実装
+
+### 3. Task CRD（タスク定義）
+
+```yaml
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_ai_strategy_01  # タスクの一意識別子
+spec:
+  taskId: task_ai_strategy_01  # タスクID
+  title: "AI Strategy Development"  # タスクタイトル
+  description: |  # マークダウン形式の詳細説明
+    ## AI Strategy Development
+    
+    Develop comprehensive AI strategy for Haconiwa platform.
+    
+    ### Requirements:
+    - Market analysis
+    - Technology roadmap
+    - Competitive analysis
+    - Investment planning
+  assignee: "ceo-motoki"  # 割り当て先エージェントID
+  spaceRef: "haconiwa-dev-company"  # 所属スペース
+  priority: "high"  # 優先度（high/medium/low）
+  worktree: true  # Git worktreeを作成するか
+  branch: "strategy/ai-roadmap"  # ブランチ名
+```
+
+**Task CRDの主要要素:**
+- `assignee`: Organization CRDで定義したエージェントIDを指定
+- `spaceRef`: 所属するcompany名を指定
+- `worktree`: trueの場合、defaultBranchからブランチを作成
+- `branch`: 作成するブランチ名
+
+### 4. マルチドキュメント構成
+
+```yaml
+# 組織定義
+---
+apiVersion: haconiwa.dev/v1
+kind: Organization
+metadata:
+  name: my-org
+spec:
+  # ...
+
+---
+# スペース定義
+apiVersion: haconiwa.dev/v1
+kind: Space
+metadata:
+  name: my-space
+spec:
+  # ...
+
+---
+# タスク定義（複数可）
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task-1
+spec:
+  # ...
+```
+
+**YAMLファイル構成のベストプラクティス:**
+1. 組織定義を最初に配置
+2. スペース定義を次に配置
+3. タスク定義を最後に配置（ルームごとにグループ化推奨）
+4. `---`で各ドキュメントを区切る
+
+### 5. 実行時の処理フロー
+
+1. **YAMLパース**: マルチドキュメントを個別のCRDオブジェクトに分解
+2. **組織作成**: Organization CRDから部門・役割構造を構築
+3. **スペース作成**: Space CRDからtmuxセッション・ウィンドウ構造を構築
+4. **タスク作成**: Task CRDからGit worktreeとタスク割り当てを作成
+   - `defaultBranch`から各タスクのブランチを作成
+   - エージェントをタスクディレクトリに配置
+5. **Claude実行**: 各ペインで`cd {path} && claude`を自動実行
+
+### 6. Law CRD（法的フレームワーク定義）- 開発予定
+
+```yaml
+apiVersion: haconiwa.dev/v1
+kind: Law
+metadata:
+  name: haconiwa-legal-framework
+spec:
+  globalRules:  # グローバル規則
+    - name: "security-policy"
+      description: "全エージェントのセキュリティポリシー"
+      content: |
+        ## セキュリティポリシー
+        - 機密情報の取り扱い規定
+        - アクセス権限の管理
+        - データ保護方針
+    - name: "code-standards"
+      description: "コーディング規約"
+      content: |
+        ## コーディング標準
+        - PEP 8準拠（Python）
+        - ESLint設定（JavaScript）
+        - 型安全性の確保
+  
+  hierarchicalRules:  # 階層別規則
+    nation:
+      enabled: true
+      rules:
+        - "国レベルの法的要件"
+        - "データ主権に関する規定"
+    city:
+      enabled: true
+      rules:
+        - "地域のコンプライアンス要件"
+        - "業界標準への準拠"
+    company:
+      enabled: true
+      rules:
+        - "組織のガバナンスポリシー"
+        - "内部統制規定"
+  
+  permissions:  # 権限管理
+    defaultPolicy: "deny"  # デフォルトは拒否
+    rules:
+      - resource: "production-database"
+        actions: ["read"]
+        subjects: ["senior-engineers", "cto"]
+      - resource: "source-code"
+        actions: ["read", "write"]
+        subjects: ["all-engineers"]
+      - resource: "financial-data"
+        actions: ["read", "write"]
+        subjects: ["cfo", "finance-team"]
+  
+  systemPrompts:  # エージェント用システムプロンプト
+    base: |
+      あなたはHaconiwa開発会社のAIエージェントです。
+      以下の規則とポリシーに従って行動してください。
+    roleSpecific:
+      ceo: "戦略的意思決定と会社全体の方向性に焦点を当ててください。"
+      engineer: "コード品質とベストプラクティスを重視してください。"
+      security: "セキュリティとコンプライアンスを最優先に考えてください。"
+```
+
+**Law CRDの主要要素（開発予定）:**
+- `globalRules`: 全階層に適用されるグローバル規則
+- `hierarchicalRules`: 階層別（nation/city/company等）の規則定義
+- `permissions`: リソースへのアクセス権限管理
+- `systemPrompts`: 役割別のエージェント行動指針
+
+**統合予定の機能:**
+- Organization/Space CRDからの自動参照
+- 階層的な規則の継承メカニズム
+- 実行時の権限チェック機能
+- エージェントへの自動プロンプト注入
 
 ## 🚀 今すぐ使える機能
 
@@ -31,16 +400,19 @@
 pip install haconiwa --upgrade
 
 # 2. YAMLファイルダウンロード（GitHubから直接取得）
-wget https://raw.githubusercontent.com/dai-motoki/haconiwa/main/haconiwa-multiroom-test.yaml
+wget https://raw.githubusercontent.com/dai-motoki/haconiwa/main/test-multiroom-with-tasks.yaml
 
 # または curlでダウンロード
-curl -O https://raw.githubusercontent.com/dai-motoki/haconiwa/main/haconiwa-multiroom-test.yaml
+curl -O https://raw.githubusercontent.com/dai-motoki/haconiwa/main/test-multiroom-with-tasks.yaml
 
 # ファイル内容確認
-cat haconiwa-multiroom-test.yaml
+cat test-multiroom-with-tasks.yaml
 
-# 3. YAML適用でマルチルーム環境作成
-haconiwa apply -f haconiwa-multiroom-test.yaml
+# 3. YAML適用でマルチルーム環境作成（デフォルトで自動アタッチ）
+haconiwa apply -f test-multiroom-with-tasks.yaml
+
+# 3b. 自動アタッチなしで適用
+haconiwa apply -f test-multiroom-with-tasks.yaml --no-attach
 
 # 4. スペース一覧確認
 haconiwa space list
@@ -48,35 +420,118 @@ haconiwa space list
 # 5. スペース一覧確認（短縮形）
 haconiwa space ls
 
-# 6. 特定ルームに接続
-haconiwa space attach -c test-multiroom-company -r room-01
+# 6. 特定ルームに接続（自動アタッチしなかった場合）
+haconiwa space attach -c test-company-multiroom-tasks -r room-frontend
 
 # 7. 全ペインでclaudeコマンド実行
-haconiwa space run -c test-multiroom-company --claude-code
+haconiwa space run -c test-company-multiroom-tasks --claude-code
 
 # 8. 特定ルームでカスタムコマンド実行
-haconiwa space run -c test-multiroom-company --cmd "echo hello" -r room-01
+haconiwa space run -c test-company-multiroom-tasks --cmd "echo hello" -r room-backend
 
 # 9. ドライランでコマンド確認
-haconiwa space run -c test-multiroom-company --claude-code --dry-run
+haconiwa space run -c test-company-multiroom-tasks --claude-code --dry-run
 
 # 10. セッション停止
-haconiwa space stop -c test-multiroom-company
+haconiwa space stop -c test-company-multiroom-tasks
 
 # 11. 完全削除（ディレクトリも削除）
-haconiwa space delete -c test-multiroom-company --clean-dirs --force
+haconiwa space delete -c test-company-multiroom-tasks --clean-dirs --force
 
 # 12. 完全削除（ディレクトリは保持）
-haconiwa space delete -c test-multiroom-company --force
+haconiwa space delete -c test-company-multiroom-tasks --force
 ```
 
-**📁 自動作成されるマルチルーム構造:**
+**📁 自動作成されるマルチルーム構造（階層的法的フレームワーク）:**
 ```
 ./test-multiroom-desks/
-├── standby/                 # 待機中エージェント（26 agents）
-│   └── README.md           # 自動生成説明ファイル
+├── jp/                                  # 国レベル (Nation Level)
+│   ├── law/                            # 国家法ディレクトリ
+│   │   ├── global-rules.md            # グローバル規則
+│   │   ├── system-prompts/            # システムプロンプト
+│   │   │   └── nation-agent-prompt.md
+│   │   └── permissions/               # 権限管理
+│   │       ├── code-permissions.yaml
+│   │       └── file-permissions.yaml
+│   └── tokyo/                         # 市レベル (City Level)
+│       ├── law/                       # 市法ディレクトリ
+│       │   ├── regional-rules.md     # 地域規則
+│       │   ├── system-prompts/       # システムプロンプト
+│       │   │   └── city-agent-prompt.md
+│       │   └── permissions/          # 権限管理
+│       │       ├── code-permissions.yaml
+│       │       └── file-permissions.yaml
+│       └── test-village/              # 村レベル (Village Level)
+│           ├── law/                   # 村法ディレクトリ
+│           │   ├── local-rules.md    # ローカル規則
+│           │   ├── system-prompts/   # システムプロンプト
+│           │   │   └── village-agent-prompt.md
+│           │   └── permissions/      # 権限管理
+│           │       ├── code-permissions.yaml
+│           │       └── file-permissions.yaml
+│           └── test-multiroom-company/    # 会社レベル (Company Level)
+│               ├── law/               # 会社法ディレクトリ
+│               │   ├── project-rules.md  # プロジェクト規則
+│               │   ├── system-prompts/   # システムプロンプト
+│               │   │   └── company-agent-prompt.md
+│               │   └── permissions/      # 権限管理
+│               │       ├── code-permissions.yaml
+│               │       └── file-permissions.yaml
+│               └── headquarters/      # 建物レベル (Building Level)
+│                   ├── law/           # 建物法ディレクトリ
+│                   │   ├── building-rules.md # 建物規則
+│                   │   ├── system-prompts/   # システムプロンプト
+│                   │   │   └── building-agent-prompt.md
+│                   │   └── permissions/      # 権限管理
+│                   │       ├── code-permissions.yaml
+│                   │       └── file-permissions.yaml
+│                   └── floor-1/       # 階層レベル (Floor Level)
+│                       ├── law/       # 階層法ディレクトリ
+│                       │   ├── floor-rules.md    # 階層規則
+│                       │   ├── system-prompts/   # システムプロンプト
+│                       │   │   └── floor-agent-prompt.md
+│                       │   └── permissions/      # 権限管理
+│                       │       ├── code-permissions.yaml
+│                       │       └── file-permissions.yaml
+│                       ├── room-01/   # 部屋レベル (Room Level)
+│                       │   ├── law/   # 部屋法ディレクトリ
+│                       │   │   ├── team-rules.md     # チーム規則
+│                       │   │   ├── system-prompts/   # システムプロンプト
+│                       │   │   │   └── room-agent-prompt.md
+│                       │   │   └── permissions/      # 権限管理
+│                       │   │       ├── code-permissions.yaml
+│                       │   │       └── file-permissions.yaml
+│                       │   └── desks/         # デスクレベル (Desk Level)
+│                       │       ├── law/       # デスク法ディレクトリ
+│                       │       │   ├── agent-rules.md    # エージェント規則
+│                       │       │   ├── system-prompts/   # システムプロンプト
+│                       │       │   │   └── desk-agent-prompt.md
+│                       │       │   └── permissions/      # 権限管理
+│                       │       │       ├── code-permissions.yaml
+│                       │       │       └── file-permissions.yaml
+│                       │       ├── org-01-pm/
+│                       │       ├── org-01-worker-a/
+│                       │       ├── org-01-worker-b/
+│                       │       ├── org-01-worker-c/
+│                       │       ├── org-02-pm/
+│                       │       ├── org-02-worker-a/
+│                       │       ├── org-02-worker-b/
+│                       │       ├── org-02-worker-c/
+│                       │       ├── org-03-pm/
+│                       │       ├── org-03-worker-a/
+│                       │       ├── org-03-worker-b/
+│                       │       ├── org-03-worker-c/
+│                       │       ├── org-04-pm/
+│                       │       ├── org-04-worker-a/
+│                       │       ├── org-04-worker-b/
+│                       │       └── org-04-worker-c/
+│                       └── room-02/   # 部屋レベル (Room Level)
+│                           ├── law/   # 部屋法ディレクトリ (同様の構成)
+│                           └── desks/ # デスクレベル (同様の構成)
+├── standby/                # 待機中エージェント（26 agents）
+│   └── README.md          # 自動生成説明ファイル
 └── tasks/                  # タスク割り当て済みエージェント（6 agents）
-    ├── main/               # メインGitリポジトリ
+    ├── main/              # メインGitリポジトリ
     ├── 20250609061748_frontend-ui-design_01/     # タスク1
     ├── 20250609061749_backend-api-development_02/ # タスク2
     ├── 20250609061750_database-schema-design_03/  # タスク3
@@ -102,7 +557,7 @@ test-multiroom-company (Session)
 
 **✅ YAML適用パターンの実際の機能:**
 - 🏢 **宣言型管理**: YAMLファイルによる環境定義
-- 🤖 **マルチルーム対応**: Room単位のWindow分離
+- 🤖 **マルチルーム対応**: Room単位のWindow分離（Frontend/Backend）
 - 🔄 **自動ルーム分散**: ルーム別Windowでのペイン配置
 - 🚀 **一括コマンド実行**: 全ペインまたはルーム別実行
 - 🎯 **柔軟なターゲティング**: ルーム指定コマンド実行
@@ -112,8 +567,6 @@ test-multiroom-company (Session)
 - 📊 **32ペイン管理**: 2ルーム × 16ペイン構成
 - 🔧 **ドライラン対応**: 実行前のコマンド確認
 - 🎯 **タスク割り当てシステム**: エージェント自動ディレクトリ移動
-- 📋 **ログファイル管理**: agent_assignment.jsonでの割り当て記録
-
 ### tmux マルチエージェント環境（従来方式）
 
 4x4グリッドのマルチエージェント開発環境を**今すぐ**作成・管理できます：
@@ -187,6 +640,118 @@ haconiwa company kill my-company --force
 - 🏛️ **会社管理**: 作成・一覧・接続・削除の完全サポート
 - 📄 **README自動生成**: 各デスクにREADME.md自動作成
 - 📊 **4x4マルチエージェント**: 組織的tmuxレイアウト（16ペイン）
+
+### 📊 リアルタイムモニタリング機能 ✅ **テスト済み**
+
+作成したtmuxマルチエージェント環境を**リアルタイムで監視**できます：
+
+```bash
+# 1. 基本的なモニタリング（全window表示）
+haconiwa monitor -c test-company-multiroom-tasks
+
+# 2. 短縮形エイリアス
+haconiwa mon -c my-company
+
+# 3. 日本語UI表示
+haconiwa monitor -c my-company --japanese
+
+# 4. 特定のwindow（部屋）のみ監視
+haconiwa monitor -c test-company-multiroom-tasks -w 0          # Frontend部屋のみ
+haconiwa monitor -c test-company-multiroom-tasks -w Backend   # Backend部屋のみ
+
+# 5. 表示列をカスタマイズ（推奨設定）
+haconiwa monitor -c my-company --columns room pane title claude agent cpu status --japanese
+
+# 6. 高頻度更新（パフォーマンス調整）
+haconiwa monitor -c my-company -r 0.5 --japanese  # 0.5秒間隔更新
+
+# 7. 低頻度更新（CPUリソース節約）
+haconiwa monitor -c my-company -r 5 --japanese    # 5秒間隔更新
+
+# 8. ミニマル表示（最小限の情報）
+haconiwa monitor -c my-company --columns pane agent status --japanese
+```
+
+**🖥️ リアルタイム表示内容:**
+```
+💼  会社名: test-company-multiroom-tasks
+
+        アクティブペイン: 22/32
+        平均稼働率: 0.8%
+        合計メモリ: 551.3MB
+        最終更新: 11:15:42
+
+🏢  部屋: Frontend
+┏━━━━━━━━┳━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┓
+┃ ペイン ┃ タスク          ┃ プロバイダAI   ┃ エージェント名      ┃ 稼働率                                                               ┃ ステータス  ┃
+┡━━━━━━━━╇━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━┩
+│ 0      │ Greeting        │ ✓ Claude       │ lead-pm-01          │   0.1% ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░                 │  仕事待ち   │
+│ 1      │ Greeting Start  │ ✓ Claude       │ motoki              │   0.2% ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░                 │  仕事待ち   │
+│ 2      │ Greeting        │ ✓ Claude       │ ai-dev-7523         │   0.1% ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░                 │  仕事待ち   │
+└────────┴─────────────────┴─────────────────┴─────────────────────┴──────────────────────────────────────────────────────────────────────┴─────────────┘
+
+🏢  部屋: Backend  
+┏━━━━━━━━┳━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┓
+┃ ペイン ┃ タスク          ┃ プロバイダAI   ┃ エージェント名      ┃ 稼働率                                                               ┃ ステータス  ┃
+┡━━━━━━━━╇━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━┩
+│ 0      │ Backend Task    │ ✗ Claude無し   │ lead-pm-01          │ N/A                                                                  │ プロセス無し │
+│ 1      │ API Development │ ✓ Claude       │ motoki              │   2.3% ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░                 │  作業中     │
+└────────┴─────────────────┴─────────────────┴─────────────────────┴──────────────────────────────────────────────────────────────────────┴─────────────┘
+```
+
+**✅ 実装・テスト済み機能:**
+- 🔍 **リアルタイム監視**: 2秒間隔でのライブ更新
+- 🏢 **複数window対応**: Frontend/Backend等の部屋別表示
+- 👥 **カスタムエージェントID表示**: 個人名やカスタムIDの完全サポート
+- 🎨 **視覚的CPU稼働率バー**: カラフルなプログレスバー表示
+- 🇯🇵 **完全日本語UI**: 列名・ステータス・メッセージの日本語化
+- 📊 **柔軟な列選択**: 必要な情報のみ表示可能
+- 🎯 **window指定監視**: 特定の部屋のみに絞り込み可能
+- 🚀 **高性能監視**: psutil + Rich による高速リアルタイム更新
+- 📈 **智能ステータス判定**: CPU使用率に基づく自動ステータス判定
+- 💼 **会社概要サマリー**: アクティブペイン数・平均CPU・合計メモリ
+- 🎮 **短縮形エイリアス**: `mon` でクイックアクセス
+- ⚡ **依存関係チェック**: 必要パッケージの自動確認
+
+**📊 利用可能な表示列:**
+- `room` - 部屋/Window名（Frontend/Backend等）
+- `window` - Window番号
+- `pane` - ペイン番号
+- `title` - タスクタイトル
+- `parent` - 親プロセスID
+- `claude` - プロバイダAI状態（✓/✗）
+- `agent` - カスタムエージェントID
+- `cpu` - CPU使用率（視覚的バー付き）
+- `memory` - メモリ使用量
+- `uptime` - プロセス稼働時間
+- `status` - エージェントステータス（仕事待ち/作業中/多忙）
+
+**🎯 状態判定ルール:**
+- **仕事待ち** (≤2.0% CPU): 待機状態、新しいタスク受付可能
+- **作業中** (2.0-20% CPU): アクティブに作業中
+- **多忙** (>20% CPU): 高負荷作業中、割り込み注意
+
+**💡 使用例・Tips:**
+```bash
+# 開発作業中の推奨監視設定
+haconiwa monitor -c my-company --columns room pane agent cpu status --japanese -r 1
+
+# 詳細デバッグ時
+haconiwa monitor -c my-company --columns room pane title claude agent cpu memory status --japanese
+
+# 軽量監視（リソース節約）
+haconiwa monitor -c my-company --columns pane agent status --japanese -r 10
+
+# Frontend部屋の集中監視
+haconiwa monitor -c my-company -w 0 --japanese
+```
+
+**🔧 必要な依存関係:**
+- `rich` - リッチなターミナルUI表示
+- `psutil` - プロセス情報取得
+- `tmux` - セッション管理
+
+monitor機能は**実際にテスト済み**で、32ペインの大規模マルチエージェント環境でも安定動作を確認しています。
 
 ## 📚 buildコマンド詳細ガイド
 
@@ -311,47 +876,78 @@ tmux kill-session -t my-company
 
 ## 🏗️ アーキテクチャ概念
 
-### tmux ↔ Haconiwa 概念対応
+### CRDベースのアーキテクチャ
 
-| tmux概念 | Haconiwa概念 | 説明 |
-|----------|-------------|------|
-| **Session** | **Company（会社）** | 最上位の管理単位。プロジェクト全体を表現 |
-| **Window** | **Room（部屋）** | 機能別の作業領域。特定の役割や機能を担当 |
-| **Pane** | **Desk（デスク）** | 個別の作業スペース。具体的なタスク実行場所 |
-
-### 論理階層管理
+Haconiwaは4つの主要なCRD（Custom Resource Definition）を中心に構築されています：
 
 ```
-Company（会社）
-├── Building（建物）    ← 論理管理層（tmuxに非依存）
-│   └── Floor（階層）   ← 論理管理層（tmuxに非依存）
-│       └── Room（部屋） ← tmux Window
-│           └── Desk（デスク） ← tmux Pane
+Haconiwa CRDアーキテクチャ
+├── Organization CRD（組織定義）
+│   ├── 部門構造（departments）
+│   ├── 役割定義（roles）
+│   └── 責任範囲（responsibilities）
+├── Space CRD（空間定義）
+│   ├── 階層構造（nations > cities > villages > companies > buildings > floors > rooms）
+│   ├── Gitリポジトリ設定（gitRepo）
+│   └── tmuxセッション/ウィンドウマッピング
+├── Task CRD（タスク定義）
+│   ├── タスク詳細（title, description）
+│   ├── エージェント割り当て（assignee）
+│   └── Git worktree設定（branch, worktree）
+└── Law CRD（法的フレームワーク）- 開発予定
+    ├── グローバル規則（globalRules）
+    ├── 階層別規則（hierarchicalRules）
+    └── 権限管理（permissions）
 ```
 
-**論理管理層の特徴：**
-- **Building**: プロジェクトの大分類（フロントエンド棟、バックエンド棟など）
-- **Floor**: 機能分類（開発フロア、テストフロア、デプロイフロアなど）
-- これらの層はtmux会社に直接対応せず、haconiwa内部で論理的に管理
-
-### 組織構成モデル
+### CRD間の関係と処理フロー
 
 ```
-Organization（組織）
-├── PM（プロジェクトマネージャー）
-│   ├── 全体調整
-│   ├── タスク割り当て
-│   └── 進捗管理
-└── Worker（作業者）
-    ├── Worker-A（開発担当）
-    ├── Worker-B（テスト担当）
-    └── Worker-C（デプロイ担当）
+1. Organization CRD
+   ↓ 定義
+   エージェント構造（部門・役割）
+   ↓
+2. Space CRD
+   ↓ 参照（organizationRef）
+   物理的な配置（tmuxセッション・ウィンドウ）
+   ↓
+3. Task CRD
+   ↓ 参照（spaceRef, assignee）
+   作業割り当てとGit worktree作成
+   ↓
+4. Law CRD（開発予定）
+   ↓ 統合
+   全CRDに対する規則・権限適用
 ```
 
-**役割定義：**
-- **PM（Boss）**: 戦略的意思決定、リソース管理、品質保証
-- **Worker**: 実装、テスト、デプロイなどの実行業務
-- **Organization**: 複数のPM/Workerで構成される論理的なチーム単位
+### tmux ↔ Haconiwa CRD マッピング
+
+| Haconiwa CRD | tmux概念 | 主な役割 |
+|-------------|----------|----------|
+| **Organization** | - | エージェントの組織構造定義 |
+| **Space (Company)** | **Session** | 開発環境のトップレベルコンテナ |
+| **Space (Room)** | **Window** | 機能別の作業グループ |
+| **Task + Agent** | **Pane** | 個別のエージェント作業環境 |
+
+### 主要な特徴
+
+**1. 宣言的な環境管理**
+- YAMLファイルですべての構成を定義
+- 再現可能な開発環境の構築
+
+**2. Git worktreeによるタスク隔離**
+- 各タスクが独立したディレクトリで作業
+- `defaultBranch`からの自動ブランチ作成
+- 並行開発の実現
+
+**3. 階層的な構造**
+- Space CRDの階層（国→市→村→会社→建物→階→部屋）
+- 将来的にLaw CRDによる階層的な規則継承
+
+**4. 自動化されたエージェント配置**
+- Organization CRDで定義されたエージェントの自動配置
+- Task CRDによる作業割り当て
+- tmuxペインへの自動マッピング
 
 ## 🚀 インストール
 
@@ -445,9 +1041,19 @@ git-worktreeと連携したタスク管理
 
 ### `world` - ワールド管理
 開発環境とワールドの管理
-- `haconiwa world create <name>` - 新しい開発ワールドを作成
+- `haconiwa world create <n>` - 新しい開発ワールドを作成
 - `haconiwa world list` - ワールド一覧表示
-- `haconiwa world switch <name>` - ワールド切り替え
+- `haconiwa world switch <n>` - ワールド切り替え
+
+### `monitor` - リアルタイム監視コマンド ✅ **テスト済み**
+tmuxマルチエージェント環境のリアルタイム監視と可視化
+- `haconiwa monitor -c <company>` - 基本監視（全window表示）
+- `haconiwa mon -c <company>` - 短縮形エイリアス  
+- `haconiwa monitor -c <company> --japanese` - 日本語UI
+- `haconiwa monitor -c <company> -w <window>` - 特定window監視
+- `haconiwa monitor -c <company> --columns <cols>` - カスタム列表示
+- `haconiwa monitor -c <company> -r <interval>` - 更新間隔調整
+- `haconiwa monitor help` - 詳細ヘルプ表示
 
 ## 🛠️ 開発状況
 
@@ -463,6 +1069,12 @@ git-worktreeと連携したタスク管理
 - **組織・タスク・デスクカスタマイズ機能**
 - **会社の自動存在チェックと更新機能**
 - **柔軟なクリーンアップシステム**
+- **📊 リアルタイムモニタリングシステム（monitor/mon コマンド）**
+- **🏢 複数window対応のマルチエージェント監視**
+- **👥 カスタムエージェントID表示機能**
+- **🇯🇵 完全日本語UI対応**
+- **🎨 視覚的CPU稼働率表示**
+- **📈 智能ステータス自動判定機能**
 - ヘルプシステムとコマンドドキュメント
 - コマンドグループの組織化とルーティング
 
@@ -515,22 +1127,6 @@ MIT License - 詳細は [LICENSE](LICENSE) ファイルをご覧ください。
 - GitHub Issues: [Issues](https://github.com/dai-motoki/haconiwa/issues)
 - メール: kanri@kandaquantum.co.jp
 
-## ⚠️ 免責事項
-
-このプロジェクトは初期アルファ開発段階かつ**デモンストレーションフェーズ**にあります。現在のCLIコマンドは主に意図されたインターフェースデザインを示すプレースホルダーです。ほとんどの機能は活発に開発中でまだ実装されていません。
-
-**現在動作するもの:**
-- CLIのインストールとコマンド構造
-- ヘルプシステムとドキュメント
-- 基本的なコマンドルーティング
-
-**今後実装予定:**
-- 宣伝されている全機能の完全実装
-- AIエージェント協調機能
-- 開発ツールとの統合
-- 実際のタスクと会社管理
-
-現時点では本番環境での使用は推奨されません。これは意図されたユーザーエクスペリエンスを示す開発プレビューです。
 
 ---
 

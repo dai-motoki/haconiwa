@@ -53,6 +53,15 @@ jobs:
           pytest --cov=haconiwa tests/
           coverage xml
 
+      - name: Run scenario tests
+        run: |
+          # Test core YAML configurations
+          echo "Testing haconiwa-world.yaml"
+          haconiwa apply -f haconiwa-world.yaml --force-clone --no-attach
+          
+          echo "Testing minimal configuration"
+          haconiwa apply -f test_cases/minimal_config.yaml --force-clone --no-attach
+
       - name: Build package
         run: python -m build
 

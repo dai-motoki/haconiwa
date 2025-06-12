@@ -13,6 +13,7 @@ class WorktreeManager:
         self.repo_path = Path(config.get("git.repo_path"))
         self.worktree_base = Path(config.get("git.worktree_base"))
         self.repo = Repo(self.repo_path)
+        self.default_branch = config.get("git.default_branch", "main")
         self._init_worktree_base()
 
     def _init_worktree_base(self):
@@ -73,7 +74,10 @@ class WorktreeManager:
         current_branch = worktree_repo.active_branch.name
         worktree_repo.git.push(remote, current_branch)
 
-    def merge_branch(self, source_task: str, target_branch: str = "main") -> Tuple[bool, str]:
+    def merge_branch(self, source_task: str, target_branch: Optional[str] = None) -> Tuple[bool, str]:
+        if target_branch is None:
+            target_branch = self.default_branch
+            
         source_path = self.worktree_base / source_task
         source_repo = Repo(source_path)
         source_branch = source_repo.active_branch.name

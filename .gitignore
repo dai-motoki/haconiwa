@@ -47,3 +47,21 @@ Thumbs.db
 /organizations/*/tasks/in-progress/*
 /organizations/*/tasks/done/*
 .haconiwa_cache/
+haconiwa-world/
+haconiwa-dev-world/
+haconiwa-dev-company/
+kamui-dev-world/
+kamui-dev-company/
+kamui-dev-company.yaml
+CLAUDE.md
+
+# Test output and temporary directories
+test_output/
+basic-executive-space/
+test_cases/basic_executive/
+test_cases/heavy_tasks/
+test_cases/error_cases/
+test_cases/minimal/
+test-*/
+*-test-*/
+*.test-*

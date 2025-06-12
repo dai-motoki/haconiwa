@@ -1,0 +1,262 @@
+apiVersion: haconiwa.dev/v1
+kind: Organization
+metadata:
+  name: test-org-8x4-tasks
+spec:
+  companyName: "Test Company 8x4 with Tasks"
+  industry: "Software Development"
+  basePath: "./test-8x4-tasks"
+  hierarchy:
+    departments:
+    - id: "dev"
+      name: "Development"
+      description: "Software development department"
+      roles:
+      - roleType: "management"
+        title: "Project Manager"
+        responsibilities:
+          - "Project planning and coordination"
+          - "Team management"
+          - "Stakeholder communication"
+      - roleType: "engineering"
+        title: "Worker A"
+        responsibilities:
+          - "Senior development tasks"
+          - "Architecture design"
+      - roleType: "engineering"
+        title: "Worker B"
+        responsibilities:
+          - "Feature implementation"
+          - "Code review"
+      - roleType: "engineering"
+        title: "Worker C"
+        responsibilities:
+          - "Testing and documentation"
+          - "Bug fixes"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Space
+metadata:
+  name: test-world-8x4-tasks
+spec:
+  nations:
+  - id: jp
+    name: Japan
+    cities:
+    - id: tokyo
+      name: Tokyo
+      villages:
+      - id: dev-village
+        name: "Development Village"
+        companies:
+        - name: test-company-8x4-tasks
+          grid: "8x4"
+          basePath: "./test-world-8x4-tasks"
+          organizationRef: "test-org-8x4-tasks"
+          gitRepo:
+            url: "https://github.com/motokidaisuke/haconiwa.git"
+            defaultBranch: "main"
+            auth: "https"
+          buildings:
+          - id: "hq"
+            name: "HQ"
+            floors:
+            - id: "floor-1"
+              name: "Dev Floor"
+              rooms:
+              - id: room-dev
+                name: "Development Room"
+
+---
+# Tasks for first 8 agents (2 organizations x 4 agents each)
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_backend_api_01
+spec:
+  taskId: task_backend_api_01
+  title: "Backend API Development"
+  description: |
+    ## Backend API Development Task
+    
+    Develop RESTful API endpoints for user management system.
+    
+    ### Requirements:
+    - User CRUD operations
+    - Authentication endpoints
+    - Role-based access control
+    - API documentation
+  assignee: "org01-pm-r1"
+  spaceRef: "test-company-8x4-tasks"
+  priority: "high"
+  worktree: true
+  branch: "feature/backend-api"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_frontend_ui_02
+spec:
+  taskId: task_frontend_ui_02
+  title: "Frontend UI Implementation"
+  description: |
+    ## Frontend UI Implementation
+    
+    Create responsive user interface components.
+    
+    ### Requirements:
+    - React components
+    - Material-UI integration
+    - Responsive design
+    - Accessibility compliance
+  assignee: "org01-wk-a-r1"
+  spaceRef: "test-company-8x4-tasks"
+  priority: "high"
+  worktree: true
+  branch: "feature/frontend-ui"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_database_schema_03
+spec:
+  taskId: task_database_schema_03
+  title: "Database Schema Design"
+  description: |
+    ## Database Schema Design
+    
+    Design and implement database schema for the application.
+    
+    ### Requirements:
+    - PostgreSQL schema
+    - Migration scripts
+    - Index optimization
+    - Data validation rules
+  assignee: "org01-wk-b-r1"
+  spaceRef: "test-company-8x4-tasks"
+  priority: "medium"
+  worktree: true
+  branch: "feature/database-schema"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_testing_framework_04
+spec:
+  taskId: task_testing_framework_04
+  title: "Testing Framework Setup"
+  description: |
+    ## Testing Framework Setup
+    
+    Set up comprehensive testing framework.
+    
+    ### Requirements:
+    - Unit test setup
+    - Integration test framework
+    - E2E test configuration
+    - CI/CD integration
+  assignee: "org01-wk-c-r1"
+  spaceRef: "test-company-8x4-tasks"
+  priority: "medium"
+  worktree: true
+  branch: "feature/testing-framework"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_devops_pipeline_05
+spec:
+  taskId: task_devops_pipeline_05
+  title: "DevOps Pipeline Configuration"
+  description: |
+    ## DevOps Pipeline Configuration
+    
+    Set up CI/CD pipeline for automated deployment.
+    
+    ### Requirements:
+    - GitHub Actions workflow
+    - Docker containerization
+    - Kubernetes deployment
+    - Monitoring setup
+  assignee: "org02-pm-r1"
+  spaceRef: "test-company-8x4-tasks"
+  priority: "high"
+  worktree: true
+  branch: "feature/devops-pipeline"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_security_audit_06
+spec:
+  taskId: task_security_audit_06
+  title: "Security Audit Implementation"
+  description: |
+    ## Security Audit Implementation
+    
+    Implement security audit and compliance checks.
+    
+    ### Requirements:
+    - Vulnerability scanning
+    - OWASP compliance
+    - Security headers
+    - Encryption implementation
+  assignee: "org02-wk-a-r1"
+  spaceRef: "test-company-8x4-tasks"
+  priority: "high"
+  worktree: true
+  branch: "feature/security-audit"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_performance_opt_07
+spec:
+  taskId: task_performance_opt_07
+  title: "Performance Optimization"
+  description: |
+    ## Performance Optimization
+    
+    Optimize application performance and response times.
+    
+    ### Requirements:
+    - Query optimization
+    - Caching strategy
+    - Load balancing
+    - CDN integration
+  assignee: "org02-wk-b-r1"
+  spaceRef: "test-company-8x4-tasks"
+  priority: "medium"
+  worktree: true
+  branch: "feature/performance-opt"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_documentation_08
+spec:
+  taskId: task_documentation_08
+  title: "Technical Documentation"
+  description: |
+    ## Technical Documentation
+    
+    Create comprehensive technical documentation.
+    
+    ### Requirements:
+    - API documentation
+    - Developer guides
+    - Architecture diagrams
+    - Deployment instructions
+  assignee: "org02-wk-c-r1"
+  spaceRef: "test-company-8x4-tasks"
+  priority: "low"
+  worktree: true
+  branch: "feature/documentation"

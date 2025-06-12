@@ -1,0 +1,150 @@
+apiVersion: haconiwa.dev/v1
+kind: Organization
+metadata:
+  name: basic-test-org
+spec:
+  companyName: "Basic Test Company"
+  industry: "Software Development"
+  basePath: "./test_output/basic_executive"
+  hierarchy:
+    departments:
+    - id: "executive"
+      name: "Executive Leadership"
+      description: "C-level executives"
+      roles:
+      - roleType: "executive"
+        title: "CEO"
+        responsibilities: ["Strategic leadership"]
+        reportsTo: "Board"
+      - roleType: "executive"
+        title: "CTO"
+        responsibilities: ["Technology strategy"]
+        reportsTo: "CEO"
+      - roleType: "executive"
+        title: "COO"
+        responsibilities: ["Operations"]
+        reportsTo: "CEO"
+    - id: "frontend"
+      name: "Frontend Team"
+      roles:
+      - roleType: "management"
+        title: "Frontend Lead"
+        responsibilities: ["Team management"]
+        reportsTo: "CTO"
+      - roleType: "engineering"
+        title: "Frontend Developer"
+        responsibilities: ["UI development"]
+        reportsTo: "Frontend Lead"
+    - id: "backend"
+      name: "Backend Team"
+      roles:
+      - roleType: "management"
+        title: "Backend Lead"
+        responsibilities: ["Backend architecture"]
+        reportsTo: "CTO"
+      - roleType: "engineering"
+        title: "Backend Developer"
+        responsibilities: ["API development"]
+        reportsTo: "Backend Lead"
+    - id: "devops"
+      name: "DevOps Team"
+      roles:
+      - roleType: "management"
+        title: "DevOps Lead"
+        responsibilities: ["Infrastructure"]
+        reportsTo: "CTO"
+      - roleType: "engineering"
+        title: "DevOps Engineer"
+        responsibilities: ["CI/CD"]
+        reportsTo: "DevOps Lead"
+    - id: "qa"
+      name: "QA Team"
+      roles:
+      - roleType: "management"
+        title: "QA Lead"
+        responsibilities: ["Quality assurance"]
+        reportsTo: "CTO"
+      - roleType: "engineering"
+        title: "QA Engineer"
+        responsibilities: ["Testing"]
+        reportsTo: "QA Lead"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Space
+metadata:
+  name: basic-executive-space
+spec:
+  nations:
+  - id: jp
+    name: Japan
+    cities:
+    - id: tokyo
+      name: Tokyo
+      villages:
+      - id: test-village
+        name: Test Village
+        companies:
+        - name: basic-test-company
+          grid: 8x4
+          organizationRef: "basic-test-org"
+          gitRepo:
+            url: "https://github.com/dai-motoki/haconiwa"
+            defaultBranch: "main"
+            auth: "https"
+          buildings:
+          - id: headquarters
+            name: Headquarters
+            floors:
+            - id: floor-1
+              name: Engineering Floor
+              rooms:
+              - id: room-01
+                name: Alpha Room
+                description: "Development room"
+              - id: room-02
+                name: Beta Room
+                description: "Testing room"
+            - id: floor-2
+              name: Executive Floor
+              rooms:
+              - id: room-executive
+                name: Executive Leadership Room
+                description: "C-level executives on 2nd floor"
+
+---
+# Executive Tasks
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: executive_strategy_planning
+spec:
+  branch: executive_strategy_planning
+  worktree: true
+  assignee: org05-ceo-re
+  spaceRef: basic-test-company
+  description: "Executive strategy planning"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: technology_roadmap
+spec:
+  branch: technology_roadmap
+  worktree: true
+  assignee: org05-cto-re
+  spaceRef: basic-test-company
+  description: "Technology roadmap development"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: operations_optimization
+spec:
+  branch: operations_optimization
+  worktree: true
+  assignee: org05-coo-re
+  spaceRef: basic-test-company
+  description: "Operations optimization" 

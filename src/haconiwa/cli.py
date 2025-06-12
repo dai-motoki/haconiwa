@@ -12,6 +12,7 @@ from haconiwa.resource.cli import resource_app as original_resource_app
 from haconiwa.agent.cli import agent_app
 from haconiwa.task.cli import task_app
 from haconiwa.watch.cli import watch_app
+from haconiwa.monitor import TmuxMonitor
 
 # Import new v1.0 components
 from haconiwa.core.crd.parser import CRDParser, CRDValidationError
@@ -98,9 +99,8 @@ def apply(
     file: str = typer.Option(..., "-f", "--file", help="YAML ファイルパス"),
     dry_run: bool = typer.Option(False, "--dry-run", help="適用をシミュレート"),
     force_clone: bool = typer.Option(False, "--force-clone", help="既存ディレクトリを確認なしで削除してGitクローン"),
-    attach: bool = typer.Option(False, "--attach", help="適用後に自動でセッションにアタッチ"),
-    no_attach: bool = typer.Option(False, "--no-attach", help="適用後にセッションにアタッチしない（明示的指定）"),
-    room: str = typer.Option("room-01", "-r", "--room", help="アタッチするルーム（--attachと併用）"),
+    no_attach: bool = typer.Option(False, "--no-attach", help="適用後にセッションにアタッチしない"),
+    room: str = typer.Option("room-01", "-r", "--room", help="アタッチするルーム"),
 ):
     """CRD定義ファイルを適用"""
     file_path = Path(file)
@@ -109,13 +109,8 @@ def apply(
         typer.echo(f"❌ File not found: {file}", err=True)
         raise typer.Exit(1)
     
-    # Handle attach/no-attach logic
-    if attach and no_attach:
-        typer.echo("❌ Cannot specify both --attach and --no-attach", err=True)
-        raise typer.Exit(1)
-    
-    # Set final attach behavior
-    should_attach = attach and not no_attach
+    # By default, attach unless --no-attach is specified
+    should_attach = not no_attach
     
     parser = CRDParser()
     applier = CRDApplier()
@@ -127,6 +122,8 @@ def apply(
         typer.echo("🔍 Dry run mode - no changes will be applied")
         if should_attach:
             typer.echo(f"🔗 Would attach to session after apply (room: {room})")
+        else:
+            typer.echo("🔗 Would NOT attach to session (--no-attach specified)")
     
     created_sessions = []  # Track created sessions for attach
     
@@ -215,6 +212,9 @@ def apply(
         
         elif should_attach and not created_sessions:
             typer.echo("⚠️ No Space sessions created, cannot attach")
+        elif not should_attach and created_sessions:
+            typer.echo(f"\n💡 Session created: {created_sessions[0]}")
+            typer.echo(f"   To attach: haconiwa space attach -c {created_sessions[0]} -r {room}")
     
     except CRDValidationError as e:
         typer.echo(f"❌ Validation error: {e}", err=True)
@@ -433,6 +433,9 @@ def space_delete(
     # Import subprocess for tmux interaction
     import subprocess
     import shutil
+    from pathlib import Path
+    
+    from haconiwa.space.manager import SpaceManager
     
     # Check if session exists
     try:
@@ -476,8 +479,11 @@ def space_delete(
             else:
                 typer.echo(f"❌ Failed to kill session: {result.stderr}", err=True)
         
-        # Clean directories
+        # Clean directories if requested
         if clean_dirs:
+            import glob
+            import os
+            # Standard directory patterns
             dirs_to_clean = [
                 f"./{company}",
                 f"./{company}-desks",
@@ -485,9 +491,74 @@ def space_delete(
                 f"./test-{company}-desks"
             ]
             
-            cleaned_dirs = []
+            # Additional flexible patterns for multiroom/space directories
+            additional_patterns = [
+                f"./test-*-desks",      # test-multiroom-desks, test-xxx-desks
+                f"./*-{company}*",      # multiroom-company variants
+                f"./test-*{company}*",  # test-multiroom-company variants  
+                f"./{company}*",        # company variations
+            ]
+            
+            # Add matched directories from glob patterns
+            for pattern in additional_patterns:
+                matched_dirs = glob.glob(pattern)
+                for matched_dir in matched_dirs:
+                    if matched_dir not in dirs_to_clean:
+                        dirs_to_clean.append(matched_dir)
+        
+        # Clean up git worktrees first (before removing directories)
+        if dirs_to_clean:
+            cleaned_worktrees = []
             for dir_path in dirs_to_clean:
                 if Path(dir_path).exists():
+                    # Check if it's a git repository with worktrees
+                    git_dir = Path(dir_path) / ".git"
+                    if git_dir.exists():
+                        try:
+                            # List and remove worktrees
+                            result = subprocess.run(['git', '-C', dir_path, 'worktree', 'list', '--porcelain'], 
+                                                   capture_output=True, text=True)
+                            if result.returncode == 0:
+                                worktrees = []
+                                current_worktree = {}
+                                for line in result.stdout.strip().split('\n'):
+                                    if line.startswith('worktree '):
+                                        if current_worktree and current_worktree.get('worktree'):
+                                            worktrees.append(current_worktree)
+                                        current_worktree = {'worktree': line.split(' ', 1)[1]}
+                                    elif line.startswith('branch '):
+                                        current_worktree['branch'] = line.split(' ', 1)[1]
+                                    elif line == 'bare':
+                                        current_worktree['bare'] = True
+                                    elif line == 'detached':
+                                        current_worktree['detached'] = True
+                                
+                                # Add the last worktree
+                                if current_worktree and current_worktree.get('worktree'):
+                                    worktrees.append(current_worktree)
+                                
+                                # Remove non-main worktrees
+                                for worktree in worktrees:
+                                    wt_path = worktree['worktree']
+                                    if wt_path != dir_path and Path(wt_path).exists():
+                                        try:
+                                            subprocess.run(['git', '-C', dir_path, 'worktree', 'remove', wt_path, '--force'], 
+                                                         capture_output=True, text=True, check=True)
+                                            cleaned_worktrees.append(wt_path)
+                                            typer.echo(f"✅ Removed git worktree: {wt_path}")
+                                        except subprocess.CalledProcessError as e:
+                                            typer.echo(f"⚠️ Failed to remove git worktree {wt_path}: {e}")
+                        except Exception as e:
+                            typer.echo(f"⚠️ Error checking git worktrees in {dir_path}: {e}")
+            
+            # Remove directories
+            cleaned_dirs = []
+            for dir_path in dirs_to_clean:
+                path_obj = Path(dir_path)
+                if path_obj.exists():
+                    # Skip if it's not a directory (e.g., YAML files)
+                    if not path_obj.is_dir():
+                        continue
                     try:
                         shutil.rmtree(dir_path)
                         cleaned_dirs.append(dir_path)
@@ -495,10 +566,9 @@ def space_delete(
                     except Exception as e:
                         typer.echo(f"❌ Failed to remove {dir_path}: {e}", err=True)
             
-            if cleaned_dirs:
-                typer.echo(f"🗑️ Cleaned {len(cleaned_dirs)} directories")
-            else:
-                typer.echo("ℹ️ No directories found to clean")
+            # Summary
+            if cleaned_dirs or cleaned_worktrees:
+                typer.echo(f"🗑️ Cleaned {len(cleaned_dirs)} directories and {len(cleaned_worktrees)} git worktrees")
         
         # Remove from SpaceManager tracking
         space_manager = SpaceManager()
@@ -623,6 +693,150 @@ def policy_delete(
         raise typer.Exit(1)
 
 # =====================================================================
+# Monitor コマンド（新規）
+# =====================================================================
+
+monitor_app = typer.Typer(name="monitor", help="tmux multi-agent environment monitoring")
+
+@monitor_app.callback(invoke_without_command=True)
+def monitor_main(
+    ctx: typer.Context,
+    company: str = typer.Option(..., "-c", "--company", help="Company name (tmux session name)"),
+    window: Optional[str] = typer.Option(None, "-w", "--window", help="Specific window number or name (default: all)"),
+    columns: Optional[List[str]] = typer.Option(None, "--columns", help="Columns to display"),
+    refresh: float = typer.Option(2.0, "-r", "--refresh", help="Refresh interval in seconds"),
+    japanese: bool = typer.Option(False, "-j", "--japanese", help="Display in Japanese"),
+):
+    """
+    Monitor tmux multi-agent development environment in real-time.
+    
+    Display real-time information about AI agents, CPU usage, and task status
+    for each pane in the tmux session. Supports multiple windows with
+    separate tables for each room.
+    
+    Examples:
+      haconiwa monitor -c my-company
+      haconiwa monitor -c my-company -w frontend --japanese  
+      haconiwa monitor -c my-company --columns pane agent cpu status
+    """
+    
+    # If a subcommand was invoked, let it handle the execution
+    if ctx.invoked_subcommand is not None:
+        return
+    
+    # Default columns if not specified
+    if columns is None:
+        columns = ["room", "pane", "title", "task", "claude", "agent", "cpu", "status"]
+    
+    # Validate columns
+    valid_columns = ["room", "window", "pane", "title", "task", "parent", "claude", "agent", "cpu", "memory", "uptime", "status"]
+    for col in columns:
+        if col not in valid_columns:
+            typer.echo(f"❌ Invalid column: {col}", err=True)
+            typer.echo(f"Valid columns: {', '.join(valid_columns)}", err=True)
+            raise typer.Exit(1)
+    
+    # Parse window parameter (could be number or name)
+    window_param = None
+    if window is not None:
+        if window.isdigit():
+            window_param = int(window)
+        else:
+            window_param = window
+    
+    # Check if tmux session exists
+    import subprocess
+    try:
+        result = subprocess.run(['tmux', 'has-session', '-t', company], 
+                               capture_output=True, text=True)
+        if result.returncode != 0:
+            typer.echo(f"❌ Company session '{company}' not found", err=True)
+            typer.echo("💡 Use 'haconiwa space list' to see available sessions", err=True)
+            raise typer.Exit(1)
+    except FileNotFoundError:
+        typer.echo("❌ tmux is not installed or not found in PATH", err=True)
+        raise typer.Exit(1)
+    
+    # Check dependencies
+    try:
+        import rich
+        import psutil
+    except ImportError as e:
+        missing_pkg = str(e).split("'")[1] if "'" in str(e) else str(e)
+        typer.echo(f"❌ Missing required package: {missing_pkg}", err=True)
+        typer.echo("Install with: pip install rich psutil", err=True)
+        raise typer.Exit(1)
+    
+    # Start monitoring
+    try:
+        monitor = TmuxMonitor(
+            session_name=company,
+            japanese=japanese,
+            columns=columns,
+            window=window_param
+        )
+        
+        # Display startup message
+        lang_info = " (日本語)" if japanese else ""
+        window_info = f" (window: {window})" if window else " (all windows)"
+        typer.echo(f"🚀 Starting monitor for {company}{window_info}{lang_info}")
+        typer.echo("Press Ctrl+C to stop")
+        
+        # Run monitoring
+        monitor.run_monitor(refresh_rate=refresh)
+        
+    except KeyboardInterrupt:
+        typer.echo("\n✅ Monitoring stopped")
+    except Exception as e:
+        typer.echo(f"\n❌ Error: {e}", err=True)
+        raise typer.Exit(1)
+
+@monitor_app.command("help")
+def monitor_help():
+    """Show detailed help for monitor command"""
+    help_text = """
+🔍 Haconiwa Monitor - Real-time tmux multi-agent monitoring
+
+USAGE:
+  haconiwa monitor -c <company> [OPTIONS]
+  haconiwa mon -c <company> [OPTIONS]     # Short alias
+
+BASIC EXAMPLES:
+  haconiwa monitor -c my-company                    # Monitor all windows
+  haconiwa monitor -c my-company --japanese         # Japanese UI
+  haconiwa monitor -c my-company -w 0               # Monitor window 0 only
+  haconiwa monitor -c my-company -w frontend        # Monitor "frontend" window
+
+COLUMN CUSTOMIZATION:
+  haconiwa monitor -c my-company --columns pane title claude agent cpu status
+  haconiwa monitor -c my-company --columns pane agent status  # Minimal view
+
+PERFORMANCE TUNING:  
+  haconiwa monitor -c my-company -r 0.5             # High-frequency updates
+  haconiwa monitor -c my-company -r 5               # Low-frequency updates
+
+AVAILABLE COLUMNS:
+  room     - Room/Window name
+  window   - Window number
+  pane     - Pane number  
+  title    - Task title
+  parent   - Parent process ID
+  claude   - Provider AI status (✓/✗)
+  agent    - Custom agent ID
+  cpu      - CPU usage with visual bar
+  memory   - Memory usage
+  uptime   - Process uptime
+  status   - Agent status (仕事待ち/作業中/多忙)
+
+TIPS:
+  • Use --columns to customize display
+  • Use -w to focus on specific room/window
+  • Use --japanese for Japanese interface
+  • Adjust --refresh for performance vs update frequency
+  """
+    typer.echo(help_text)
+
+# =====================================================================
 # アプリケーション登録
 # =====================================================================
 
@@ -630,6 +844,8 @@ def policy_delete(
 app.add_typer(space_app, name="space")
 app.add_typer(tool_app, name="tool")
 app.add_typer(policy_app, name="policy")
+app.add_typer(monitor_app, name="monitor")
+app.add_typer(monitor_app, name="mon")  # Short alias for monitor
 
 # 既存コマンド（一部deprecated）
 app.add_typer(core_app, name="core")
