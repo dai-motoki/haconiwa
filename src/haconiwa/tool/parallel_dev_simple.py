@@ -1,25 +1,24 @@
-"""Claude Code SDK parallel development functionality."""
+"""Simplified Claude Code SDK parallel development functionality."""
 
 import asyncio
 import json
+import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
 
 import typer
-import yaml
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
 from rich.table import Table
 
-from claude_code_sdk import query, ClaudeCodeOptions
-
+# Try to load dotenv if available
 try:
-    from claude_code_sdk import PermissionMode
+    from dotenv import load_dotenv
+    load_dotenv()
 except ImportError:
-    # If PermissionMode is not available in this version
-    PermissionMode = None
+    pass
 
 # Create typer app for parallel-dev subcommands
 parallel_dev_app = typer.Typer(
@@ -30,8 +29,8 @@ parallel_dev_app = typer.Typer(
 console = Console()
 
 
-class ParallelDevManager:
-    """Manager for parallel development operations."""
+class SimpleParallelDevManager:
+    """Simplified manager for parallel development operations using CLI directly."""
     
     def __init__(self):
         self.results_dir = Path("./parallel-dev-results")
@@ -39,15 +38,29 @@ class ParallelDevManager:
         self.task_history = []
         self.active_tasks = {}
         
-    async def process_file(
+    async def process_file_cli(
         self,
         file_path: str,
         prompt: str,
-        options: ClaudeCodeOptions,
-        task_id: str
+        task_id: str,
+        max_turns: int = 5,
+        timeout: int = 60
     ) -> Dict[str, any]:
-        """Process a single file with Claude Code SDK."""
+        """Process a single file using Claude CLI directly."""
         start_time = datetime.now()
+        
+        # Construct command - use full path to claude
+        claude_path = "/Users/motokidaisuke/.claude/local/claude"
+        
+        # Get absolute path
+        import os
+        abs_file_path = os.path.abspath(file_path)
+        
+        cmd = [
+            claude_path, "-p",
+            f"Please edit the file {abs_file_path} with the following instructions: {prompt}",
+            "--max-turns", str(max_turns)
+        ]
         
         try:
             # Track active task
@@ -58,13 +71,21 @@ class ParallelDevManager:
                 "start_time": start_time
             }
             
-            # Execute Claude Code query
-            messages = []
-            async for message in query(
-                prompt=f"Edit file {file_path}: {prompt}",
-                options=options
-            ):
-                messages.append(message)
+            # Run command
+            proc = await asyncio.create_subprocess_exec(
+                *cmd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                env={**os.environ, "ANTHROPIC_API_KEY": os.environ.get("ANTHROPIC_API_KEY", "")}
+            )
+            
+            # Wait for completion with timeout
+            try:
+                stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=timeout)
+            except asyncio.TimeoutError:
+                proc.kill()
+                await proc.wait()
+                raise TimeoutError(f"Task timed out after {timeout} seconds")
             
             end_time = datetime.now()
             duration = (end_time - start_time).total_seconds()
@@ -72,16 +93,27 @@ class ParallelDevManager:
             # Mark as completed
             self.active_tasks[task_id]["status"] = "completed"
             
-            return {
-                "task_id": task_id,
-                "file": file_path,
-                "prompt": prompt,
-                "status": "success",
-                "messages": messages,
-                "duration": duration,
-                "timestamp": start_time.isoformat()
-            }
-            
+            if proc.returncode == 0:
+                return {
+                    "task_id": task_id,
+                    "file": file_path,
+                    "prompt": prompt,
+                    "status": "success",
+                    "output": stdout.decode('utf-8'),
+                    "duration": duration,
+                    "timestamp": start_time.isoformat()
+                }
+            else:
+                return {
+                    "task_id": task_id,
+                    "file": file_path,
+                    "prompt": prompt,
+                    "status": "error",
+                    "error": stderr.decode('utf-8') or stdout.decode('utf-8'),
+                    "duration": duration,
+                    "timestamp": start_time.isoformat()
+                }
+                
         except Exception as e:
             end_time = datetime.now()
             duration = (end_time - start_time).total_seconds()
@@ -100,26 +132,14 @@ class ParallelDevManager:
                 "timestamp": start_time.isoformat()
             }
     
-    async def parallel_execute(
+    async def parallel_execute_simple(
         self,
         files_and_prompts: List[Tuple[str, str]],
         max_concurrent: int = 3,
         timeout: int = 60,
-        allowed_tools: List[str] = None,
-        permission_mode: str = "acceptEdits"
+        max_turns: int = 5
     ) -> List[Dict[str, any]]:
-        """Execute multiple file edits in parallel."""
-        
-        # Default allowed tools
-        if allowed_tools is None:
-            allowed_tools = ["Read", "Write", "Edit", "MultiEdit"]
-        
-        # Create Claude Code options
-        options = ClaudeCodeOptions(
-            max_turns=5,
-            cwd=Path.cwd(),
-            allowed_tools=allowed_tools
-        )
+        """Execute multiple file edits in parallel using CLI."""
         
         # Create semaphore for concurrency control
         semaphore = asyncio.Semaphore(max_concurrent)
@@ -127,7 +147,9 @@ class ParallelDevManager:
         async def process_with_semaphore(file_path: str, prompt: str, idx: int):
             async with semaphore:
                 task_id = f"task-{idx:03d}"
-                return await self.process_file(file_path, prompt, options, task_id)
+                return await self.process_file_cli(
+                    file_path, prompt, task_id, max_turns, timeout
+                )
         
         # Create tasks
         tasks = [
@@ -137,48 +159,31 @@ class ParallelDevManager:
             for idx, (file_path, prompt) in enumerate(files_and_prompts)
         ]
         
-        # Execute with timeout
-        try:
-            results = await asyncio.wait_for(
-                asyncio.gather(*tasks, return_exceptions=True),
-                timeout=timeout * len(files_and_prompts)  # Total timeout
-            )
-        except asyncio.TimeoutError:
-            # Cancel remaining tasks
-            for task in tasks:
-                if not task.done():
-                    task.cancel()
-            
-            # Gather results including timeouts
-            results = []
-            for idx, task in enumerate(tasks):
-                if task.done():
-                    try:
-                        results.append(task.result())
-                    except Exception as e:
-                        results.append({
-                            "task_id": f"task-{idx:03d}",
-                            "file": files_and_prompts[idx][0],
-                            "prompt": files_and_prompts[idx][1],
-                            "status": "timeout",
-                            "error": "Task timed out"
-                        })
-                else:
-                    results.append({
-                        "task_id": f"task-{idx:03d}",
-                        "file": files_and_prompts[idx][0],
-                        "prompt": files_and_prompts[idx][1],
-                        "status": "timeout",
-                        "error": "Task timed out"
-                    })
+        # Execute all tasks
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        
+        # Convert exceptions to error results
+        final_results = []
+        for idx, result in enumerate(results):
+            if isinstance(result, Exception):
+                final_results.append({
+                    "task_id": f"task-{idx:03d}",
+                    "file": files_and_prompts[idx][0],
+                    "prompt": files_and_prompts[idx][1],
+                    "status": "error",
+                    "error": str(result),
+                    "duration": 0
+                })
+            else:
+                final_results.append(result)
         
         # Clear active tasks
         self.active_tasks.clear()
         
         # Store in history
-        self.task_history.extend(results)
+        self.task_history.extend(final_results)
         
-        return results
+        return final_results
     
     def save_results(self, results: List[Dict[str, any]], session_id: str):
         """Save results to file."""
@@ -192,7 +197,6 @@ class ParallelDevManager:
             "total_tasks": len(results),
             "successful": sum(1 for r in results if r.get("status") == "success"),
             "failed": sum(1 for r in results if r.get("status") == "error"),
-            "timeout": sum(1 for r in results if r.get("status") == "timeout"),
             "results": results
         }
         
@@ -215,17 +219,19 @@ class ParallelDevManager:
                 f.write("\n" + "="*50 + "\n\n")
                 
                 if result["status"] == "success":
-                    f.write("Messages:\n")
-                    for msg in result.get("messages", []):
-                        f.write(str(msg) + "\n")
+                    f.write("Output:\n")
+                    f.write(result.get("output", ""))
                 else:
                     f.write(f"Error: {result.get('error', 'Unknown error')}\n")
         
         return summary_file
 
 
-# Global manager instance
-manager = ParallelDevManager()
+# Import os module
+import os
+
+# Replace the original manager with the simple one
+manager = SimpleParallelDevManager()
 
 
 @parallel_dev_app.command("claude")
@@ -239,10 +245,14 @@ def claude_parallel(
     timeout: int = typer.Option(60, "-t", "--timeout", help="Timeout per task in seconds"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Show what would be executed"),
     output_dir: Optional[Path] = typer.Option(None, "-o", "--output-dir", help="Output directory"),
-    permission_mode: str = typer.Option("acceptEdits", "--permission-mode", help="Permission mode"),
-    allowed_tools: Optional[str] = typer.Option(None, "--allowed-tools", help="Comma-separated allowed tools")
+    max_turns: int = typer.Option(5, "--max-turns", help="Maximum turns for Claude")
 ):
-    """Execute parallel file edits using Claude Code SDK."""
+    """Execute parallel file edits using Claude Code SDK (simplified version)."""
+    
+    # Check for API key
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        console.print("[red]❌ ANTHROPIC_API_KEY environment variable not set[/red]")
+        raise typer.Exit(1)
     
     # Parse inputs
     files_and_prompts = []
@@ -253,6 +263,7 @@ def claude_parallel(
             console.print(f"[red]❌ YAML file not found: {from_yaml}[/red]")
             raise typer.Exit(1)
         
+        import yaml
         with open(from_yaml, 'r') as f:
             config = yaml.safe_load(f)
         
@@ -267,8 +278,6 @@ def claude_parallel(
         options = config.get("options", {})
         max_concurrent = options.get("max_concurrent", max_concurrent)
         timeout = options.get("timeout", timeout)
-        if "allowed_tools" in options:
-            allowed_tools = ",".join(options["allowed_tools"])
     
     elif files and prompts:
         # Parse comma-separated lists
@@ -311,17 +320,12 @@ def claude_parallel(
     if len(files_and_prompts) > 10:
         console.print(f"[yellow]⚠️ Processing {len(files_and_prompts)} files (max recommended: 10)[/yellow]")
     
-    # Parse allowed tools
-    tools_list = None
-    if allowed_tools:
-        tools_list = [t.strip() for t in allowed_tools.split(",")]
-    
     # Display summary
     console.print(f"\n[bold]📋 Task Summary:[/bold]")
     console.print(f"- Total files: {len(files_and_prompts)}")
     console.print(f"- Max concurrent: {max_concurrent}")
     console.print(f"- Timeout per task: {timeout}s")
-    console.print(f"- Permission mode: {permission_mode}")
+    console.print(f"- Max turns: {max_turns}")
     
     if dry_run:
         console.print("\n[yellow]🔍 Dry run - Tasks that would be executed:[/yellow]")
@@ -337,30 +341,26 @@ def claude_parallel(
         raise typer.Exit(0)
     
     # Execute parallel tasks
-    console.print(f"\n[bold green]🚀 Starting parallel Claude Code SDK execution...[/bold green]")
+    console.print(f"\n[bold green]🚀 Starting parallel Claude execution (simplified)...[/bold green]")
     
     # Run async execution
     results = asyncio.run(
-        manager.parallel_execute(
+        manager.parallel_execute_simple(
             files_and_prompts,
             max_concurrent=max_concurrent,
             timeout=timeout,
-            allowed_tools=tools_list,
-            permission_mode=permission_mode
+            max_turns=max_turns
         )
     )
     
     # Display results
     success_count = sum(1 for r in results if r["status"] == "success")
     error_count = sum(1 for r in results if r["status"] == "error")
-    timeout_count = sum(1 for r in results if r["status"] == "timeout")
     
     console.print(f"\n[bold]Summary:[/bold]")
     console.print(f"✅ Success: {success_count}/{len(results)}")
     if error_count > 0:
         console.print(f"❌ Failed: {error_count}/{len(results)}")
-    if timeout_count > 0:
-        console.print(f"⏱️ Timeout: {timeout_count}/{len(results)}")
     
     # Save results
     if output_dir:
@@ -371,7 +371,7 @@ def claude_parallel(
     console.print(f"\n📁 Results saved to: {summary_file}")
     
     # Exit with error if any failures
-    if error_count > 0 or timeout_count > 0:
+    if error_count > 0:
         raise typer.Exit(1)
 
 

@@ -629,8 +629,8 @@ def configure(
     else:
         typer.echo(f"❌ Configuration not available for: {tool_name}", err=True)
 
-# Import parallel-dev subcommands
-from haconiwa.tool import parallel_dev_app
+# Import parallel-dev subcommands (use simplified version)
+from haconiwa.tool.parallel_dev_simple import parallel_dev_app
 
 # Add parallel-dev as a subcommand
 tool_app.add_typer(parallel_dev_app, name="parallel-dev")
