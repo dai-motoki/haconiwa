@@ -548,8 +548,10 @@ class TaskManager:
                 return False
             
             # Create .haconiwa directory for agent logs
-            haconiwa_dir = task_path / ".haconiwa"
-            haconiwa_dir.mkdir(exist_ok=True)
+            # Use task directory name as subdirectory to avoid conflicts
+            task_name_dir = task_path.name
+            haconiwa_dir = task_path / ".haconiwa" / task_name_dir
+            haconiwa_dir.mkdir(parents=True, exist_ok=True)
             
             # Agent assignment log file
             log_file = haconiwa_dir / "agent_assignment.json"
@@ -685,8 +687,10 @@ class TaskManager:
                 return False
             
             # Create .haconiwa directory for agent logs
-            haconiwa_dir = task_dir / ".haconiwa"
-            haconiwa_dir.mkdir(exist_ok=True)
+            # Use task directory name as subdirectory to avoid conflicts
+            task_name_dir = task_dir.name
+            haconiwa_dir = task_dir / ".haconiwa" / task_name_dir
+            haconiwa_dir.mkdir(parents=True, exist_ok=True)
             
             # Agent assignment log file
             log_file = haconiwa_dir / "agent_assignment.json"
