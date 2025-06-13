@@ -1245,6 +1245,7 @@ tmux kill-session -t my-company
 - 📋 **タスク管理**: git-worktreeと連携したタスク管理システム
 - 📊 **リソース管理**: DBやファイルパスの効率的なスキャン
 - 👁️ **リアルタイム監視**: エージェントやタスクの進捗監視
+- 🛠️ **開発ツール連携**: Claude Code SDK等を使用した並列開発支援（開発中）
 
 ## 🏗️ アーキテクチャ概念
 
@@ -1392,6 +1393,13 @@ CLIツールは7つの主要コマンドグループを提供します：
 - `haconiwa resource scan` - リソーススキャン
 - `haconiwa resource list` - リソース一覧表示
 
+### `tool` - 開発ツール管理
+外部ツールやSDKとの統合機能
+- `haconiwa tool list` - 利用可能なツール一覧
+- `haconiwa tool install <tool>` - ツールのインストール
+- `haconiwa tool configure <tool>` - ツールの設定
+- `haconiwa tool parallel-dev` - AI並列開発機能（開発中）
+
 ### `company` - tmux会社と企業管理
 tmuxを使った効率的な開発企業環境管理
 - `haconiwa company build <name>` - tmux会社の作成・更新・再構築
@@ -1437,6 +1445,48 @@ tmuxマルチエージェント環境のリアルタイム監視と可視化
 - `haconiwa scan guide <model>` - モデル別開発ガイド生成
 - `haconiwa scan generate-parallel-config` - 並列開発用の設定YAML生成
 
+### `tool` - 開発ツール連携コマンド
+外部ツールやSDKとの統合機能
+- `haconiwa tool list` - 利用可能なツール一覧
+- `haconiwa tool install <tool>` - ツールのインストール  
+- `haconiwa tool configure <tool>` - ツールの設定
+- **`haconiwa tool parallel-dev`** - AI並列開発機能 🚧 **開発中**
+
+#### `tool parallel-dev` - Claude Code SDK並列実行機能
+高速並列ファイル編集のためのAI開発支援機能
+- `haconiwa tool parallel-dev claude` - Claude Code SDKでの並列編集実行
+- `haconiwa tool parallel-dev status` - 実行中タスクの状態確認
+- `haconiwa tool parallel-dev cancel <task-id>` - 実行中タスクのキャンセル
+- `haconiwa tool parallel-dev history` - 実行履歴表示
+
+**主な機能:**
+- 🚀 **高速並列処理**: 最大10ファイルの同時編集
+- 📝 **柔軟なプロンプト指定**: ファイルごとに個別のプロンプト
+- 🎯 **セマフォ制御**: 同時実行数の制限でAPI負荷を管理
+- 📊 **リアルタイム進捗表示**: 処理状況の可視化
+- 🔧 **エラーハンドリング**: 個別失敗でも他タスクは継続
+
+**使用例:**
+```bash
+# 基本的な並列編集（3ファイル）
+haconiwa tool parallel-dev claude \
+  -f src/main.py,src/utils.py,src/api.py \
+  -p "Add type hints","Refactor functions","Add error handling"
+
+# 10ファイルの一斉修正
+haconiwa tool parallel-dev claude \
+  --file-list files.txt \
+  --prompt-file prompts.txt \
+  -m 5 \
+  -t 120
+
+# YAML設定ファイルから実行
+haconiwa tool parallel-dev claude --from-yaml parallel-dev.yaml
+
+# 実行状態の確認
+haconiwa tool parallel-dev status
+```
+
 ## 🛠️ 開発状況
 
 > 🎬 **現在のフェーズ**: **デモンストレーション・プロトタイピング**  
@@ -1470,6 +1520,12 @@ tmuxマルチエージェント環境のリアルタイム監視と可視化
 - リソーススキャン機能 (プレースホルダー → 実装)
 - リアルタイム監視システム (プレースホルダー → 実装)
 - ワールド/環境管理 (プレースホルダー → 実装)
+- **開発ツール連携機能（tool parallel-dev）** (設計 → 実装中)
+  - Claude Code SDK統合による並列ファイル編集（最大10ファイル同時）
+  - asyncio.gatherによる高速非同期処理
+  - 柔軟なプロンプト管理（ファイルごとに個別指定）
+  - エラーハンドリングと進捗表示
+  - 将来的に他のAIツール（GitHub Copilot、ChatGPT等）も統合予定
 
 ### 📋 計画中機能
 - 高度なAIエージェント協調
