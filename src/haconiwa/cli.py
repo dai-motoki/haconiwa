@@ -13,6 +13,7 @@ from haconiwa.agent.cli import agent_app
 from haconiwa.task.cli import task_app
 from haconiwa.watch.cli import watch_app
 from haconiwa.monitor import TmuxMonitor
+from haconiwa.scan.cli import scan_app
 
 # Import new v1.0 components
 from haconiwa.core.crd.parser import CRDParser, CRDValidationError
@@ -593,7 +594,54 @@ def space_delete(
 # Tool コマンド（resource のリネーム・拡張）
 # =====================================================================
 
-tool_app = typer.Typer(name="tool", help="ファイルスキャン・DB スキャン機能")
+tool_app = typer.Typer(name="tool", help="開発ツール連携機能")
+
+@tool_app.command()
+def list():
+    """利用可能なツール一覧を表示"""
+    typer.echo("🛠️ Available Tools:")
+    typer.echo("  📦 claude-code - Claude Code SDK integration")
+    typer.echo("  📊 file-scanner - File path scanning")
+    typer.echo("  🗄️ db-scanner - Database scanning")
+    typer.echo("\n💡 Use 'haconiwa tool install <tool>' to install a tool")
+
+@tool_app.command()
+def install(
+    tool_name: str = typer.Argument(..., help="Tool name to install")
+):
+    """ツールをインストール"""
+    supported_tools = ["claude-code", "file-scanner", "db-scanner"]
+    
+    if tool_name not in supported_tools:
+        typer.echo(f"❌ Unknown tool: {tool_name}", err=True)
+        typer.echo(f"Supported tools: {', '.join(supported_tools)}", err=True)
+        raise typer.Exit(1)
+    
+    typer.echo(f"📦 Installing {tool_name}...")
+    
+    if tool_name == "claude-code":
+        typer.echo("  → claude-code-sdk package")
+        typer.echo("  → Run: pip install claude-code-sdk")
+    
+    typer.echo(f"✅ Tool '{tool_name}' installation instructions provided")
+
+@tool_app.command()
+def configure(
+    tool_name: str = typer.Argument(..., help="Tool name to configure")
+):
+    """ツールの設定"""
+    if tool_name == "claude-code":
+        typer.echo("🔧 Configuring claude-code...")
+        typer.echo("  Set environment variable: ANTHROPIC_API_KEY=your-api-key")
+        typer.echo("  Or pass --api-key flag when running commands")
+    else:
+        typer.echo(f"❌ Configuration not available for: {tool_name}", err=True)
+
+# Import parallel-dev subcommands (use simplified version)
+from haconiwa.tool.parallel_dev_simple import parallel_dev_app
+
+# Add parallel-dev as a subcommand
+tool_app.add_typer(parallel_dev_app, name="parallel-dev")
 
 @tool_app.command()
 def scan_filepath(
@@ -853,6 +901,7 @@ app.add_typer(tool_app, name="tool")
 app.add_typer(policy_app, name="policy")
 app.add_typer(monitor_app, name="monitor")
 app.add_typer(monitor_app, name="mon")  # Short alias for monitor
+app.add_typer(scan_app, name="scan")  # Universal AI model search
 
 # 既存コマンド（一部deprecated）
 app.add_typer(core_app, name="core")

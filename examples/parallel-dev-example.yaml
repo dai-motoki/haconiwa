@@ -1,0 +1,31 @@
+# Claude Code SDK Parallel Development Example Configuration
+provider: claude
+tasks:
+  - file: src/models/user.py
+    prompt: Add comprehensive validation methods and type hints for all attributes
+  - file: src/models/product.py
+    prompt: Implement inventory tracking with stock management methods
+  - file: src/models/order.py
+    prompt: Add order status management with state transitions
+  - file: src/services/auth.py
+    prompt: Implement JWT authentication with refresh token support
+  - file: src/services/payment.py
+    prompt: Add payment gateway integration with error handling
+  - file: src/api/routes/users.py
+    prompt: Create RESTful CRUD endpoints with proper validation
+  - file: src/api/routes/products.py
+    prompt: Implement product search functionality with filtering
+  - file: src/utils/validators.py
+    prompt: Create comprehensive input validation functions
+  - file: src/utils/formatters.py
+    prompt: Add data formatting utilities for API responses
+  - file: src/config/settings.py
+    prompt: Update configuration structure with environment variables
+options:
+  max_concurrent: 5
+  timeout: 90
+  allowed_tools:
+    - Read
+    - Write
+    - Edit
+    - MultiEdit

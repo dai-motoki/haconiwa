@@ -1,4 +1,3 @@
-import os
 import shutil
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
@@ -15,16 +14,34 @@ class WorktreeManager:
         self.repo = Repo(self.repo_path)
         self.default_branch = config.get("git.default_branch", "main")
         self._init_worktree_base()
+        self._ensure_origin_sync()
 
     def _init_worktree_base(self):
         self.worktree_base.mkdir(parents=True, exist_ok=True)
 
-    def create_worktree(self, task_id: str, branch_name: str) -> Path:
+    def _ensure_origin_sync(self):
+        """Ensure the repository is synced with origin"""
+        try:
+            # Fetch latest from origin
+            self.repo.git.fetch("origin")
+        except GitCommandError:
+            # Log but don't fail - repository might not have origin
+            pass
+
+    def create_worktree(self, task_id: str, branch_name: str, base_branch: Optional[str] = None) -> Path:
         worktree_path = self.worktree_base / task_id
         if worktree_path.exists():
             raise ValueError(f"Worktree already exists: {task_id}")
 
-        self.repo.git.worktree("add", str(worktree_path), "-b", branch_name)
+        # Use provided base_branch or default
+        if base_branch is None:
+            base_branch = f"origin/{self.default_branch}"
+        
+        # Ensure we have latest from origin
+        self._ensure_origin_sync()
+        
+        # Create worktree with new branch based on origin branch
+        self.repo.git.worktree("add", str(worktree_path), "-b", branch_name, base_branch)
         return worktree_path
 
     def remove_worktree(self, task_id: str, force: bool = False) -> None:
@@ -36,7 +53,7 @@ class WorktreeManager:
             self.repo.git.worktree("remove", str(worktree_path), "--force" if force else "")
             if worktree_path.exists():
                 shutil.rmtree(worktree_path)
-        except GitCommandError as e:
+        except GitCommandError:
             if not force:
                 raise
             shutil.rmtree(worktree_path)

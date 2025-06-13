@@ -391,6 +391,378 @@ spec:
 - Runtime permission checking
 - Automatic prompt injection to agents
 
+### 🔍 scan Command - AI Model Search & Analysis ✅ **Implemented**
+
+Advanced AI model search and analysis functionality is **available now**:
+
+```bash
+# 1. Search by model name (automatic prefix stripping)
+haconiwa scan model gpt-4
+haconiwa scan model claude-3-opus --no-strip-prefix
+
+# 2. Search file contents
+haconiwa scan content "import torch" --type .py
+haconiwa scan content "model\.forward\(" --context 5
+
+# 3. List AI models
+haconiwa scan list
+haconiwa scan list --provider openai
+haconiwa scan list --category llm --format json
+
+# 4. Analyze directory structure
+haconiwa scan analyze
+haconiwa scan analyze --path ./models
+haconiwa scan analyze --show-structure
+
+# 5. Compare models
+haconiwa scan compare gpt-4 claude-3-opus
+haconiwa scan compare gpt-3.5-turbo gpt-4 --output comparison.json
+
+# 6. Generate development guides
+haconiwa scan guide gpt-4 --type development
+haconiwa scan guide claude-3 --type quickstart --output guide.md
+```
+
+**🎯 Key Features of scan Command:**
+- **Model Name Search**: Automatic prefix stripping (gpt-, claude-, etc.)
+- **Content Search**: Regex support with context lines
+- **Category Classification**: Auto-categorization (LLM, Vision, Audio, Multimodal)
+- **Provider Identification**: Auto-detection (OpenAI, Anthropic, Meta, etc.)
+- **Comparison Analysis**: Feature and parameter comparison across models
+- **Guide Generation**: Auto-generate development, usage, integration guides
+- **Multiple Output Formats**: text, json, yaml, table, tree formats
+
+**💡 Usage Examples:**
+```bash
+# Search for GPT-4 related files in project
+haconiwa scan model gpt-4 --format tree
+
+# Search for model initialization code in Python files
+haconiwa scan content "model = .*\(" --type .py --context 3
+
+# Compare OpenAI and Anthropic models
+haconiwa scan compare gpt-4 claude-3-opus --output compare.yaml
+
+# Generate development guide
+haconiwa scan guide gpt-4 --type development --output gpt4-dev-guide.md
+```
+
+The scan feature is particularly useful for AI model development projects, helping with model management, documentation generation, and migration planning.
+
+### 📄 Output Examples for scan Command
+
+#### 1. `haconiwa scan list` - List AI Models
+```
+          Available AI Models          
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━┓
+┃ Provider ┃ Model         ┃ Category ┃ Files ┃
+┡━━━━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━┩
+│ openai   │ gpt-4         │ llm      │ 24    │
+│ openai   │ gpt-3.5-turbo │ llm      │ 18    │
+│ anthropic│ claude-3-opus │ llm      │ 32    │
+│ meta     │ llama-2-70b   │ llm      │ 45    │
+│ google   │ gemini-pro    │ multimodal│ 28   │
+└──────────┴───────────────┴──────────┴───────┘
+```
+
+#### 2. `haconiwa scan content "model.forward"` - Search Content
+```
+pattern: model.forward
+matches:
+  file: models/gpt4/inference.py
+  line_number: 156
+  line: output = model.forward(input_ids, attention_mask=mask)
+  context:
+    - # Prepare input tensors
+    - input_ids = tokenizer.encode(text)
+    - mask = create_attention_mask(input_ids)
+    - output = model.forward(input_ids, attention_mask=mask)
+    - logits = output.logits
+    
+  file: models/claude/model.py
+  line_number: 89
+  line: result = self.model.forward(tokens)
+  context:
+    - def generate(self, prompt):
+    -     tokens = self.tokenize(prompt)
+    -     result = self.model.forward(tokens)
+    -     return self.decode(result)
+```
+
+#### 3. `haconiwa scan analyze` - Analyze Directory Structure
+```
+📊 AI Model Directory Analysis
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Total models found: 12
+Total files: 342
+Total size: 2.4 GB
+
+📁 Directory Structure:
+models/
+├── openai/          (5 models, 89 files)
+│   ├── gpt-4/
+│   ├── gpt-3.5-turbo/
+│   └── embeddings/
+├── anthropic/       (3 models, 76 files)
+│   ├── claude-3-opus/
+│   └── claude-3-sonnet/
+└── opensource/      (4 models, 177 files)
+    ├── llama-2/
+    └── mistral/
+
+📊 Category Distribution:
+- LLM: 8 models (66.7%)
+- Vision: 2 models (16.7%)
+- Multimodal: 2 models (16.7%)
+
+🔍 Insights:
+- Most models include example scripts
+- Configuration files follow similar patterns
+- Test coverage: 78% of models have tests
+```
+
+#### 4. `haconiwa scan guide gpt-4 --type development` - Generate Development Guide
+
+The guide generation feature automatically creates 4 types of comprehensive documentation based on discovered model information:
+
+**Types of Guides Generated:**
+- **development**: Model configuration, file structure, dependencies, getting started, best practices
+- **usage**: Basic usage, common use cases, code examples, performance optimization tips
+- **integration**: System requirements, deployment options, API integration, monitoring setup
+- **quickstart**: Minimal setup and execution example to get started in 5 minutes
+
+**Output Example (Development Guide):**
+```markdown
+# Development Guide: gpt-4
+
+Generated on: 2024-01-15 14:30:45
+
+## Overview
+
+This guide provides development information for working with gpt-4.
+
+## Model Configuration
+
+```json
+{
+  "model_type": "transformer",
+  "hidden_size": 1024,
+  "num_layers": 24,
+  "num_attention_heads": 16,
+  "vocab_size": 50257,
+  "max_position_embeddings": 2048
+}
+```
+
+## Categories
+
+This model is categorized as: llm
+
+## File Structure
+
+Total files: 24
+
+### Key Files:
+- `config.json` (json)
+- `model.py` (python)
+- `tokenizer.py` (python)
+- `inference.py` (python)
+- `requirements.txt` (text)
+- `examples/chat_completion.py` (python)
+- `tests/test_model.py` (python)
+
+## Requirements
+
+### Dependencies:
+
+From `requirements.txt`:
+```
+torch>=2.0.0
+transformers>=4.30.0
+numpy>=1.24.0
+tokenizers>=0.13.0
+```
+
+## Getting Started
+
+### 1. Setup Environment
+```bash
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### 2. Load Model
+```python
+# Example code to load gpt-4
+import json
+
+# Load configuration
+with open('config.json', 'r') as f:
+    config = json.load(f)
+
+# Initialize model (framework-specific)
+# Add your model initialization code here
+```
+
+## Best Practices
+
+1. **Version Control**: Track model versions and configurations
+2. **Testing**: Implement comprehensive tests for model inference
+3. **Documentation**: Keep documentation up-to-date with model changes
+4. **Performance**: Monitor and optimize inference performance
+5. **Security**: Validate inputs and handle errors gracefully
+```
+
+#### 5. `haconiwa scan compare gpt-4 claude-3-opus` - Compare Models
+```
+🔍 Model Comparison Analysis
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 Basic Comparison:
+┏━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┓
+┃ Feature       ┃ gpt-4         ┃ claude-3-opus  ┃
+┡━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━┩
+│ Provider      │ OpenAI        │ Anthropic      │
+│ Category      │ LLM           │ LLM            │
+│ Files         │ 24            │ 32             │
+│ Config Found  │ ✓             │ ✓              │
+│ Examples      │ 6             │ 8              │
+│ Tests         │ ✓             │ ✓              │
+│ Documentation │ README.md     │ README.md      │
+└───────────────┴───────────────┴────────────────┘
+
+📁 Unique Files:
+GPT-4 only:
+- api_reference.md
+- deployment_guide.md
+
+Claude-3-Opus only:
+- safety_guidelines.md
+- constitutional_ai.md
+- context_window.md
+
+🔧 Configuration Differences:
+- Max tokens: gpt-4 (8192) vs claude-3-opus (100000)
+- Training data cutoff: gpt-4 (2023-04) vs claude-3-opus (2023-08)
+
+💡 Recommendations:
+- Both models have comprehensive test coverage
+- Claude-3-Opus has more extensive safety documentation
+- GPT-4 includes more deployment examples
+```
+
+### 🎯 Practical Use Cases for scan Command
+
+1. **New Project Setup**
+   ```bash
+   # Check available models in project
+   haconiwa scan list
+   
+   # Generate quickstart guide for specific model
+   haconiwa scan guide gpt-4 --type quickstart --output quickstart.md
+   ```
+
+2. **Codebase Investigation**
+   ```bash
+   # Search for model initialization patterns
+   haconiwa scan content "load_model|from_pretrained" --type .py
+   
+   # Analyze project structure
+   haconiwa scan analyze --show-structure
+   ```
+
+3. **Model Migration Planning**
+   ```bash
+   # Compare two models in detail
+   haconiwa scan compare old-model new-model --output migration-plan.yaml
+   
+   # Generate integration guide for new model
+   haconiwa scan guide new-model --type integration
+   ```
+
+4. **Automated Documentation**
+   ```bash
+   # Generate documentation for all models
+   for model in $(haconiwa scan list --format json | jq -r '.models[].name'); do
+     haconiwa scan guide "$model" --type development --output "docs/${model}-guide.md"
+   done
+   ```
+
+#### 6. `haconiwa scan generate-parallel-config` - Generate Parallel Development Configuration YAML
+
+Automatically generates configuration YAML files for parallel development from scan search results:
+
+**Usage Examples:**
+```bash
+# Basic example (generate sample YAML)
+haconiwa scan generate-parallel-config --example
+
+# Generate from model search results
+haconiwa scan generate-parallel-config --source model:gpt-4 --action add_tests
+
+# Generate migration YAML
+haconiwa scan generate-parallel-config --migration gpt-3.5:gpt-4 --max-files 20
+
+# Generate pattern fix YAML
+haconiwa scan generate-parallel-config --pattern-fix "old_api:replace with new_api" 
+
+# Project-wide changes
+haconiwa scan generate-parallel-config --project-wide "*.py" --action add_type_hints
+
+# Use custom prompt file
+haconiwa scan generate-parallel-config --prompt-file prompts.txt
+```
+
+**Generated YAML Example:**
+```yaml
+provider: claude
+metadata:
+  generated_at: '2024-01-15T14:30:00'
+  source: haconiwa scan generate-parallel-config
+  action: add_tests
+tasks:
+  - file: src/models/user.py
+    prompt: Add validation methods and type hints
+  - file: src/models/product.py
+    prompt: Implement inventory tracking
+  - file: src/models/order.py
+    prompt: Add status management
+options:
+  max_concurrent: 3
+  timeout: 90
+  allowed_tools: [Read, Write, Edit, MultiEdit]
+  permission_mode: confirmEach
+  output_dir: ./parallel-dev-results
+```
+
+**Action Types:**
+- `refactor` - Code refactoring
+- `add_type_hints` - Add type hints
+- `add_validation` - Implement validation
+- `add_tests` - Create test code
+- `add_docs` - Add documentation
+- `optimize` - Performance optimization
+- `security` - Security improvements
+- `async_conversion` - Convert to async
+- `error_handling` - Add error handling
+- `api_implementation` - Implement APIs
+
+**Integration Workflow:**
+```bash
+# 1. Search for model
+haconiwa scan model gpt-4
+
+# 2. Generate parallel development configuration YAML from results
+haconiwa scan generate-parallel-config --source model:gpt-4 --action add_tests
+
+# 3. Review the generated parallel-dev.yaml file
+cat parallel-dev.yaml
+```
+
 ### apply yaml Pattern (v1.0 New Feature)
 
 Declarative YAML file-based multiroom multi-agent environment management is available **right now**:
@@ -932,6 +1304,16 @@ Development environment and world management
 - `haconiwa world list` - List worlds
 - `haconiwa world switch <name>` - Switch world
 
+### `scan` - AI Model Search & Analysis ✅ **Implemented**
+Advanced search and analysis functionality for AI model-related files in projects
+- `haconiwa scan model <name>` - Search by model name (with automatic prefix stripping)
+- `haconiwa scan content <pattern>` - Search file contents with regex
+- `haconiwa scan list` - List available AI models
+- `haconiwa scan analyze` - Analyze directory structure and categorization
+- `haconiwa scan compare <model1> <model2>` - Compare multiple models
+- `haconiwa scan guide <model>` - Generate development guide for specific model
+- `haconiwa scan generate-parallel-config` - Generate parallel development configuration YAML
+
 ## 🛠️ Development Status
 
 > 🎬 **Current Phase**: **Demonstration & Prototyping**  
@@ -946,6 +1328,10 @@ Development environment and world management
 - **Organization, Task, and Desk Customization Features**
 - **Automatic Company Existence Check and Update Functionality**
 - **Flexible Cleanup System**
+- **🔍 AI Model Search & Analysis System (scan command)**
+- **📁 Model name search with automatic prefix stripping**
+- **📝 File content search with regex support**
+- **📊 Model comparison analysis and development guide generation**
 - Help system and command documentation
 - Command group organization and routing
 
@@ -977,6 +1363,62 @@ pip install -e .[dev]
 ```bash
 pytest tests/
 ```
+
+### 🧪 Test Code Guidelines
+
+**Test Directory Structure:**
+```
+tests/
+├── test_scan/              # scan command test module
+│   ├── __init__.py
+│   ├── test_scanner.py     # Scanner class tests
+│   ├── test_analyzer.py    # Analyzer class tests
+│   ├── test_formatter.py   # Formatter class tests
+│   ├── test_comparator.py  # Comparator class tests
+│   ├── test_guide_generator.py  # Guide generator tests
+│   ├── test_generate_parallel.py  # Parallel YAML generator tests
+│   └── test_cli.py         # CLI command tests
+├── unit/                   # Unit tests (optional)
+│   └── test_<module>.py
+└── integration/            # Integration tests (optional)
+    └── test_<feature>.py
+```
+
+**Test Naming Conventions:**
+- **Test Files**: `test_<module_name>.py` - matches the source module being tested
+- **Test Classes**: `Test<ClassName>` - PascalCase with "Test" prefix
+- **Test Methods**: `test_<functionality_description>` - snake_case with "test_" prefix
+
+**Examples:**
+```python
+# File: tests/test_scan/test_scanner.py
+class TestModelScanner:
+    def test_search_by_model_name(self):
+        """Test model name search functionality"""
+        pass
+    
+    def test_search_with_prefix_stripping(self):
+        """Test automatic prefix removal feature"""
+        pass
+
+# File: tests/test_scan/test_cli.py
+class TestScanCLI:
+    def test_scan_model_command(self):
+        """Test the scan model command"""
+        pass
+```
+
+**Test Documentation:**
+- Each test file should have a module docstring explaining what it tests
+- Each test class should have a class docstring describing the test scope
+- Each test method should have a clear, descriptive name that explains what it tests
+- Use docstrings for complex test scenarios
+
+**Test Coverage:**
+- Aim for high test coverage (>80%)
+- Test both happy paths and edge cases
+- Include integration tests for CLI commands
+- Mock external dependencies appropriately
 
 ## 📝 License
 

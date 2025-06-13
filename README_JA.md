@@ -753,6 +753,378 @@ haconiwa monitor -c my-company -w 0 --japanese
 
 monitor機能は**実際にテスト済み**で、32ペインの大規模マルチエージェント環境でも安定動作を確認しています。
 
+### 🔍 scanコマンド - AIモデル検索・分析機能 ✅ **実装済み**
+
+高度なAIモデル検索・分析機能を**今すぐ**利用できます：
+
+```bash
+# 1. モデル名で検索（プレフィックス自動削除）
+haconiwa scan model gpt-4
+haconiwa scan model claude-3-opus --no-strip-prefix
+
+# 2. ファイル内容を検索
+haconiwa scan content "import torch" --type .py
+haconiwa scan content "model\.forward\(" --context 5
+
+# 3. AIモデル一覧表示
+haconiwa scan list
+haconiwa scan list --provider openai
+haconiwa scan list --category llm --format json
+
+# 4. ディレクトリ構造分析
+haconiwa scan analyze
+haconiwa scan analyze --path ./models
+haconiwa scan analyze --show-structure
+
+# 5. モデル比較分析
+haconiwa scan compare gpt-4 claude-3-opus
+haconiwa scan compare gpt-3.5-turbo gpt-4 --output comparison.json
+
+# 6. 開発ガイド生成
+haconiwa scan guide gpt-4 --type development
+haconiwa scan guide claude-3 --type quickstart --output guide.md
+```
+
+**🎯 scanコマンドの主な機能:**
+- **モデル名検索**: プレフィックス（gpt-, claude-等）の自動削除対応
+- **コンテンツ検索**: 正規表現対応、コンテキスト行表示
+- **カテゴリ分類**: LLM、Vision、Audio、Multimodal等の自動分類
+- **プロバイダー識別**: OpenAI、Anthropic、Meta等の自動識別
+- **比較分析**: 複数モデルの機能・パラメータ比較
+- **ガイド生成**: 開発、使用方法、統合、クイックスタートガイドの自動生成
+- **多様な出力形式**: text、json、yaml、table、tree形式対応
+
+**💡 使用例:**
+```bash
+# プロジェクト内のGPT-4関連ファイルを検索
+haconiwa scan model gpt-4 --format tree
+
+# Pythonファイル内でモデル初期化コードを検索
+haconiwa scan content "model = .*\(" --type .py --context 3
+
+# OpenAIとAnthropicのモデルを比較
+haconiwa scan compare gpt-4 claude-3-opus --output compare.yaml
+
+# 開発ガイドを生成
+haconiwa scan guide gpt-4 --type development --output gpt4-dev-guide.md
+```
+
+scan機能は、AIモデル開発プロジェクトでのモデル管理、ドキュメント生成、移行計画の策定に特に有用です。
+
+### 📄 scanコマンドの出力結果例
+
+#### 1. `haconiwa scan list` - モデル一覧表示
+```
+          Available AI Models          
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━┓
+┃ Provider ┃ Model         ┃ Category ┃ Files ┃
+┡━━━━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━┩
+│ openai   │ gpt-4         │ llm      │ 24    │
+│ openai   │ gpt-3.5-turbo │ llm      │ 18    │
+│ anthropic│ claude-3-opus │ llm      │ 32    │
+│ meta     │ llama-2-70b   │ llm      │ 45    │
+│ google   │ gemini-pro    │ multimodal│ 28   │
+└──────────┴───────────────┴──────────┴───────┘
+```
+
+#### 2. `haconiwa scan content "model.forward"` - コンテンツ検索
+```
+pattern: model.forward
+matches:
+  file: models/gpt4/inference.py
+  line_number: 156
+  line: output = model.forward(input_ids, attention_mask=mask)
+  context:
+    - # Prepare input tensors
+    - input_ids = tokenizer.encode(text)
+    - mask = create_attention_mask(input_ids)
+    - output = model.forward(input_ids, attention_mask=mask)
+    - logits = output.logits
+    
+  file: models/claude/model.py
+  line_number: 89
+  line: result = self.model.forward(tokens)
+  context:
+    - def generate(self, prompt):
+    -     tokens = self.tokenize(prompt)
+    -     result = self.model.forward(tokens)
+    -     return self.decode(result)
+```
+
+#### 3. `haconiwa scan analyze` - ディレクトリ構造分析
+```
+📊 AI Model Directory Analysis
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Total models found: 12
+Total files: 342
+Total size: 2.4 GB
+
+📁 Directory Structure:
+models/
+├── openai/          (5 models, 89 files)
+│   ├── gpt-4/
+│   ├── gpt-3.5-turbo/
+│   └── embeddings/
+├── anthropic/       (3 models, 76 files)
+│   ├── claude-3-opus/
+│   └── claude-3-sonnet/
+└── opensource/      (4 models, 177 files)
+    ├── llama-2/
+    └── mistral/
+
+📊 Category Distribution:
+- LLM: 8 models (66.7%)
+- Vision: 2 models (16.7%)
+- Multimodal: 2 models (16.7%)
+
+🔍 Insights:
+- Most models include example scripts
+- Configuration files follow similar patterns
+- Test coverage: 78% of models have tests
+```
+
+#### 4. `haconiwa scan guide gpt-4 --type development` - 開発ガイド生成
+
+開発ガイド機能は、プロジェクト内で発見されたモデル情報を基に、4種類の包括的なドキュメントを自動生成します：
+
+**生成されるガイドの種類：**
+- **development** (開発ガイド): モデル設定、ファイル構造、依存関係、開始方法、ベストプラクティス
+- **usage** (使用ガイド): 基本的な使い方、一般的なユースケース、コード例、パフォーマンス最適化のヒント
+- **integration** (統合ガイド): システム要件、デプロイオプション、API統合、監視設定
+- **quickstart** (クイックスタート): 5分で始められる最小限のセットアップと実行例
+
+**出力例（開発ガイド）：**
+```markdown
+# Development Guide: gpt-4
+
+Generated on: 2024-01-15 14:30:45
+
+## Overview
+
+This guide provides development information for working with gpt-4.
+
+## Model Configuration
+
+```json
+{
+  "model_type": "transformer",
+  "hidden_size": 1024,
+  "num_layers": 24,
+  "num_attention_heads": 16,
+  "vocab_size": 50257,
+  "max_position_embeddings": 2048
+}
+```
+
+## Categories
+
+This model is categorized as: llm
+
+## File Structure
+
+Total files: 24
+
+### Key Files:
+- `config.json` (json)
+- `model.py` (python)
+- `tokenizer.py` (python)
+- `inference.py` (python)
+- `requirements.txt` (text)
+- `examples/chat_completion.py` (python)
+- `tests/test_model.py` (python)
+
+## Requirements
+
+### Dependencies:
+
+From `requirements.txt`:
+```
+torch>=2.0.0
+transformers>=4.30.0
+numpy>=1.24.0
+tokenizers>=0.13.0
+```
+
+## Getting Started
+
+### 1. Setup Environment
+```bash
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### 2. Load Model
+```python
+# Example code to load gpt-4
+import json
+
+# Load configuration
+with open('config.json', 'r') as f:
+    config = json.load(f)
+
+# Initialize model (framework-specific)
+# Add your model initialization code here
+```
+
+## Best Practices
+
+1. **Version Control**: Track model versions and configurations
+2. **Testing**: Implement comprehensive tests for model inference
+3. **Documentation**: Keep documentation up-to-date with model changes
+4. **Performance**: Monitor and optimize inference performance
+5. **Security**: Validate inputs and handle errors gracefully
+```
+
+#### 5. `haconiwa scan compare gpt-4 claude-3-opus` - モデル比較
+```
+🔍 Model Comparison Analysis
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 Basic Comparison:
+┏━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┓
+┃ Feature       ┃ gpt-4         ┃ claude-3-opus  ┃
+┡━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━┩
+│ Provider      │ OpenAI        │ Anthropic      │
+│ Category      │ LLM           │ LLM            │
+│ Files         │ 24            │ 32             │
+│ Config Found  │ ✓             │ ✓              │
+│ Examples      │ 6             │ 8              │
+│ Tests         │ ✓             │ ✓              │
+│ Documentation │ README.md     │ README.md      │
+└───────────────┴───────────────┴────────────────┘
+
+📁 Unique Files:
+GPT-4 only:
+- api_reference.md
+- deployment_guide.md
+
+Claude-3-Opus only:
+- safety_guidelines.md
+- constitutional_ai.md
+- context_window.md
+
+🔧 Configuration Differences:
+- Max tokens: gpt-4 (8192) vs claude-3-opus (100000)
+- Training data cutoff: gpt-4 (2023-04) vs claude-3-opus (2023-08)
+
+💡 Recommendations:
+- Both models have comprehensive test coverage
+- Claude-3-Opus has more extensive safety documentation
+- GPT-4 includes more deployment examples
+```
+
+### 🎯 scanコマンドの活用シナリオ
+
+1. **新規プロジェクト立ち上げ時**
+   ```bash
+   # プロジェクト内の利用可能なモデルを確認
+   haconiwa scan list
+   
+   # 特定モデルの開発ガイドを生成
+   haconiwa scan guide gpt-4 --type quickstart --output quickstart.md
+   ```
+
+2. **既存コードベースの調査**
+   ```bash
+   # モデル初期化パターンを検索
+   haconiwa scan content "load_model|from_pretrained" --type .py
+   
+   # プロジェクト構造を分析
+   haconiwa scan analyze --show-structure
+   ```
+
+3. **モデル移行計画**
+   ```bash
+   # 2つのモデルを詳細比較
+   haconiwa scan compare old-model new-model --output migration-plan.yaml
+   
+   # 新モデルの統合ガイドを生成
+   haconiwa scan guide new-model --type integration
+   ```
+
+4. **ドキュメント自動生成**
+   ```bash
+   # 全モデルのドキュメントを一括生成
+   for model in $(haconiwa scan list --format json | jq -r '.models[].name'); do
+     haconiwa scan guide "$model" --type development --output "docs/${model}-guide.md"
+   done
+   ```
+
+#### 6. `haconiwa scan generate-parallel-config` - 並列開発設定YAML生成
+
+scanコマンドの検索結果から、並列開発用の設定YAMLファイルを自動生成します：
+
+**使用例：**
+```bash
+# 基本的な例（サンプルYAMLを生成）
+haconiwa scan generate-parallel-config --example
+
+# モデル検索結果から生成
+haconiwa scan generate-parallel-config --source model:gpt-4 --action add_tests
+
+# モデル移行用YAML生成
+haconiwa scan generate-parallel-config --migration gpt-3.5:gpt-4 --max-files 20
+
+# パターン修正用YAML生成
+haconiwa scan generate-parallel-config --pattern-fix "old_api:new_api に置換" 
+
+# プロジェクト全体の変更
+haconiwa scan generate-parallel-config --project-wide "*.py" --action add_type_hints
+
+# カスタムプロンプトファイルを使用
+haconiwa scan generate-parallel-config --prompt-file prompts.txt
+```
+
+**生成されるYAMLの例：**
+```yaml
+provider: claude
+metadata:
+  generated_at: '2024-01-15T14:30:00'
+  source: haconiwa scan generate-parallel-config
+  action: add_tests
+tasks:
+  - file: src/models/user.py
+    prompt: Add validation methods and type hints
+  - file: src/models/product.py
+    prompt: Implement inventory tracking
+  - file: src/models/order.py
+    prompt: Add status management
+options:
+  max_concurrent: 3
+  timeout: 90
+  allowed_tools: [Read, Write, Edit, MultiEdit]
+  permission_mode: confirmEach
+  output_dir: ./parallel-dev-results
+```
+
+**アクションタイプ：**
+- `refactor` - コードのリファクタリング
+- `add_type_hints` - 型ヒントの追加
+- `add_validation` - バリデーションの実装
+- `add_tests` - テストコードの作成
+- `add_docs` - ドキュメントの追加
+- `optimize` - パフォーマンス最適化
+- `security` - セキュリティ改善
+- `async_conversion` - 非同期化
+- `error_handling` - エラーハンドリング追加
+- `api_implementation` - API実装
+
+**統合ワークフロー：**
+```bash
+# 1. モデルを検索
+haconiwa scan model gpt-4
+
+# 2. 検索結果から並列開発設定YAMLを生成
+haconiwa scan generate-parallel-config --source model:gpt-4 --action add_tests
+
+# 3. 生成されたparallel-dev.yamlファイルを確認
+cat parallel-dev.yaml
+```
+
 ## 📚 buildコマンド詳細ガイド
 
 ### 基本的な使い方
@@ -873,6 +1245,7 @@ tmux kill-session -t my-company
 - 📋 **タスク管理**: git-worktreeと連携したタスク管理システム
 - 📊 **リソース管理**: DBやファイルパスの効率的なスキャン
 - 👁️ **リアルタイム監視**: エージェントやタスクの進捗監視
+- 🛠️ **開発ツール連携**: Claude Code SDK等を使用した並列開発支援（開発中）
 
 ## 🏗️ アーキテクチャ概念
 
@@ -1020,6 +1393,13 @@ CLIツールは7つの主要コマンドグループを提供します：
 - `haconiwa resource scan` - リソーススキャン
 - `haconiwa resource list` - リソース一覧表示
 
+### `tool` - 開発ツール管理
+外部ツールやSDKとの統合機能
+- `haconiwa tool list` - 利用可能なツール一覧
+- `haconiwa tool install <tool>` - ツールのインストール
+- `haconiwa tool configure <tool>` - ツールの設定
+- `haconiwa tool parallel-dev` - AI並列開発機能（開発中）
+
 ### `company` - tmux会社と企業管理
 tmuxを使った効率的な開発企業環境管理
 - `haconiwa company build <name>` - tmux会社の作成・更新・再構築
@@ -1055,6 +1435,58 @@ tmuxマルチエージェント環境のリアルタイム監視と可視化
 - `haconiwa monitor -c <company> -r <interval>` - 更新間隔調整
 - `haconiwa monitor help` - 詳細ヘルプ表示
 
+### `scan` - AIモデル検索・分析コマンド ✅ **実装済み**
+プロジェクト内のAIモデル関連ファイルの高度な検索・分析機能
+- `haconiwa scan model <name>` - モデル名で検索（プレフィックス自動削除対応）
+- `haconiwa scan content <pattern>` - ファイル内容を正規表現で検索
+- `haconiwa scan list` - 利用可能なAIモデル一覧表示
+- `haconiwa scan analyze` - ディレクトリ構造とカテゴリ分析
+- `haconiwa scan compare <model1> <model2>` - 複数モデルの比較分析
+- `haconiwa scan guide <model>` - モデル別開発ガイド生成
+- `haconiwa scan generate-parallel-config` - 並列開発用の設定YAML生成
+
+### `tool` - 開発ツール連携コマンド
+外部ツールやSDKとの統合機能
+- `haconiwa tool list` - 利用可能なツール一覧
+- `haconiwa tool install <tool>` - ツールのインストール  
+- `haconiwa tool configure <tool>` - ツールの設定
+- **`haconiwa tool parallel-dev`** - AI並列開発機能 🚧 **開発中**
+
+#### `tool parallel-dev` - Claude Code SDK並列実行機能
+高速並列ファイル編集のためのAI開発支援機能
+- `haconiwa tool parallel-dev claude` - Claude Code SDKでの並列編集実行
+- `haconiwa tool parallel-dev status` - 実行中タスクの状態確認
+- `haconiwa tool parallel-dev cancel <task-id>` - 実行中タスクのキャンセル
+- `haconiwa tool parallel-dev history` - 実行履歴表示
+
+**主な機能:**
+- 🚀 **高速並列処理**: 最大10ファイルの同時編集
+- 📝 **柔軟なプロンプト指定**: ファイルごとに個別のプロンプト
+- 🎯 **セマフォ制御**: 同時実行数の制限でAPI負荷を管理
+- 📊 **リアルタイム進捗表示**: 処理状況の可視化
+- 🔧 **エラーハンドリング**: 個別失敗でも他タスクは継続
+
+**使用例:**
+```bash
+# 基本的な並列編集（3ファイル）
+haconiwa tool parallel-dev claude \
+  -f src/main.py,src/utils.py,src/api.py \
+  -p "Add type hints","Refactor functions","Add error handling"
+
+# 10ファイルの一斉修正
+haconiwa tool parallel-dev claude \
+  --file-list files.txt \
+  --prompt-file prompts.txt \
+  -m 5 \
+  -t 120
+
+# YAML設定ファイルから実行
+haconiwa tool parallel-dev claude --from-yaml parallel-dev.yaml
+
+# 実行状態の確認
+haconiwa tool parallel-dev status
+```
+
 ## 🛠️ 開発状況
 
 > 🎬 **現在のフェーズ**: **デモンストレーション・プロトタイピング**  
@@ -1075,6 +1507,10 @@ tmuxマルチエージェント環境のリアルタイム監視と可視化
 - **🇯🇵 完全日本語UI対応**
 - **🎨 視覚的CPU稼働率表示**
 - **📈 智能ステータス自動判定機能**
+- **🔍 AIモデル検索・分析システム（scan コマンド）**
+- **📁 モデル名検索とプレフィックス自動削除機能**
+- **📝 ファイル内容の正規表現検索**
+- **📊 モデル比較分析と開発ガイド生成**
 - ヘルプシステムとコマンドドキュメント
 - コマンドグループの組織化とルーティング
 
@@ -1084,6 +1520,12 @@ tmuxマルチエージェント環境のリアルタイム監視と可視化
 - リソーススキャン機能 (プレースホルダー → 実装)
 - リアルタイム監視システム (プレースホルダー → 実装)
 - ワールド/環境管理 (プレースホルダー → 実装)
+- **開発ツール連携機能（tool parallel-dev）** (設計 → 実装中)
+  - Claude Code SDK統合による並列ファイル編集（最大10ファイル同時）
+  - asyncio.gatherによる高速非同期処理
+  - 柔軟なプロンプト管理（ファイルごとに個別指定）
+  - エラーハンドリングと進捗表示
+  - 将来的に他のAIツール（GitHub Copilot、ChatGPT等）も統合予定
 
 ### 📋 計画中機能
 - 高度なAIエージェント協調
@@ -1106,6 +1548,62 @@ pip install -e .[dev]
 ```bash
 pytest tests/
 ```
+
+### 🧪 テストコードガイドライン
+
+**テストディレクトリ構造:**
+```
+tests/
+├── test_scan/              # scanコマンドのテストモジュール
+│   ├── __init__.py
+│   ├── test_scanner.py     # Scannerクラスのテスト
+│   ├── test_analyzer.py    # Analyzerクラスのテスト
+│   ├── test_formatter.py   # Formatterクラスのテスト
+│   ├── test_comparator.py  # Comparatorクラスのテスト
+│   ├── test_guide_generator.py  # ガイド生成のテスト
+│   ├── test_generate_parallel.py  # 並列YAML生成のテスト
+│   └── test_cli.py         # CLIコマンドのテスト
+├── unit/                   # ユニットテスト（オプション）
+│   └── test_<module>.py
+└── integration/            # 統合テスト（オプション）
+    └── test_<feature>.py
+```
+
+**テスト命名規則:**
+- **テストファイル**: `test_<module_name>.py` - テスト対象のソースモジュールと対応
+- **テストクラス**: `Test<ClassName>` - "Test"プレフィックス付きのPascalCase
+- **テストメソッド**: `test_<functionality_description>` - "test_"プレフィックス付きのsnake_case
+
+**例:**
+```python
+# ファイル: tests/test_scan/test_scanner.py
+class TestModelScanner:
+    def test_search_by_model_name(self):
+        """モデル名検索機能のテスト"""
+        pass
+    
+    def test_search_with_prefix_stripping(self):
+        """プレフィックス自動削除機能のテスト"""
+        pass
+
+# ファイル: tests/test_scan/test_cli.py
+class TestScanCLI:
+    def test_scan_model_command(self):
+        """scan modelコマンドのテスト"""
+        pass
+```
+
+**テストドキュメント:**
+- 各テストファイルには、何をテストするかを説明するモジュールdocstringを含める
+- 各テストクラスには、テスト範囲を説明するクラスdocstringを含める
+- 各テストメソッドには、何をテストするかが分かる明確で説明的な名前を付ける
+- 複雑なテストシナリオにはdocstringを使用する
+
+**テストカバレッジ:**
+- 高いテストカバレッジ（>80%）を目指す
+- ハッピーパスとエッジケースの両方をテストする
+- CLIコマンドの統合テストを含める
+- 外部依存関係は適切にモック化する
 
 ## 📝 ライセンス
 

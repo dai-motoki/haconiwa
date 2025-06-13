@@ -1,5 +1,3 @@
-import os
-
 __all__ = ["TaskManager"]
 
 class TaskManager:

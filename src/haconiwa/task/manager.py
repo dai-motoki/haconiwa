@@ -113,13 +113,13 @@ class TaskManager:
             logger.info(f"Creating worktree: {worktree_path} for branch: {branch}")
             
             # First, ensure we're on the default branch and it's up to date
-            logger.info(f"Fetching and checking out {self.default_branch} branch")
+            logger.info(f"Fetching and syncing with origin/{self.default_branch}")
             
-            # Fetch the latest from origin
-            fetch_result = subprocess.run(['git', '-C', str(main_repo_path), 'fetch', 'origin', self.default_branch], 
+            # Fetch all from origin to ensure we have latest refs
+            fetch_result = subprocess.run(['git', '-C', str(main_repo_path), 'fetch', 'origin'], 
                                         capture_output=True, text=True)
             if fetch_result.returncode != 0:
-                logger.warning(f"Failed to fetch {self.default_branch}: {fetch_result.stderr}")
+                logger.warning(f"Failed to fetch from origin: {fetch_result.stderr}")
             
             # Checkout default branch
             checkout_result = subprocess.run(['git', '-C', str(main_repo_path), 'checkout', self.default_branch], 
@@ -127,11 +127,11 @@ class TaskManager:
             if checkout_result.returncode != 0:
                 logger.warning(f"Failed to checkout {self.default_branch}: {checkout_result.stderr}")
             
-            # Pull latest changes
-            pull_result = subprocess.run(['git', '-C', str(main_repo_path), 'pull', 'origin', self.default_branch], 
-                                       capture_output=True, text=True)
-            if pull_result.returncode != 0:
-                logger.warning(f"Failed to pull {self.default_branch}: {pull_result.stderr}")
+            # Hard reset to origin to ensure we're exactly at origin's state
+            reset_result = subprocess.run(['git', '-C', str(main_repo_path), 'reset', '--hard', f'origin/{self.default_branch}'], 
+                                        capture_output=True, text=True)
+            if reset_result.returncode != 0:
+                logger.warning(f"Failed to reset to origin/{self.default_branch}: {reset_result.stderr}")
             
             # Check if branch already exists
             check_branch = subprocess.run(['git', '-C', str(main_repo_path), 'rev-parse', '--verify', branch], 
@@ -294,7 +294,7 @@ class TaskManager:
                 return candidate
         
         # Strategy 3: Scan all directories for tasks subdirectory (fallback)
-        logger.debug(f"Scanning current directory for any directory with 'tasks' subdirectory...")
+        logger.debug("Scanning current directory for any directory with 'tasks' subdirectory...")
         current_dirs = [p for p in Path(".").iterdir() if p.is_dir()]
         for dir_path in current_dirs:
             if (dir_path / "tasks").exists():
@@ -620,8 +620,10 @@ class TaskManager:
                 return False
             
             # Create .haconiwa directory for agent logs
-            haconiwa_dir = task_path / ".haconiwa"
-            haconiwa_dir.mkdir(exist_ok=True)
+            # Use task directory name as subdirectory to avoid conflicts
+            task_name_dir = task_path.name
+            haconiwa_dir = task_path / ".haconiwa" / task_name_dir
+            haconiwa_dir.mkdir(parents=True, exist_ok=True)
             
             # Agent assignment log file
             log_file = haconiwa_dir / "agent_assignment.json"
@@ -757,8 +759,10 @@ class TaskManager:
                 return False
             
             # Create .haconiwa directory for agent logs
-            haconiwa_dir = task_dir / ".haconiwa"
-            haconiwa_dir.mkdir(exist_ok=True)
+            # Use task directory name as subdirectory to avoid conflicts
+            task_name_dir = task_dir.name
+            haconiwa_dir = task_dir / ".haconiwa" / task_name_dir
+            haconiwa_dir.mkdir(parents=True, exist_ok=True)
             
             # Agent assignment log file
             log_file = haconiwa_dir / "agent_assignment.json"

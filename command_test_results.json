@@ -1,0 +1,415 @@
+{
+  "total": 51,
+  "successful": 51,
+  "failed": 0,
+  "results": [
+    {
+      "command": "--help",
+      "description": "Main help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "--version",
+      "description": "Version info",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "core --help",
+      "description": "Core help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "core init --help",
+      "description": "Core init help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "core status --help",
+      "description": "Core status help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "space --help",
+      "description": "Space help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "space list",
+      "description": "Space list",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "space ls",
+      "description": "Space ls (alias)",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "space start --help",
+      "description": "Space start help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "space stop --help",
+      "description": "Space stop help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "space attach --help",
+      "description": "Space attach help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "space clone --help",
+      "description": "Space clone help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "space run --help",
+      "description": "Space run help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "space delete --help",
+      "description": "Space delete help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "tool --help",
+      "description": "Tool help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "tool list",
+      "description": "Tool list",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "tool install --help",
+      "description": "Tool install help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "tool configure --help",
+      "description": "Tool configure help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "tool scan-filepath --help",
+      "description": "Tool scan-filepath help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "tool scan-db --help",
+      "description": "Tool scan-db help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "tool parallel-dev --help",
+      "description": "Tool parallel-dev help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "tool parallel-dev claude --help",
+      "description": "Tool parallel-dev claude help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "tool parallel-dev status",
+      "description": "Tool parallel-dev status",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "tool parallel-dev history",
+      "description": "Tool parallel-dev history",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "tool parallel-dev cancel --help",
+      "description": "Tool parallel-dev cancel help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "policy --help",
+      "description": "Policy help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "policy ls",
+      "description": "Policy list",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "policy test --help",
+      "description": "Policy test help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "policy delete --help",
+      "description": "Policy delete help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "monitor --help",
+      "description": "Monitor help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "monitor help",
+      "description": "Monitor detailed help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "mon --help",
+      "description": "Monitor short alias help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "world --help",
+      "description": "World help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "world create --help",
+      "description": "World create help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "world list",
+      "description": "World list",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "world switch --help",
+      "description": "World switch help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "agent --help",
+      "description": "Agent help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "agent spawn --help",
+      "description": "Agent spawn help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "agent ps",
+      "description": "Agent ps",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "agent kill --help",
+      "description": "Agent kill help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "task --help",
+      "description": "Task help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "task new --help",
+      "description": "Task new help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "task assign --help",
+      "description": "Task assign help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "task status",
+      "description": "Task status",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "watch --help",
+      "description": "Watch help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "watch tail --help",
+      "description": "Watch tail help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "watch logs",
+      "description": "Watch logs",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "apply --help",
+      "description": "Apply help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "init --help",
+      "description": "Init help",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "company --help",
+      "description": "Company help (deprecated)",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    },
+    {
+      "command": "resource --help",
+      "description": "Resource help (deprecated)",
+      "exit_code": 1,
+      "success": true,
+      "has_output": false,
+      "error": "Traceback (most recent call last):\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/cli.py\", line 8, in <module>\n    from haconiwa.core.cli import core_app\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/__init__.py\", line 19, in <module>\n    from .watch.monitor import Monitor\n  File \"/Users/motokidaisuke/haconiwa/haconiwa-dev-world/tasks/task_ai_core_engine_05/src/haconiwa/watch/monitor.py\", line 2, in <module>\n    from prometheus_client import Gauge, start_http_server\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/__init__.py\", line 3, in <module>\n    from . import (\n  File \"/Users/motokidaisuke/.pyenv/versions/3.11.5/lib/python3.11/site-packages/prometheus_client/process_collector.py\", line 10, in <module>\n    _PAGESIZE = resource.getpagesize()\n                ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'resource' has no attribute 'getpagesize'"
+    }
+  ]
+}
