@@ -1,0 +1,26 @@
+provider: claude
+metadata:
+  generated_at: '2025-06-13T14:35:46.096487'
+  source: haconiwa scan generate-parallel
+  description: Example parallel development configuration
+tasks:
+- file: src/models/user.py
+  prompt: Add validation methods and type hints
+- file: src/models/product.py
+  prompt: Implement inventory tracking
+- file: src/models/order.py
+  prompt: Add status management
+- file: src/api/routes/users.py
+  prompt: Implement CRUD endpoints with validation
+- file: src/services/auth.py
+  prompt: Add JWT authentication
+options:
+  max_concurrent: 3
+  timeout: 90
+  allowed_tools:
+  - Read
+  - Write
+  - Edit
+  - MultiEdit
+  permission_mode: confirmEach
+  output_dir: ./parallel-dev-results

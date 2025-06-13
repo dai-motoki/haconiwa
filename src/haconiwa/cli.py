@@ -13,6 +13,7 @@ from haconiwa.agent.cli import agent_app
 from haconiwa.task.cli import task_app
 from haconiwa.watch.cli import watch_app
 from haconiwa.monitor import TmuxMonitor
+from haconiwa.scan.cli import scan_app
 
 # Import new v1.0 components
 from haconiwa.core.crd.parser import CRDParser, CRDValidationError
@@ -893,6 +894,7 @@ app.add_typer(tool_app, name="tool")
 app.add_typer(policy_app, name="policy")
 app.add_typer(monitor_app, name="monitor")
 app.add_typer(monitor_app, name="mon")  # Short alias for monitor
+app.add_typer(scan_app, name="scan")  # Universal AI model search
 
 # 既存コマンド（一部deprecated）
 app.add_typer(core_app, name="core")
