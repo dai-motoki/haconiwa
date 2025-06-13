@@ -65,3 +65,10 @@ test_cases/minimal/
 test-*/
 *-test-*/
 *.test-*
+
+# Parallel-dev specific
+parallel-dev-results/
+test_claude_direct.py
+test_claude_sdk.py
+test_simple_claude.py
+test_parallel_yaml.yaml
