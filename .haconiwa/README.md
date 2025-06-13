@@ -1,9 +1,15 @@
 # エージェント割り当て情報
 
 ## 基本情報
+
 - **エージェントID**: `ai-lead-nakamura`
 - **タスク名**: `task_ai_core_engine_05`
 - **割り当て日時**: 2025-06-13T13:22:02.968471
+
+- **エージェントID**: `ceo-motoki`
+- **タスク名**: `task_ai_strategy_01`
+- **割り当て日時**: 2025-06-13T13:22:02.930391
+
 - **ステータス**: active
 
 ## 環境情報
@@ -11,6 +17,8 @@
 - **tmuxウィンドウ**: None
 - **tmuxペイン**: None
 - **タスクディレクトリ**: `haconiwa-dev-world/tasks/task_ai_core_engine_05`
+- **タスクディレクトリ**: `haconiwa-dev-world/tasks/task_ai_strategy_01`
+
 
 ## エージェント役割
 **役割**: 未定義
