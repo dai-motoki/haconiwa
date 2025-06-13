@@ -554,7 +554,11 @@ def space_delete(
             # Remove directories
             cleaned_dirs = []
             for dir_path in dirs_to_clean:
-                if Path(dir_path).exists():
+                path_obj = Path(dir_path)
+                if path_obj.exists():
+                    # Skip if it's not a directory (e.g., YAML files)
+                    if not path_obj.is_dir():
+                        continue
                     try:
                         shutil.rmtree(dir_path)
                         cleaned_dirs.append(dir_path)

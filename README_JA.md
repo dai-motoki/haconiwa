@@ -7,9 +7,26 @@
 
 **箱庭 (Haconiwa)** は、AI協調開発支援Python CLIツールです。tmux会社管理、git-worktree連携、タスク管理、AIエージェント調整機能を統合し、効率的な開発環境を提供する次世代ツールです。
 
-> ⚠️ **注意**: このプロジェクトは現在活発に開発中です。機能やAPIは頻繁に変更される可能性があります。
-
 [🇺🇸 English README](README.md)
+
+## ⚠️ 免責事項
+
+このプロジェクトは初期アルファ開発段階かつ**デモンストレーションフェーズ**にあります。現在のCLIコマンドは主に意図されたインターフェースデザインを示すプレースホルダーです。ほとんどの機能は活発に開発中でまだ実装されていません。
+
+**現在動作するもの:**
+- CLIのインストールとコマンド構造
+- ヘルプシステムとドキュメント
+- 基本的なコマンドルーティング
+
+**今後実装予定:**
+- 宣伝されている全機能の完全実装
+- AIエージェント協調機能
+- 開発ツールとの統合
+- 実際のタスクと会社管理
+
+現時点では本番環境での使用は推奨されません。これは意図されたユーザーエクスペリエンスを示す開発プレビューです。
+
+> ⚠️ **注意**: このプロジェクトは現在活発に開発中です。機能やAPIは頻繁に変更される可能性があります。
 
 ## 📋 バージョン管理
 
@@ -19,6 +36,358 @@
 - **🏷️ 最新バージョン**: 0.4.0
 - **📦 PyPI**: [haconiwa](https://pypi.org/project/haconiwa/)
 - **🔖 GitHubリリース**: [Releases](https://github.com/dai-motoki/haconiwa/releases)
+
+## 🔧 最近の更新 (2025-06-13)
+
+**タスクブランチの修正**: YAMLで指定された`defaultBranch`ではなく`main`ブランチからタスクブランチが作成される問題を修正しました。YAML設定で`defaultBranch: "dev"`を指定すると、すべてのタスクワークツリーが正しく`dev`ブランチから作成されるようになりました。
+
+- ✅ Task CRDが関連するSpace CRDから`defaultBranch`を適切に継承
+- ✅ 既存の誤ったブランチを自動的に検出し、正しいブランチから再作成
+- ✅ ハードコードされた`main`ブランチへのすべての参照を設定可能なデフォルトに置き換え
+
+## 🛠️ 事前準備
+
+**必要な環境のセットアップ**
+
+```bash
+# 1. tmuxのインストール
+# macOS
+brew install tmux
+
+# Ubuntu/Debian
+sudo apt-get install tmux
+
+# 2. Python環境のセットアップ（3.8以上）
+python --version  # バージョン確認
+
+# 3. pipのアップグレード
+pip install --upgrade pip
+
+# 4. Claude Codeのセットアップ
+# 詳細な手順はこちらを参照: https://docs.anthropic.com/en/docs/claude-code/getting-started
+# 環境変数の設定（必要に応じて）
+export ANTHROPIC_API_KEY="your-api-key"
+
+# 5. Haconiwaのインストール
+pip install haconiwa --upgrade
+```
+
+## 📚 基本的なワークフロー
+
+**1. YAMLファイルの取得とプロジェクト立ち上げ**
+
+```bash
+# YAMLファイルダウンロード（GitHubから直接取得）
+wget https://raw.githubusercontent.com/dai-motoki/haconiwa/main/haconiwa-dev-company.yaml
+
+# または curlでダウンロード
+curl -O https://raw.githubusercontent.com/dai-motoki/haconiwa/main/haconiwa-dev-company.yaml
+
+# YAML適用（デフォルトで自動的にtmuxセッションにアタッチ）
+haconiwa apply -f haconiwa-dev-company.yaml
+# tmuxセッションから離脱: Ctrl+b, d
+
+# または、アタッチしない場合
+haconiwa apply -f haconiwa-dev-company.yaml --no-attach
+
+# アタッチしなかった場合は、明示的にアタッチ
+haconiwa space attach -c haconiwa-dev-company
+```
+
+**2. プロジェクトの操作**
+
+```bash
+# tmuxセッションから離脱: Ctrl+b, d
+
+# 別のターミナルでリアルタイム監視
+haconiwa monitor -c haconiwa-dev-company --japanese
+
+# プロジェクト一覧を確認
+haconiwa space list
+
+# プロジェクトに再接続
+haconiwa space attach -c haconiwa-dev-company
+```
+
+**3. プロジェクトの削除**
+
+```bash
+# スペースとディレクトリを完全削除
+haconiwa space delete -c haconiwa-dev-company --clean-dirs --force
+```
+
+## 📝 YAML文法詳細解説
+
+Haconiwaの宣言型YAML設定は、複数のCRD (Custom Resource Definition) をマルチドキュメント形式で記述します。
+
+### 1. Organization CRD（組織定義）
+
+```yaml
+apiVersion: haconiwa.dev/v1
+kind: Organization
+metadata:
+  name: haconiwa-dev-company-org  # 組織の一意識別子
+spec:
+  companyName: "Haconiwa Development Company"  # 会社名
+  industry: "AI Development Tools & Infrastructure"  # 業界
+  basePath: "./haconiwa-dev-company"  # 組織のベースパス
+  hierarchy:
+    departments:  # 部門定義
+    - id: "executive"  # 部門ID（ルーム割り当てに使用）
+      name: "Executive Team"
+      description: "Company leadership and strategic decision making"
+      roles:  # 役割定義
+      - roleType: "management"  # 管理職
+        title: "Chief Executive Officer"
+        agentId: "ceo-motoki"  # エージェントID
+        responsibilities:
+          - "Strategic vision and direction"
+          - "Company-wide decision making"
+      - roleType: "engineering"  # エンジニア
+        title: "Senior AI Engineer"
+        agentId: "ai-lead-nakamura"
+        responsibilities:
+          - "AI/ML model development"
+          - "Algorithm optimization"
+```
+
+**Organization CRDの主要要素:**
+- `metadata.name`: 組織の一意識別子（Space CRDから参照される）
+- `spec.hierarchy.departments`: 部門の定義（各部門がtmuxのルームに対応）
+- `spec.hierarchy.departments[].roles`: 各部門の役割定義（4つの役割で16ペインを構成）
+
+### 2. Space CRD（空間定義）
+
+```yaml
+apiVersion: haconiwa.dev/v1
+kind: Space
+metadata:
+  name: haconiwa-dev-world  # スペースの一意識別子
+spec:
+  nations:  # 国レベル（最上位階層）
+  - id: jp
+    name: Japan
+    cities:  # 市レベル
+    - id: tokyo
+      name: Tokyo
+      villages:  # 村レベル
+      - id: haconiwa-village
+        name: "Haconiwa Village"
+        companies:  # 会社レベル（tmuxセッション）
+        - name: haconiwa-dev-company  # セッション名
+          grid: "8x4"  # グリッドサイズ（8列×4行=32ペイン）
+          basePath: "./haconiwa-dev-world"
+          organizationRef: "haconiwa-dev-company-org"  # 組織参照
+          gitRepo:  # Gitリポジトリ設定
+            url: "https://github.com/dai-motoki/haconiwa"
+            defaultBranch: "dev"  # タスクブランチの基となるブランチ
+            auth: "https"
+          agentDefaults:  # エージェントのデフォルト設定（開発予定）
+            type: "claude-code"
+            permissions:  # 権限設定（開発予定機能）
+              allow:
+                - "Bash(python -m pytest)"
+                - "Bash(python -m ruff)"
+                - "Bash(python -m mypy)"
+                - "Read(src/**/*.py)"
+                - "Write(src/**/*.py)"
+              deny:
+                - "Bash(rm -rf /)"
+          buildings:  # 建物レベル
+          - id: "hq-tower"
+            name: "Haconiwa HQ Tower"
+            floors:  # 階層レベル
+            - id: "executive-floor"
+              name: "Executive Floor"
+              rooms:  # 部屋レベル（tmuxウィンドウ）
+              - id: room-executive  # Executive用ウィンドウ
+                name: "Executive Room"
+                description: "C-level executives and senior leadership"
+              - id: room-standby  # Standby用ウィンドウ
+                name: "Standby Room"
+                description: "Ready-to-deploy talent pool"
+```
+
+**Space CRDの階層構造:**
+- `nations` > `cities` > `villages` > `companies` > `buildings` > `floors` > `rooms`
+- 各階層に法的フレームワーク（law/）を配置可能
+- `companies`がtmuxセッションに対応
+- `rooms`がtmuxウィンドウに対応
+
+**gitRepo設定の詳細解説:**
+- `url`: クローンするGitリポジトリのURL
+- `defaultBranch`: タスクブランチを作成する際の基準となるブランチ
+  - 例: `defaultBranch: "dev"` の場合、すべてのタスクブランチは`dev`ブランチから作成される
+  - これにより、`main`ブランチを保護しながら、開発ブランチからフィーチャーブランチを派生させることが可能
+- `auth`: 認証方式（"https" または "ssh"）
+
+**重要**: `defaultBranch`の設定により、Task CRDで`worktree: true`が指定されたタスクは、このブランチから新しいブランチとworktreeが作成されます。Git worktreeを使用することで、各タスクは独立したディレクトリに隔離され、以下のメリットがあります：
+- 各タスクが専用のワーキングディレクトリを持つため、並行開発が可能
+- ブランチの切り替えなしに複数のタスクを同時進行できる
+- 各エージェントが他のタスクの作業に影響を与えることなく開発可能
+- 例: `task_ai_strategy_01`は`./haconiwa-dev-world/tasks/task_ai_strategy_01/`に独立した作業環境として作成される
+
+**agentDefaults.permissions（開発予定機能）:**
+- エージェントが実行できるコマンドや操作を制限する機能
+- `allow`: 許可されるコマンドパターン
+- `deny`: 禁止されるコマンドパターン
+- 現在は設定値として記述可能だが、実際の権限制御は未実装
+
+### 3. Task CRD（タスク定義）
+
+```yaml
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_ai_strategy_01  # タスクの一意識別子
+spec:
+  taskId: task_ai_strategy_01  # タスクID
+  title: "AI Strategy Development"  # タスクタイトル
+  description: |  # マークダウン形式の詳細説明
+    ## AI Strategy Development
+    
+    Develop comprehensive AI strategy for Haconiwa platform.
+    
+    ### Requirements:
+    - Market analysis
+    - Technology roadmap
+    - Competitive analysis
+    - Investment planning
+  assignee: "ceo-motoki"  # 割り当て先エージェントID
+  spaceRef: "haconiwa-dev-company"  # 所属スペース
+  priority: "high"  # 優先度（high/medium/low）
+  worktree: true  # Git worktreeを作成するか
+  branch: "strategy/ai-roadmap"  # ブランチ名
+```
+
+**Task CRDの主要要素:**
+- `assignee`: Organization CRDで定義したエージェントIDを指定
+- `spaceRef`: 所属するcompany名を指定
+- `worktree`: trueの場合、defaultBranchからブランチを作成
+- `branch`: 作成するブランチ名
+
+### 4. マルチドキュメント構成
+
+```yaml
+# 組織定義
+---
+apiVersion: haconiwa.dev/v1
+kind: Organization
+metadata:
+  name: my-org
+spec:
+  # ...
+
+---
+# スペース定義
+apiVersion: haconiwa.dev/v1
+kind: Space
+metadata:
+  name: my-space
+spec:
+  # ...
+
+---
+# タスク定義（複数可）
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task-1
+spec:
+  # ...
+```
+
+**YAMLファイル構成のベストプラクティス:**
+1. 組織定義を最初に配置
+2. スペース定義を次に配置
+3. タスク定義を最後に配置（ルームごとにグループ化推奨）
+4. `---`で各ドキュメントを区切る
+
+### 5. 実行時の処理フロー
+
+1. **YAMLパース**: マルチドキュメントを個別のCRDオブジェクトに分解
+2. **組織作成**: Organization CRDから部門・役割構造を構築
+3. **スペース作成**: Space CRDからtmuxセッション・ウィンドウ構造を構築
+4. **タスク作成**: Task CRDからGit worktreeとタスク割り当てを作成
+   - `defaultBranch`から各タスクのブランチを作成
+   - エージェントをタスクディレクトリに配置
+5. **Claude実行**: 各ペインで`cd {path} && claude`を自動実行
+
+### 6. Law CRD（法的フレームワーク定義）- 開発予定
+
+```yaml
+apiVersion: haconiwa.dev/v1
+kind: Law
+metadata:
+  name: haconiwa-legal-framework
+spec:
+  globalRules:  # グローバル規則
+    - name: "security-policy"
+      description: "全エージェントのセキュリティポリシー"
+      content: |
+        ## セキュリティポリシー
+        - 機密情報の取り扱い規定
+        - アクセス権限の管理
+        - データ保護方針
+    - name: "code-standards"
+      description: "コーディング規約"
+      content: |
+        ## コーディング標準
+        - PEP 8準拠（Python）
+        - ESLint設定（JavaScript）
+        - 型安全性の確保
+  
+  hierarchicalRules:  # 階層別規則
+    nation:
+      enabled: true
+      rules:
+        - "国レベルの法的要件"
+        - "データ主権に関する規定"
+    city:
+      enabled: true
+      rules:
+        - "地域のコンプライアンス要件"
+        - "業界標準への準拠"
+    company:
+      enabled: true
+      rules:
+        - "組織のガバナンスポリシー"
+        - "内部統制規定"
+  
+  permissions:  # 権限管理
+    defaultPolicy: "deny"  # デフォルトは拒否
+    rules:
+      - resource: "production-database"
+        actions: ["read"]
+        subjects: ["senior-engineers", "cto"]
+      - resource: "source-code"
+        actions: ["read", "write"]
+        subjects: ["all-engineers"]
+      - resource: "financial-data"
+        actions: ["read", "write"]
+        subjects: ["cfo", "finance-team"]
+  
+  systemPrompts:  # エージェント用システムプロンプト
+    base: |
+      あなたはHaconiwa開発会社のAIエージェントです。
+      以下の規則とポリシーに従って行動してください。
+    roleSpecific:
+      ceo: "戦略的意思決定と会社全体の方向性に焦点を当ててください。"
+      engineer: "コード品質とベストプラクティスを重視してください。"
+      security: "セキュリティとコンプライアンスを最優先に考えてください。"
+```
+
+**Law CRDの主要要素（開発予定）:**
+- `globalRules`: 全階層に適用されるグローバル規則
+- `hierarchicalRules`: 階層別（nation/city/company等）の規則定義
+- `permissions`: リソースへのアクセス権限管理
+- `systemPrompts`: 役割別のエージェント行動指針
+
+**統合予定の機能:**
+- Organization/Space CRDからの自動参照
+- 階層的な規則の継承メカニズム
+- 実行時の権限チェック機能
+- エージェントへの自動プロンプト注入
 
 ## 🚀 今すぐ使える機能
 
@@ -198,195 +567,6 @@ test-multiroom-company (Session)
 - 📊 **32ペイン管理**: 2ルーム × 16ペイン構成
 - 🔧 **ドライラン対応**: 実行前のコマンド確認
 - 🎯 **タスク割り当てシステム**: エージェント自動ディレクトリ移動
-- 📋 **ログファイル管理**: agent_assignment.jsonでの割り当て記録
-- 🔗 **自動アタッチ機能**: apply後に自動でセッションにアタッチ（--no-attachで無効化）
-- 🤖 **Claude自動実行**: 全ペインで作成後にclaudeコマンドを自動実行
-- 🏠 **相対パス対応**: ホームディレクトリ配下は~プレフィックスでクリーンな表示
-
-### 📝 YAML文法詳細解説
-
-Haconiwaの宣言型YAML設定は、複数のCRD (Custom Resource Definition) をマルチドキュメント形式で記述します。
-
-#### 1. Organization CRD（組織定義）
-
-```yaml
-apiVersion: haconiwa.dev/v1
-kind: Organization
-metadata:
-  name: test-org-multiroom-tasks  # 組織の一意識別子
-spec:
-  companyName: "Test Company Multiroom with Tasks"  # 会社名
-  industry: "Software Development"  # 業界
-  basePath: "./test-multiroom-tasks"  # 組織のベースパス
-  hierarchy:
-    departments:  # 部門定義
-    - id: "frontend"  # 部門ID（ルーム割り当てに使用）
-      name: "Frontend Team"
-      description: "Frontend development department"
-      roles:  # 役割定義
-      - roleType: "management"  # 管理職
-        title: "Frontend Lead"
-        responsibilities:
-          - "Frontend architecture"
-          - "Team coordination"
-      - roleType: "engineering"  # エンジニア
-        title: "UI Developer"
-        responsibilities:
-          - "UI component development"
-```
-
-**Organization CRDの主要要素:**
-- `metadata.name`: 組織の一意識別子（Space CRDから参照される）
-- `spec.hierarchy.departments`: 部門の定義（各部門がtmuxのルームに対応）
-- `spec.hierarchy.departments[].roles`: 各部門の役割定義（4つの役割で16ペインを構成）
-
-#### 2. Space CRD（空間定義）
-
-```yaml
-apiVersion: haconiwa.dev/v1
-kind: Space
-metadata:
-  name: test-world-multiroom-tasks  # スペースの一意識別子
-spec:
-  nations:  # 国レベル（最上位階層）
-  - id: jp
-    name: Japan
-    cities:  # 市レベル
-    - id: tokyo
-      name: Tokyo
-      villages:  # 村レベル
-      - id: tech-village
-        name: "Tech Village"
-        companies:  # 会社レベル（tmuxセッション）
-        - name: test-company-multiroom-tasks  # セッション名
-          grid: "8x4"  # グリッドサイズ（8列×4行=32ペイン）
-          basePath: "./test-world-multiroom-tasks"
-          organizationRef: "test-org-multiroom-tasks"  # 組織参照
-          gitRepo:  # Gitリポジトリ設定
-            url: "https://github.com/anthropics/claude-code.git"
-            defaultBranch: "main"
-            auth: "https"
-          buildings:  # 建物レベル
-          - id: "tech-tower"
-            name: "Tech Tower"
-            floors:  # 階層レベル
-            - id: "floor-1"
-              name: "Development Floor"
-              rooms:  # 部屋レベル（tmuxウィンドウ）
-              - id: room-frontend  # Frontend用ウィンドウ
-                name: "Frontend Room"
-              - id: room-backend   # Backend用ウィンドウ
-                name: "Backend Room"
-```
-
-**Space CRDの階層構造:**
-- `nations` > `cities` > `villages` > `companies` > `buildings` > `floors` > `rooms`
-- 各階層に法的フレームワーク（law/）を配置可能
-- `companies`がtmuxセッションに対応
-- `rooms`がtmuxウィンドウに対応
-
-#### 3. Task CRD（タスク定義）
-
-```yaml
-apiVersion: haconiwa.dev/v1
-kind: Task
-metadata:
-  name: task_react_components_01  # タスクの一意識別子
-spec:
-  taskId: task_react_components_01  # タスクID
-  title: "React Component Library"  # タスクタイトル
-  description: |  # マークダウン形式の詳細説明
-    ## React Component Library Development
-    
-    Build reusable React component library.
-    
-    ### Requirements:
-    - TypeScript components
-    - Storybook integration
-    - Unit tests
-    - Documentation
-  assignee: "org01-pm-r1"  # 割り当て先エージェントID
-  spaceRef: "test-company-multiroom-tasks"  # 所属スペース
-  priority: "high"  # 優先度（high/medium/low）
-  worktree: true  # Git worktreeを作成するか
-  branch: "feature/react-components"  # ブランチ名
-```
-
-**Task CRDのエージェントID規則:**
-- フォーマット: `org{組織番号}-{役割}-r{ルーム番号}`
-- 例: `org01-pm-r1` = 組織1のPM、ルーム1
-- 役割タイプ:
-  - `pm`: プロジェクトマネージャー（management roleType）
-  - `wk-a`, `wk-b`, `wk-c`: ワーカーA, B, C（engineering roleType）
-
-#### 4. マルチドキュメント構成
-
-```yaml
-# 組織定義
----
-apiVersion: haconiwa.dev/v1
-kind: Organization
-metadata:
-  name: my-org
-spec:
-  # ...
-
----
-# スペース定義
-apiVersion: haconiwa.dev/v1
-kind: Space
-metadata:
-  name: my-space
-spec:
-  # ...
-
----
-# タスク定義（複数可）
-apiVersion: haconiwa.dev/v1
-kind: Task
-metadata:
-  name: task-1
-spec:
-  # ...
-```
-
-**YAMLファイル構成のベストプラクティス:**
-1. 組織定義を最初に配置
-2. スペース定義を次に配置
-3. タスク定義を最後に配置（ルームごとにグループ化推奨）
-4. `---`で各ドキュメントを区切る
-
-#### 5. エージェント自動配置ルール
-
-**ペイン配置の計算式:**
-- 総ペイン数 = grid列数 × grid行数（例: 8×4=32）
-- ルームあたりペイン数 = 総ペイン数 ÷ ルーム数（例: 32÷2=16）
-- 各組織4ペイン（PM×1 + Worker×3）
-
-**エージェントIDとペインの対応:**
-```
-Frontend Room (Window 0):
-- Pane 0-3:   org01 (PM, Worker-A, Worker-B, Worker-C)
-- Pane 4-7:   org02 (PM, Worker-A, Worker-B, Worker-C)
-- Pane 8-11:  org03 (PM, Worker-A, Worker-B, Worker-C)
-- Pane 12-15: org04 (PM, Worker-A, Worker-B, Worker-C)
-
-Backend Room (Window 1):
-- Pane 0-3:   org01 (PM, Worker-A, Worker-B, Worker-C)
-- Pane 4-7:   org02 (PM, Worker-A, Worker-B, Worker-C)
-- Pane 8-11:  org03 (PM, Worker-A, Worker-B, Worker-C)
-- Pane 12-15: org04 (PM, Worker-A, Worker-B, Worker-C)
-```
-
-#### 6. 実行時の処理フロー
-
-1. **YAMLパース**: マルチドキュメントを個別のCRDオブジェクトに分解
-2. **組織作成**: Organization CRDから部門・役割構造を構築
-3. **スペース作成**: Space CRDからtmuxセッション・ウィンドウ構造を構築
-4. **タスク作成**: Task CRDからGit worktreeとタスク割り当てを作成
-5. **エージェント配置**: assigneeに基づいてペインをタスクディレクトリに移動
-6. **Claude実行**: 各ペインで`cd {path} && claude`を自動実行
-
 ### tmux マルチエージェント環境（従来方式）
 
 4x4グリッドのマルチエージェント開発環境を**今すぐ**作成・管理できます：
@@ -696,96 +876,79 @@ tmux kill-session -t my-company
 
 ## 🏗️ アーキテクチャ概念
 
-### スペース規則階層 (Space Rule Hierarchy)
+### CRDベースのアーキテクチャ
 
-Haconista は、YAML スペース構造に従った**スペース規則階層**を組み込み、シンプルな規則継承を通じてエージェントガバナンスを管理します：
-
-| 階層レベル | 規則文書 | tmux対応 | エージェント統制 | ディレクトリ構造 |
-|-----------|---------|-----------|-----------------|-----------------|
-| **国 (Nation)** | **グローバル規則 (Global Rules)** | - | 汎用原則・中核標準 | `jp/law/global-rules.md` |
-| **市 (City)** | **地域規則 (Regional Rules)** | - | 地域ガイドライン・コンプライアンス | `jp/tokyo/law/regional-rules.md` |
-| **村 (Village)** | **ローカル規則 (Local Rules)** | - | コミュニティプラクティス・ワークフロー | `jp/tokyo/test-village/law/local-rules.md` |
-| **会社 (Company)** | **プロジェクト規則 (Project Rules)** | **Session** | プロジェクトポリシー・手続き | `jp/tokyo/test-village/test-multiroom-company/law/project-rules.md` |
-| **建物 (Building)** | **建物規則 (Building Rules)** | - | 建物固有ガイドライン | `../headquarters/law/building-rules.md` |
-| **階層 (Floor)** | **階層規則 (Floor Rules)** | - | フロアレベル管理 | `../floor-1/law/floor-rules.md` |
-| **部屋 (Room)** | **チーム規則 (Team Rules)** | **Window** | チーム固有ガイドライン | `../room-01/law/team-rules.md` |
-| **デスク (Desk)** | **エージェント規則 (Agent Rules)** | **Pane** | 個人エージェント行動規則 | `../desks/law/agent-rules.md` |
-
-### 規則文書・エージェント管理システム
-
-各階層レベルには `law/` ディレクトリが含まれ、以下を管理：
+Haconiwaは4つの主要なCRD（Custom Resource Definition）を中心に構築されています：
 
 ```
-{level}/law/
-├── {rule-document}.md      # 規則文書 (Rule Document)
-├── system-prompts/         # システムプロンプト (System Prompts)
-│   └── {level}-agent-prompt.md
-└── permissions/            # 権限管理 (Permissions Management)
-    ├── code-permissions.yaml    # コード権限 (Code Permissions)
-    └── file-permissions.yaml   # ファイル権限 (File Permissions)
+Haconiwa CRDアーキテクチャ
+├── Organization CRD（組織定義）
+│   ├── 部門構造（departments）
+│   ├── 役割定義（roles）
+│   └── 責任範囲（responsibilities）
+├── Space CRD（空間定義）
+│   ├── 階層構造（nations > cities > villages > companies > buildings > floors > rooms）
+│   ├── Gitリポジトリ設定（gitRepo）
+│   └── tmuxセッション/ウィンドウマッピング
+├── Task CRD（タスク定義）
+│   ├── タスク詳細（title, description）
+│   ├── エージェント割り当て（assignee）
+│   └── Git worktree設定（branch, worktree）
+└── Law CRD（法的フレームワーク）- 開発予定
+    ├── グローバル規則（globalRules）
+    ├── 階層別規則（hierarchicalRules）
+    └── 権限管理（permissions）
 ```
 
-**📋 スペース規則フレームワークの特徴:**
-- **🏛️ YAML準拠階層**: YAML スペース構造との完全一致 (Nations > Cities > Villages > Companies > Buildings > Floors > Rooms > Desks)
-- **🤖 汎用エージェント**: 全エージェントが同じ構造に従いつつ、異なる規則セットで動作
-- **📜 分散法管理**: 実際のスペース階層全体に規則文書を分散配置
-- **🔐 階層権限**: スペースレベル経由でのコード・ファイルアクセス権継承
-- **📋 コンプライアンス追跡**: 全スペースレベルでの自動規則コンプライアンス検証
-- **🔄 規則継承**: エージェントは親スペースレベルのすべての規則を順序立てて継承
-
-### tmux ↔ Haconiwa 概念対応
-
-| tmux概念 | Haconiwa概念 | 規則フレームワーク | 説明 |
-|----------|-------------|------------------|------|
-| **Session** | **Company（会社）** | **プロジェクト規則** | プロジェクトガバナンスを持つ最上位管理単位 |
-| **Window** | **Room（部屋）** | **チーム規則** | チーム固有規則を持つ機能別作業領域 |
-| **Pane** | **Desk（デスク）** | **エージェント規則** | 個人エージェント規則を持つ個別作業スペース |
-
-### 階層規則管理
+### CRD間の関係と処理フロー
 
 ```
-
-YAML準拠スペース規則フレームワーク (YAML-Aligned Space Rule Framework)
-├── Nation (jp) (国)                    ← グローバル原則 (Global principles)
-│   └── City (tokyo) (市)              ← 地域ガイドライン (Regional guidelines)
-│       └── Village (test-village) (村) ← ローカルプラクティス (Local practices)
-│           └── Company (test-multiroom-company) (会社) ← プロジェクト規則 (Project rules) → tmux Session
-│               └── Building (headquarters) (建物) ← 建物規則 (Building rules)
-│                   └── Floor (floor-1) (階層) ← 階層規則 (Floor rules)
-│                       └── Room (room-01/room-02) (部屋) ← チーム規則 (Team rules) → tmux Window
-│                           └── Desk (desks/*) (デスク) ← エージェント規則 (Agent rules) → tmux Pane
+1. Organization CRD
+   ↓ 定義
+   エージェント構造（部門・役割）
+   ↓
+2. Space CRD
+   ↓ 参照（organizationRef）
+   物理的な配置（tmuxセッション・ウィンドウ）
+   ↓
+3. Task CRD
+   ↓ 参照（spaceRef, assignee）
+   作業割り当てとGit worktree作成
+   ↓
+4. Law CRD（開発予定）
+   ↓ 統合
+   全CRDに対する規則・権限適用
 ```
 
-**スペースガバナンス機能:**
-- **国**: グローバル原則、汎用標準、コアアーキテクチャガイドライン
-- **市**: 地域開発標準、技術コンプライアンス要件
-- **村**: コミュニティガイドライン、ローカルワークフロー標準、チームプロトコル
-- **会社**: プロジェクト管理ポリシー、ビジネスロジック制約、リソースルール
-- **建物**: 建物固有手続き、物理スペース管理
-- **階層**: フロアレベル調整、リソース配分、ルーム間コミュニケーション
-- **部屋**: チーム固有手続き、役割ベース責任、タスクガイドライン
-- **デスク**: 個人エージェント行動、個人生産性標準、タスク制約
+### tmux ↔ Haconiwa CRD マッピング
 
+| Haconiwa CRD | tmux概念 | 主な役割 |
+|-------------|----------|----------|
+| **Organization** | - | エージェントの組織構造定義 |
+| **Space (Company)** | **Session** | 開発環境のトップレベルコンテナ |
+| **Space (Room)** | **Window** | 機能別の作業グループ |
+| **Task + Agent** | **Pane** | 個別のエージェント作業環境 |
 
+### 主要な特徴
 
-```
-Organization（組織）
-├── PM（プロジェクトマネージャー）
-│   ├── 全体調整
-│   ├── タスク割り当て
-│   └── 進捗管理
-└── Worker（作業者）
-    ├── Worker-A（開発担当）
-    ├── Worker-B（テスト担当）
-    └── Worker-C（デプロイ担当）
-```
+**1. 宣言的な環境管理**
+- YAMLファイルですべての構成を定義
+- 再現可能な開発環境の構築
 
-**役割定義：**
-- **PM（Boss）**: 戦略的意思決定、リソース管理、品質保証
-- **Worker**: 実装、テスト、デプロイなどの実行業務
-- **Organization**: 複数のPM/Workerで構成される論理的なチーム単位
-```
-    Organization（組織）
+**2. Git worktreeによるタスク隔離**
+- 各タスクが独立したディレクトリで作業
+- `defaultBranch`からの自動ブランチ作成
+- 並行開発の実現
+
+**3. 階層的な構造**
+- Space CRDの階層（国→市→村→会社→建物→階→部屋）
+- 将来的にLaw CRDによる階層的な規則継承
+
+**4. 自動化されたエージェント配置**
+- Organization CRDで定義されたエージェントの自動配置
+- Task CRDによる作業割り当て
+- tmuxペインへの自動マッピング
+
 ## 🚀 インストール
 
 ```bash
@@ -964,22 +1127,6 @@ MIT License - 詳細は [LICENSE](LICENSE) ファイルをご覧ください。
 - GitHub Issues: [Issues](https://github.com/dai-motoki/haconiwa/issues)
 - メール: kanri@kandaquantum.co.jp
 
-## ⚠️ 免責事項
-
-このプロジェクトは初期アルファ開発段階かつ**デモンストレーションフェーズ**にあります。現在のCLIコマンドは主に意図されたインターフェースデザインを示すプレースホルダーです。ほとんどの機能は活発に開発中でまだ実装されていません。
-
-**現在動作するもの:**
-- CLIのインストールとコマンド構造
-- ヘルプシステムとドキュメント
-- 基本的なコマンドルーティング
-
-**今後実装予定:**
-- 宣伝されている全機能の完全実装
-- AIエージェント協調機能
-- 開発ツールとの統合
-- 実際のタスクと会社管理
-
-現時点では本番環境での使用は推奨されません。これは意図されたユーザーエクスペリエンスを示す開発プレビューです。
 
 ---
 

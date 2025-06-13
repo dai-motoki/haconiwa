@@ -103,6 +103,60 @@ git push origin v0.1.5
 - `dist/` - ビルド成果物（`.gitignore`で除外済み）
 - `build/` - ビルド一時ファイル（`.gitignore`で除外済み）
 
+## 🔧 トラブルシューティング
+
+### PyPIアップロード時のメタデータエラー
+
+**エラー:** `InvalidDistribution: Metadata is missing required fields: Name, Version`
+
+```bash
+ERROR    InvalidDistribution: Metadata is missing required fields: Name, Version.
+         Make sure the distribution includes the files where those fields are specified, and
+         is using a supported Metadata-Version: 1.0, 1.1, 1.2, 2.0, 2.1, 2.2, 2.3.
+```
+
+**原因:** `pkginfo`ライブラリが古いバージョンの場合、メタデータの解析に問題が発生することがある
+
+**解決方法:**
+```bash
+# pkginfoライブラリをアップグレード
+pip install --upgrade pkginfo
+
+# 再度ビルドしてアップロード
+rm -rf dist/*
+python -m build
+twine upload dist/*
+```
+
+### src/レイアウトでのビルドエラー
+
+**問題:** pyproject.tomlでsrc/ベースのプロジェクト構造を使用している場合のパッケージ認識エラー
+
+**解決方法:** pyproject.tomlに以下の設定を追加：
+
+```toml
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+```
+
+### その他の一般的なエラー
+
+1. **twineの認証エラー**
+   ```bash
+   # PyPIのAPIトークンを使用する場合
+   twine upload --username __token__ --password YOUR_API_TOKEN dist/*
+   ```
+
+2. **ビルドファイルの競合**
+   ```bash
+   # 古いビルドファイルをクリーン
+   rm -rf dist/* build/*
+   python -m build
+   ```
+
 ## 📋 チェックリスト
 
 リリース前の確認事項：
@@ -110,6 +164,7 @@ git push origin v0.1.5
 - [ ] 全てのテストがパス
 - [ ] `CHANGELOG.md` が更新済み
 - [ ] バージョン番号が正しく更新済み
+- [ ] 必要な依存パッケージが最新（特に`pkginfo`, `twine`, `build`）
 - [ ] PyPIアップロードが成功
 - [ ] Gitタグが作成・プッシュ済み
 - [ ] GitHub Releaseが作成済み

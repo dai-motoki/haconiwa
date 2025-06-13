@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "haconiwa"
-version = "0.4.0"
+version = "0.5.0"
 description = "AI協調開発支援Python CLIツール - 箱庭での開発を支援"
 readme = "README.md"
 authors = [
@@ -56,6 +56,12 @@ Issues = "https://github.com/haconiwa/haconiwa/issues"
 haconiwa = "haconiwa.cli:app"
 haconiwa-test = "haconiwa.scripts.test_runner:run_tests"
 haconiwa-prerelease = "haconiwa.scripts.prerelease:run_prerelease_checks"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.black]
 line-length = 88

@@ -69,7 +69,8 @@ class SpaceManager:
             
             # Handle Git repository setup in tasks/main/
             if config.get("git_repo"):
-                git_config = config["git_repo"]
+                git_config = config["git_repo"].copy()  # Make a copy to add space_ref
+                git_config["space_ref"] = config["name"]  # Add space reference
                 logger.info(f"Setting up Git repository in tasks/main/: {git_config['url']}")
                 
                 # Clone to tasks/main/ 
@@ -1631,6 +1632,14 @@ class SpaceManager:
                     logger.warning(f"Failed to pull {default_branch}: {pull_result.stderr}")
                 else:
                     logger.info(f"✅ Successfully checked out and pulled {default_branch} branch")
+                
+                # After repository is set up, set default branch for TaskManager
+                space_ref = git_config.get("space_ref")
+                if space_ref and default_branch:
+                    logger.info(f"Setting TaskManager default branch to: {default_branch}")
+                    from ..task.manager import TaskManager
+                    task_manager = TaskManager()
+                    task_manager.set_default_branch(default_branch)
                 
                 return True
             else:

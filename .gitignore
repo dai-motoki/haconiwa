@@ -52,6 +52,8 @@ haconiwa-dev-world/
 haconiwa-dev-company/
 kamui-dev-company.yaml
 kamui-dev-world/
+kamui-dev-company/
+CLAUDE.md
 
 # Test output and temporary directories
 test_output/

@@ -1,5 +1,13 @@
 # Claude Code Settings for Haconiwa Project
 
+## Important Guidelines
+
+### Path References
+- **NEVER use full paths** in documentation or code comments
+- Use relative paths or descriptive references instead
+- Bad: `/Users/username/project/haconiwa/src/file.py`
+- Good: `src/file.py` or `haconiwa/src/file.py`
+
 ## Available Commands
 
 ### ripgrep (rg)

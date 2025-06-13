@@ -7,9 +7,26 @@
 
 **Haconiwa (箱庭)** is an AI collaborative development support Python CLI tool. This next-generation tool integrates tmux company management, git-worktree integration, task management, and AI agent coordination to provide an efficient development environment.
 
-> ⚠️ **Note**: This project is currently under active development. Features and APIs may change frequently.
-
 [🇯🇵 日本語版 README](README_JA.md)
+
+## ⚠️ Disclaimer
+
+This project is in early alpha development and in a **demonstration phase**. Current CLI commands are primarily placeholders showing the intended interface design. Most functionality is actively under development and not yet implemented.
+
+**Currently Working:**
+- CLI installation and command structure
+- Help system and documentation
+- Basic command routing
+
+**To be Implemented:**
+- Complete implementation of all advertised features
+- AI agent collaboration functionality
+- Development tool integrations
+- Actual task and company management
+
+Production use is not recommended at this time. This is a development preview showing the intended user experience.
+
+> ⚠️ **Note**: This project is currently under active development. Features and APIs may change frequently.
 
 ## 📋 Version Management
 
@@ -21,6 +38,358 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **🔖 GitHub Releases**: [Releases](https://github.com/dai-motoki/haconiwa/releases)
 
 ## 🚀 Ready-to-Use Features
+
+### 🔧 Recent Updates (2025-06-13)
+
+**Task Branch Fix**: Fixed an issue where task branches were being created from the `main` branch instead of the YAML-specified `defaultBranch`. Now, when you specify `defaultBranch: "dev"` in your YAML configuration, all task worktrees will be correctly created from the `dev` branch.
+
+- ✅ Task CRDs now properly inherit `defaultBranch` from their associated Space CRD
+- ✅ Existing incorrect branches are automatically detected and recreated from the correct branch
+- ✅ All hardcoded references to `main` branch have been replaced with configurable defaults
+
+## 🛠️ Prerequisites
+
+**Environment Setup**
+
+```bash
+# 1. Install tmux
+# macOS
+brew install tmux
+
+# Ubuntu/Debian
+sudo apt-get install tmux
+
+# 2. Python environment setup (3.8+)
+python --version  # Check version
+
+# 3. Upgrade pip
+pip install --upgrade pip
+
+# 4. Claude Code setup
+# See detailed instructions: https://docs.anthropic.com/en/docs/claude-code/getting-started
+# Set environment variable (if needed)
+export ANTHROPIC_API_KEY="your-api-key"
+
+# 5. Install Haconiwa
+pip install haconiwa --upgrade
+```
+
+### 📚 Basic Workflow
+
+**1. Get YAML and Launch Project**
+
+```bash
+# Download YAML file from GitHub
+wget https://raw.githubusercontent.com/dai-motoki/haconiwa/main/haconiwa-dev-company.yaml
+
+# Or download with curl
+curl -O https://raw.githubusercontent.com/dai-motoki/haconiwa/main/haconiwa-dev-company.yaml
+
+# Apply YAML (automatically attaches to tmux session by default)
+haconiwa apply -f haconiwa-dev-company.yaml
+# Detach from tmux session: Ctrl+b, d
+
+# Or, apply without attaching
+haconiwa apply -f haconiwa-dev-company.yaml --no-attach
+
+# If not attached, explicitly attach
+haconiwa space attach -c haconiwa-dev-company
+```
+
+**2. Project Operations**
+
+```bash
+# Detach from tmux session: Ctrl+b, d
+
+# Real-time monitoring in another terminal
+haconiwa monitor -c haconiwa-dev-company --japanese
+
+# List all projects
+haconiwa space list
+
+# Re-attach to project
+haconiwa space attach -c haconiwa-dev-company
+```
+
+**3. Delete Projects**
+
+```bash
+# Completely delete space and directories
+haconiwa space delete -c haconiwa-dev-company --clean-dirs --force
+```
+
+## 📝 YAML Grammar Detailed Explanation
+
+Haconiwa's declarative YAML configuration uses multiple CRDs (Custom Resource Definitions) in multi-document format.
+
+### 1. Organization CRD (Organization Definition)
+
+```yaml
+apiVersion: haconiwa.dev/v1
+kind: Organization
+metadata:
+  name: haconiwa-dev-company-org  # Unique organization identifier
+spec:
+  companyName: "Haconiwa Development Company"  # Company name
+  industry: "AI Development Tools & Infrastructure"  # Industry
+  basePath: "./haconiwa-dev-company"  # Organization base path
+  hierarchy:
+    departments:  # Department definitions
+    - id: "executive"  # Department ID (used for room assignment)
+      name: "Executive Team"
+      description: "Company leadership and strategic decision making"
+      roles:  # Role definitions
+      - roleType: "management"  # Management role
+        title: "Chief Executive Officer"
+        agentId: "ceo-motoki"  # Agent ID
+        responsibilities:
+          - "Strategic vision and direction"
+          - "Company-wide decision making"
+      - roleType: "engineering"  # Engineering role
+        title: "Senior AI Engineer"
+        agentId: "ai-lead-nakamura"
+        responsibilities:
+          - "AI/ML model development"
+          - "Algorithm optimization"
+```
+
+**Organization CRD Key Elements:**
+- `metadata.name`: Unique organization identifier (referenced from Space CRD)
+- `spec.hierarchy.departments`: Department definitions (each department maps to a tmux room)
+- `spec.hierarchy.departments[].roles`: Role definitions per department (4 roles form 16 panes)
+
+### 2. Space CRD (Space Definition)
+
+```yaml
+apiVersion: haconiwa.dev/v1
+kind: Space
+metadata:
+  name: haconiwa-dev-world  # Unique space identifier
+spec:
+  nations:  # Nation level (top hierarchy)
+  - id: jp
+    name: Japan
+    cities:  # City level
+    - id: tokyo
+      name: Tokyo
+      villages:  # Village level
+      - id: haconiwa-village
+        name: "Haconiwa Village"
+        companies:  # Company level (tmux session)
+        - name: haconiwa-dev-company  # Session name
+          grid: "8x4"  # Grid size (8 columns × 4 rows = 32 panes)
+          basePath: "./haconiwa-dev-world"
+          organizationRef: "haconiwa-dev-company-org"  # Organization reference
+          gitRepo:  # Git repository settings
+            url: "https://github.com/dai-motoki/haconiwa"
+            defaultBranch: "dev"  # Base branch for task branches
+            auth: "https"
+          agentDefaults:  # Agent default settings (planned)
+            type: "claude-code"
+            permissions:  # Permission settings (planned feature)
+              allow:
+                - "Bash(python -m pytest)"
+                - "Bash(python -m ruff)"
+                - "Bash(python -m mypy)"
+                - "Read(src/**/*.py)"
+                - "Write(src/**/*.py)"
+              deny:
+                - "Bash(rm -rf /)"
+          buildings:  # Building level
+          - id: "hq-tower"
+            name: "Haconiwa HQ Tower"
+            floors:  # Floor level
+            - id: "executive-floor"
+              name: "Executive Floor"
+              rooms:  # Room level (tmux windows)
+              - id: room-executive  # Executive window
+                name: "Executive Room"
+                description: "C-level executives and senior leadership"
+              - id: room-standby   # Standby window
+                name: "Standby Room"
+                description: "Ready-to-deploy talent pool"
+```
+
+**Space CRD Hierarchy Structure:**
+- `nations` > `cities` > `villages` > `companies` > `buildings` > `floors` > `rooms`
+- Legal framework (law/) can be placed at each hierarchy level
+- `companies` map to tmux sessions
+- `rooms` map to tmux windows
+
+**gitRepo Configuration Detailed Explanation:**
+- `url`: URL of the Git repository to clone
+- `defaultBranch`: Base branch from which task branches are created
+  - Example: When `defaultBranch: "dev"`, all task branches are created from the `dev` branch
+  - This allows protecting the `main` branch while deriving feature branches from the development branch
+- `auth`: Authentication method ("https" or "ssh")
+
+**Important**: With the `defaultBranch` setting, tasks with `worktree: true` in Task CRD will create new branches and worktrees from this branch. By using Git worktree, each task is isolated in its own directory, providing the following benefits:
+- Each task has its own working directory, enabling parallel development
+- Multiple tasks can progress simultaneously without branch switching
+- Each agent can develop without affecting other tasks' work
+- Example: `task_ai_strategy_01` is created as an isolated working environment in `./haconiwa-dev-world/tasks/task_ai_strategy_01/`
+
+**agentDefaults.permissions (Planned Feature):**
+- Feature to restrict commands and operations that agents can execute
+- `allow`: Permitted command patterns
+- `deny`: Prohibited command patterns
+- Currently can be written as configuration values, but actual permission control is not yet implemented
+
+### 3. Task CRD (Task Definition)
+
+```yaml
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_ai_strategy_01  # Unique task identifier
+spec:
+  taskId: task_ai_strategy_01  # Task ID
+  title: "AI Strategy Development"  # Task title
+  description: |  # Detailed description in markdown format
+    ## AI Strategy Development
+    
+    Develop comprehensive AI strategy for Haconiwa platform.
+    
+    ### Requirements:
+    - Market analysis
+    - Technology roadmap
+    - Competitive analysis
+    - Investment planning
+  assignee: "ceo-motoki"  # Assigned agent ID
+  spaceRef: "haconiwa-dev-company"  # Belonging space
+  priority: "high"  # Priority (high/medium/low)
+  worktree: true  # Whether to create Git worktree
+  branch: "strategy/ai-roadmap"  # Branch name
+```
+
+**Task CRD Key Elements:**
+- `assignee`: Specify agent ID defined in Organization CRD
+- `spaceRef`: Specify the belonging company name
+- `worktree`: If true, creates branch from defaultBranch
+- `branch`: Branch name to create
+
+### 4. Multi-Document Configuration
+
+```yaml
+# Organization definition
+---
+apiVersion: haconiwa.dev/v1
+kind: Organization
+metadata:
+  name: my-org
+spec:
+  # ...
+
+---
+# Space definition
+apiVersion: haconiwa.dev/v1
+kind: Space
+metadata:
+  name: my-space
+spec:
+  # ...
+
+---
+# Task definitions (multiple allowed)
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task-1
+spec:
+  # ...
+```
+
+**YAML File Configuration Best Practices:**
+1. Place organization definition first
+2. Place space definition next
+3. Place task definitions last (recommend grouping by room)
+4. Separate each document with `---`
+
+### 5. Runtime Processing Flow
+
+1. **YAML Parsing**: Decompose multi-document into individual CRD objects
+2. **Organization Creation**: Build department/role structure from Organization CRD
+3. **Space Creation**: Build tmux session/window structure from Space CRD
+4. **Task Creation**: Create Git worktrees and task assignments from Task CRD
+   - Create each task branch from `defaultBranch`
+   - Place agents in task directories
+5. **Claude Execution**: Auto-execute `cd {path} && claude` in each pane
+
+### 6. Law CRD (Legal Framework Definition) - Planned Development
+
+```yaml
+apiVersion: haconiwa.dev/v1
+kind: Law
+metadata:
+  name: haconiwa-legal-framework
+spec:
+  globalRules:  # Global rules
+    - name: "security-policy"
+      description: "Security policy for all agents"
+      content: |
+        ## Security Policy
+        - Confidential information handling
+        - Access control management
+        - Data protection policies
+    - name: "code-standards"
+      description: "Coding standards"
+      content: |
+        ## Coding Standards
+        - PEP 8 compliance (Python)
+        - ESLint configuration (JavaScript)
+        - Type safety enforcement
+  
+  hierarchicalRules:  # Hierarchical rules
+    nation:
+      enabled: true
+      rules:
+        - "National legal requirements"
+        - "Data sovereignty regulations"
+    city:
+      enabled: true
+      rules:
+        - "Regional compliance requirements"
+        - "Industry standard adherence"
+    company:
+      enabled: true
+      rules:
+        - "Organizational governance policies"
+        - "Internal control regulations"
+  
+  permissions:  # Permission management
+    defaultPolicy: "deny"  # Default deny
+    rules:
+      - resource: "production-database"
+        actions: ["read"]
+        subjects: ["senior-engineers", "cto"]
+      - resource: "source-code"
+        actions: ["read", "write"]
+        subjects: ["all-engineers"]
+      - resource: "financial-data"
+        actions: ["read", "write"]
+        subjects: ["cfo", "finance-team"]
+  
+  systemPrompts:  # Agent system prompts
+    base: |
+      You are an AI agent of Haconiwa Development Company.
+      Please follow these rules and policies in your actions.
+    roleSpecific:
+      ceo: "Focus on strategic decision-making and company-wide direction."
+      engineer: "Prioritize code quality and best practices."
+      security: "Put security and compliance first."
+```
+
+**Law CRD Key Elements (Planned):**
+- `globalRules`: Global rules applied to all hierarchies
+- `hierarchicalRules`: Rules definition by hierarchy (nation/city/company etc.)
+- `permissions`: Resource access control management
+- `systemPrompts`: Role-specific agent behavior guidelines
+
+**Planned Integration Features:**
+- Automatic reference from Organization/Space CRDs
+- Hierarchical rule inheritance mechanism
+- Runtime permission checking
+- Automatic prompt injection to agents
 
 ### apply yaml Pattern (v1.0 New Feature)
 
@@ -202,190 +571,6 @@ test-multiroom-company (Session)
 - 🔗 **Auto-attach Feature**: Automatically attach to session after apply (disable with --no-attach)
 - 🤖 **Claude Auto-execution**: Claude command executed in all panes after creation
 - 🏠 **Relative Path Support**: Clean path display using ~ prefix for home directories
-
-### 📝 YAML Grammar Detailed Explanation
-
-Haconiwa's declarative YAML configuration uses multiple CRDs (Custom Resource Definitions) in multi-document format.
-
-#### 1. Organization CRD (Organization Definition)
-
-```yaml
-apiVersion: haconiwa.dev/v1
-kind: Organization
-metadata:
-  name: test-org-multiroom-tasks  # Unique organization identifier
-spec:
-  companyName: "Test Company Multiroom with Tasks"  # Company name
-  industry: "Software Development"  # Industry
-  basePath: "./test-multiroom-tasks"  # Organization base path
-  hierarchy:
-    departments:  # Department definitions
-    - id: "frontend"  # Department ID (used for room assignment)
-      name: "Frontend Team"
-      description: "Frontend development department"
-      roles:  # Role definitions
-      - roleType: "management"  # Management role
-        title: "Frontend Lead"
-        responsibilities:
-          - "Frontend architecture"
-          - "Team coordination"
-      - roleType: "engineering"  # Engineering role
-        title: "UI Developer"
-        responsibilities:
-          - "UI component development"
-```
-
-**Organization CRD Key Elements:**
-- `metadata.name`: Unique organization identifier (referenced from Space CRD)
-- `spec.hierarchy.departments`: Department definitions (each department maps to a tmux room)
-- `spec.hierarchy.departments[].roles`: Role definitions per department (4 roles form 16 panes)
-
-#### 2. Space CRD (Space Definition)
-
-```yaml
-apiVersion: haconiwa.dev/v1
-kind: Space
-metadata:
-  name: test-world-multiroom-tasks  # Unique space identifier
-spec:
-  nations:  # Nation level (top hierarchy)
-  - id: jp
-    name: Japan
-    cities:  # City level
-    - id: tokyo
-      name: Tokyo
-      villages:  # Village level
-      - id: tech-village
-        name: "Tech Village"
-        companies:  # Company level (tmux session)
-        - name: test-company-multiroom-tasks  # Session name
-          grid: "8x4"  # Grid size (8 columns × 4 rows = 32 panes)
-          basePath: "./test-world-multiroom-tasks"
-          organizationRef: "test-org-multiroom-tasks"  # Organization reference
-          gitRepo:  # Git repository settings
-            url: "https://github.com/anthropics/claude-code.git"
-            defaultBranch: "main"
-            auth: "https"
-          buildings:  # Building level
-          - id: "tech-tower"
-            name: "Tech Tower"
-            floors:  # Floor level
-            - id: "floor-1"
-              name: "Development Floor"
-              rooms:  # Room level (tmux windows)
-              - id: room-frontend  # Frontend window
-                name: "Frontend Room"
-              - id: room-backend   # Backend window
-                name: "Backend Room"
-```
-
-**Space CRD Hierarchy Structure:**
-- `nations` > `cities` > `villages` > `companies` > `buildings` > `floors` > `rooms`
-- Legal framework (law/) can be placed at each hierarchy level
-- `companies` map to tmux sessions
-- `rooms` map to tmux windows
-
-#### 3. Task CRD (Task Definition)
-
-```yaml
-apiVersion: haconiwa.dev/v1
-kind: Task
-metadata:
-  name: task_react_components_01  # Unique task identifier
-spec:
-  taskId: task_react_components_01  # Task ID
-  title: "React Component Library"  # Task title
-  description: |  # Detailed description in markdown format
-    ## React Component Library Development
-    
-    Build reusable React component library.
-    
-    ### Requirements:
-    - TypeScript components
-    - Storybook integration
-    - Unit tests
-    - Documentation
-  assignee: "org01-pm-r1"  # Assigned agent ID
-  spaceRef: "test-company-multiroom-tasks"  # Belonging space
-  priority: "high"  # Priority (high/medium/low)
-  worktree: true  # Whether to create Git worktree
-  branch: "feature/react-components"  # Branch name
-```
-
-**Task CRD Agent ID Rules:**
-- Format: `org{org_number}-{role}-r{room_number}`
-- Example: `org01-pm-r1` = Organization 1's PM, Room 1
-- Role types:
-  - `pm`: Project Manager (management roleType)
-  - `wk-a`, `wk-b`, `wk-c`: Worker A, B, C (engineering roleType)
-
-#### 4. Multi-Document Configuration
-
-```yaml
-# Organization definition
----
-apiVersion: haconiwa.dev/v1
-kind: Organization
-metadata:
-  name: my-org
-spec:
-  # ...
-
----
-# Space definition
-apiVersion: haconiwa.dev/v1
-kind: Space
-metadata:
-  name: my-space
-spec:
-  # ...
-
----
-# Task definitions (multiple allowed)
-apiVersion: haconiwa.dev/v1
-kind: Task
-metadata:
-  name: task-1
-spec:
-  # ...
-```
-
-**YAML File Configuration Best Practices:**
-1. Place organization definition first
-2. Place space definition next
-3. Place task definitions last (recommend grouping by room)
-4. Separate each document with `---`
-
-#### 5. Agent Auto-Placement Rules
-
-**Pane Placement Calculation:**
-- Total panes = grid columns × grid rows (e.g., 8×4=32)
-- Panes per room = total panes ÷ number of rooms (e.g., 32÷2=16)
-- Each organization has 4 panes (PM×1 + Worker×3)
-
-**Agent ID to Pane Mapping:**
-```
-Frontend Room (Window 0):
-- Pane 0-3:   org01 (PM, Worker-A, Worker-B, Worker-C)
-- Pane 4-7:   org02 (PM, Worker-A, Worker-B, Worker-C)
-- Pane 8-11:  org03 (PM, Worker-A, Worker-B, Worker-C)
-- Pane 12-15: org04 (PM, Worker-A, Worker-B, Worker-C)
-
-Backend Room (Window 1):
-- Pane 0-3:   org01 (PM, Worker-A, Worker-B, Worker-C)
-- Pane 4-7:   org02 (PM, Worker-A, Worker-B, Worker-C)
-- Pane 8-11:  org03 (PM, Worker-A, Worker-B, Worker-C)
-- Pane 12-15: org04 (PM, Worker-A, Worker-B, Worker-C)
-```
-
-#### 6. Runtime Processing Flow
-
-1. **YAML Parsing**: Decompose multi-document into individual CRD objects
-2. **Organization Creation**: Build department/role structure from Organization CRD
-3. **Space Creation**: Build tmux session/window structure from Space CRD
-4. **Task Creation**: Create Git worktrees and task assignments from Task CRD
-5. **Agent Placement**: Move panes to task directories based on assignee
-6. **Claude Execution**: Auto-execute `cd {path} && claude` in each pane
 
 ### tmux Multi-Agent Environment (Traditional Method)
 
@@ -578,74 +763,78 @@ tmux kill-session -t my-company
 
 ## 🏗️ Architecture Concepts
 
-### Space Rule Hierarchy (スペース規則階層)
+### CRD-Based Architecture
 
-Haconista incorporates a **space rule hierarchy** that manages agent governance through simple rule inheritance following the YAML space structure:
-
-| Hierarchy Level | Rule Document | Tmux Mapping | Agent Governance | Directory Structure |
-|----------------|---------------|--------------|------------------|-------------------|
-| **Nation (国)** | **Global Rules (グローバル規則)** | - | Universal principles & core standards | `jp/law/global-rules.md` |
-| **City (市)** | **Regional Rules (地域規則)** | - | Regional guidelines & compliance | `jp/tokyo/law/regional-rules.md` |
-| **Village (村)** | **Local Rules (ローカル規則)** | - | Community practices & workflows | `jp/tokyo/test-village/law/local-rules.md` |
-| **Company (会社)** | **Project Rules (プロジェクト規則)** | **Session** | Project policies & procedures | `jp/tokyo/test-village/test-multiroom-company/law/project-rules.md` |
-| **Building (建物)** | **Building Rules (建物規則)** | - | Building-specific guidelines | `../headquarters/law/building-rules.md` |
-| **Floor (階層)** | **Floor Rules (階層規則)** | - | Floor-level management | `../floor-1/law/floor-rules.md` |
-| **Room (部屋)** | **Team Rules (チーム規則)** | **Window** | Team-specific guidelines | `../room-01/law/team-rules.md` |
-| **Desk (デスク)** | **Agent Rules (エージェント規則)** | **Pane** | Individual agent behavior rules | `../desks/law/agent-rules.md` |
-
-### Rule Document & Agent Management System
-
-Each hierarchy level contains a `law/` directory with:
+Haconiwa is built around four main CRDs (Custom Resource Definitions):
 
 ```
-{level}/law/
-├── {rule-document}.md      # 規則文書 (Rule Document)
-├── system-prompts/         # システムプロンプト (System Prompts)
-│   └── {level}-agent-prompt.md
-└── permissions/            # 権限管理 (Permissions Management)
-    ├── code-permissions.yaml    # コード権限 (Code Permissions)
-    └── file-permissions.yaml   # ファイル権限 (File Permissions)
+Haconiwa CRD Architecture
+├── Organization CRD (Organization Definition)
+│   ├── Department Structure (departments)
+│   ├── Role Definitions (roles)
+│   └── Responsibilities (responsibilities)
+├── Space CRD (Space Definition)
+│   ├── Hierarchy (nations > cities > villages > companies > buildings > floors > rooms)
+│   ├── Git Repository Settings (gitRepo)
+│   └── tmux Session/Window Mapping
+├── Task CRD (Task Definition)
+│   ├── Task Details (title, description)
+│   ├── Agent Assignment (assignee)
+│   └── Git Worktree Settings (branch, worktree)
+└── Law CRD (Legal Framework) - Planned
+    ├── Global Rules (globalRules)
+    ├── Hierarchical Rules (hierarchicalRules)
+    └── Permission Management (permissions)
 ```
 
-**📋 Space Rule Framework Features:**
-- **🏛️ YAML-Aligned Hierarchy**: Perfect match with YAML space structure (Nations > Cities > Villages > Companies > Buildings > Floors > Rooms > Desks)
-- **🤖 Universal Agents**: All agents follow the same structure with different rule sets
-- **📜 Distributed Law Management**: Rule documents distributed across actual space hierarchy
-- **🔐 Hierarchical Permissions**: Code and file access rights inherited through space levels
-- **📋 Compliance Tracking**: Automatic rule compliance verification across all space levels
-- **🔄 Rule Inheritance**: Agents inherit rules from all parent space levels in order
-
-### tmux ↔ Haconiwa Concept Mapping
-
-| tmux Concept | Haconiwa Concept | Rule Framework | Description |
-|-------------|------------------|----------------|-------------|
-| **Session** | **Company** | **Project Rules** | Top-level management unit with project governance |
-| **Window** | **Room** | **Team Rules** | Functional work areas with team-specific rules |
-| **Pane** | **Desk** | **Agent Rules** | Individual workspaces with personal agent rules |
-
-### Hierarchical Rule Management
+### CRD Relationships and Processing Flow
 
 ```
-YAML-Aligned Space Rule Framework (YAML準拠スペース規則フレームワーク)
-├── Nation (jp) (国)                    ← Global principles (グローバル原則)
-│   └── City (tokyo) (市)              ← Regional guidelines (地域ガイドライン)
-│       └── Village (test-village) (村) ← Local practices (ローカルプラクティス)
-│           └── Company (test-multiroom-company) (会社) ← Project rules (プロジェクト規則) → tmux Session
-│               └── Building (headquarters) (建物) ← Building rules (建物規則)
-│                   └── Floor (floor-1) (階層) ← Floor rules (階層規則)
-│                       └── Room (room-01/room-02) (部屋) ← Team rules (チーム規則) → tmux Window
-│                           └── Desk (desks/*) (デスク) ← Agent rules (エージェント規則) → tmux Pane
+1. Organization CRD
+   ↓ Defines
+   Agent Structure (Departments & Roles)
+   ↓
+2. Space CRD
+   ↓ References (organizationRef)
+   Physical Layout (tmux Sessions & Windows)
+   ↓
+3. Task CRD
+   ↓ References (spaceRef, assignee)
+   Work Assignment & Git Worktree Creation
+   ↓
+4. Law CRD (Planned)
+   ↓ Integrates
+   Rules & Permissions Applied to All CRDs
 ```
 
-**Space Governance Features:**
-- **Nation**: Global principles, universal standards, core architecture guidelines
-- **City**: Regional development standards, technical compliance requirements
-- **Village**: Community guidelines, local workflow standards, team protocols
-- **Company**: Project management policies, business logic constraints, resource rules
-- **Building**: Building-specific procedures, physical space management
-- **Floor**: Floor-level coordination, resource allocation, cross-room communication
-- **Room**: Team-specific procedures, role-based responsibilities, task guidelines
-- **Desk**: Individual agent behavior, personal productivity standards, task constraints
+### tmux ↔ Haconiwa CRD Mapping
+
+| Haconiwa CRD | tmux Concept | Main Role |
+|-------------|--------------|-----------|
+| **Organization** | - | Define agent organizational structure |
+| **Space (Company)** | **Session** | Top-level container for development environment |
+| **Space (Room)** | **Window** | Functional work groups |
+| **Task + Agent** | **Pane** | Individual agent work environment |
+
+### Key Features
+
+**1. Declarative Environment Management**
+- Define all configuration in YAML files
+- Build reproducible development environments
+
+**2. Task Isolation with Git Worktree**
+- Each task works in an independent directory
+- Automatic branch creation from `defaultBranch`
+- Enable parallel development
+
+**3. Hierarchical Structure**
+- Space CRD hierarchy (Nation → City → Village → Company → Building → Floor → Room)
+- Future hierarchical rule inheritance via Law CRD
+
+**4. Automated Agent Placement**
+- Automatic placement of agents defined in Organization CRD
+- Work assignment via Task CRD
+- Automatic mapping to tmux panes
 
 ## 🚀 Installation
 
@@ -809,22 +998,6 @@ We welcome contributions to the project! As this is an active development projec
 - GitHub Issues: [Issues](https://github.com/dai-motoki/haconiwa/issues)
 - Email: kanri@kandaquantum.co.jp
 
-## ⚠️ Disclaimer
-
-This project is in early alpha development and in a **demonstration phase**. Current CLI commands are primarily placeholders showing the intended interface design. Most functionality is actively under development and not yet implemented.
-
-**Currently Working:**
-- CLI installation and command structure
-- Help system and documentation
-- Basic command routing
-
-**To be Implemented:**
-- Complete implementation of all advertised features
-- AI agent collaboration functionality
-- Development tool integrations
-- Actual task and company management
-
-Production use is not recommended at this time. This is a development preview showing the intended user experience.
 
 ---
 

@@ -731,8 +731,15 @@ class CRDApplier:
         from ..task.manager import TaskManager
         task_manager = TaskManager()  # This will get the singleton instance
         
-        # Get company agent defaults from applied Space CRD
+        # Get company agent defaults and git config from applied Space CRD
         company_agent_defaults = self._get_company_agent_defaults(crd.spec.spaceRef)
+        git_config = self._get_company_git_config(crd.spec.spaceRef)
+        
+        # Set default branch if found in git config
+        if git_config and git_config.get("defaultBranch"):
+            default_branch = git_config["defaultBranch"]
+            task_manager.set_default_branch(default_branch)
+            logger.info(f"Set TaskManager default branch to: {default_branch} (from Space config)")
         
         # Create task configuration
         task_config = {
@@ -774,6 +781,34 @@ class CRDApplier:
             
         except Exception as e:
             logger.error(f"Failed to get company agent defaults: {e}")
+            return {}
+    
+    def _get_company_git_config(self, space_ref: str) -> dict:
+        """Get company git config from applied Space CRD"""
+        try:
+            # Find the Space CRD for this space_ref
+            for resource_key, resource in self.applied_resources.items():
+                if resource_key.startswith("Space/") and hasattr(resource, 'metadata'):
+                    space_crd = resource
+                    # Find the company in the Space CRD
+                    for nation in space_crd.spec.nations:
+                        for city in nation.cities:
+                            for village in city.villages:
+                                for company in village.companies:
+                                    if company.name == space_ref:
+                                        # Return gitRepo config if exists
+                                        if hasattr(company, 'gitRepo') and company.gitRepo:
+                                            return {
+                                                'url': company.gitRepo.url,
+                                                'defaultBranch': getattr(company.gitRepo, 'defaultBranch', 'main'),
+                                                'auth': getattr(company.gitRepo, 'auth', 'ssh')
+                                            }
+            
+            logger.debug(f"No git config found for space: {space_ref}")
+            return {}
+            
+        except Exception as e:
+            logger.error(f"Error getting company git config: {e}")
             return {}
     
     def _convert_agent_config_to_dict(self, agent_config) -> dict:

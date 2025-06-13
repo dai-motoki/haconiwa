@@ -121,7 +121,7 @@ class TaskManager:
             if fetch_result.returncode != 0:
                 logger.warning(f"Failed to fetch {self.default_branch}: {fetch_result.stderr}")
             
-            # Checkout the default branch
+            # Checkout default branch
             checkout_result = subprocess.run(['git', '-C', str(main_repo_path), 'checkout', self.default_branch], 
                                            capture_output=True, text=True)
             if checkout_result.returncode != 0:
@@ -133,15 +133,36 @@ class TaskManager:
             if pull_result.returncode != 0:
                 logger.warning(f"Failed to pull {self.default_branch}: {pull_result.stderr}")
             
-            # Create and checkout new branch from the default branch
-            result1 = subprocess.run(['git', '-C', str(main_repo_path), 'checkout', '-b', branch, f'origin/{self.default_branch}'], 
-                                   capture_output=True, text=True)
-            if result1.returncode != 0:
-                # Branch might already exist, try to checkout
-                result1 = subprocess.run(['git', '-C', str(main_repo_path), 'checkout', branch], 
+            # Check if branch already exists
+            check_branch = subprocess.run(['git', '-C', str(main_repo_path), 'rev-parse', '--verify', branch], 
+                                        capture_output=True, text=True)
+            
+            if check_branch.returncode == 0:
+                # Branch exists, check if it's based on the correct branch
+                merge_base = subprocess.run(['git', '-C', str(main_repo_path), 'merge-base', branch, f'origin/{self.default_branch}'], 
+                                          capture_output=True, text=True)
+                default_branch_commit = subprocess.run(['git', '-C', str(main_repo_path), 'rev-parse', f'origin/{self.default_branch}'], 
+                                                     capture_output=True, text=True)
+                
+                if merge_base.stdout.strip() != default_branch_commit.stdout.strip():
+                    # Branch exists but is based on wrong branch, delete and recreate
+                    logger.info(f"Branch {branch} exists but is based on wrong branch, recreating from {self.default_branch}")
+                    subprocess.run(['git', '-C', str(main_repo_path), 'branch', '-D', branch], 
+                                 capture_output=True, text=True)
+                    # Create new branch from the default branch
+                    result1 = subprocess.run(['git', '-C', str(main_repo_path), 'checkout', '-b', branch, f'origin/{self.default_branch}'], 
+                                           capture_output=True, text=True)
+                else:
+                    # Branch exists and is based on correct branch, just checkout
+                    result1 = subprocess.run(['git', '-C', str(main_repo_path), 'checkout', branch], 
+                                           capture_output=True, text=True)
+            else:
+                # Branch doesn't exist, create it from the default branch
+                result1 = subprocess.run(['git', '-C', str(main_repo_path), 'checkout', '-b', branch, f'origin/{self.default_branch}'], 
                                        capture_output=True, text=True)
-                if result1.returncode != 0:
-                    logger.warning(f"Failed to create/checkout branch {branch}: {result1.stderr}")
+            
+            if result1.returncode != 0:
+                logger.warning(f"Failed to create/checkout branch {branch}: {result1.stderr}")
             
             # Switch back to default branch
             subprocess.run(['git', '-C', str(main_repo_path), 'checkout', self.default_branch], 
@@ -337,26 +358,12 @@ class TaskManager:
                 role_part = parts[1]  # pm
                 room_part = parts[2]  # r1, r2
                 worker_type = None
-            elif len(parts) == 4 and parts[1] == "wk":
+            elif len(parts) == 4:
                 # Format: org01-wk-a-r1
                 org_part = parts[0]  # org01
                 role_part = parts[1]  # wk
                 worker_type = parts[2]  # a, b, c
                 room_part = parts[3]  # r1, r2
-            elif len(parts) == 4 and parts[1] == "dev":
-                # Format: dev01-dev-r1-d1 (simple dev format)
-                org_part = parts[0]  # dev01
-                role_part = parts[1]  # dev
-                room_part = parts[2]  # r1
-                desk_part = parts[3]  # d1, d2, d3
-                worker_type = None
-                # Extract desk number for pane index
-                if desk_part.startswith("d"):
-                    expected_pane_index = int(desk_part[1:]) - 1  # d1->0, d2->1, d3->2
-                    window_id = "0"  # Always window 0 for simple dev
-                    
-                    # Direct return for simple format
-                    return self._find_pane_by_index(session_name, window_id, expected_pane_index)
             else:
                 logger.warning(f"Invalid assignee format: {assignee}")
                 return None
@@ -481,40 +488,6 @@ class TaskManager:
             logger.error(f"Error finding pane for agent {assignee}: {e}")
             return None
     
-    def _find_pane_by_index(self, session_name: str, window_id: str, pane_index: int) -> Optional[Dict[str, Any]]:
-        """Find pane by direct index"""
-        try:
-            # Get pane info directly
-            cmd = ["tmux", "list-panes", "-t", f"{session_name}:{window_id}", 
-                   "-F", "#{pane_index}:#{pane_current_path}:#{pane_title}"]
-            result = subprocess.run(cmd, capture_output=True, text=True)
-            
-            if result.returncode != 0:
-                logger.error(f"Failed to list panes: {result.stderr}")
-                return None
-            
-            # Find the specific pane
-            for line in result.stdout.strip().split('\n'):
-                if not line:
-                    continue
-                parts = line.split(':', 2)
-                if len(parts) >= 3:
-                    idx = int(parts[0])
-                    if idx == pane_index:
-                        return {
-                            "window_id": window_id,
-                            "pane_index": str(pane_index),
-                            "current_path": parts[1],
-                            "title": parts[2]
-                        }
-            
-            logger.warning(f"Pane {pane_index} not found in window {window_id}")
-            return None
-            
-        except Exception as e:
-            logger.error(f"Error finding pane by index: {e}")
-            return None
-    
     def _update_agent_pane_directory(self, session_name: str, pane_info: Dict[str, Any], 
                                    assignee: str, task_name: str, worktree_path: str) -> bool:
         """Update specific pane to use task worktree directory"""
@@ -560,26 +533,6 @@ class TaskManager:
             
         except Exception as e:
             logger.error(f"Error updating pane directory: {e}")
-            return False
-    
-    def create_task_worktree(self, task: Any, main_repo: Path, worktree_path: Path) -> bool:
-        """Create git worktree for task"""
-        try:
-            import subprocess
-            
-            # Create worktree using git command
-            cmd = ["git", "worktree", "add", str(worktree_path), task.spec.branch]
-            result = subprocess.run(cmd, capture_output=True, text=True, cwd=main_repo)
-            
-            if result.returncode == 0:
-                logger.info(f"Created worktree for branch {task.spec.branch}")
-                return True
-            else:
-                logger.error(f"Failed to create worktree: {result.stderr}")
-                return False
-                
-        except Exception as e:
-            logger.error(f"Error creating worktree: {e}")
             return False
     
     def _create_agent_assignment_log(self, task_dir: str, assignee: str, task_name: str, 
