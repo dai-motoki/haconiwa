@@ -1,0 +1,147 @@
+apiVersion: haconiwa.dev/v1
+kind: Organization
+metadata:
+  name: simple-dev-org
+spec:
+  companyName: "Simple Dev Company"
+  industry: "Software Development"
+  basePath: "./simple-dev-world"
+  hierarchy:
+    departments:
+    - id: "dev"
+      name: "Development"
+      description: "Simple development team"
+      roles:
+      - roleType: "engineering"
+        title: "Developer"
+        responsibilities:
+          - "Development"
+        reportsTo: "Lead"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Space
+metadata:
+  name: simple-dev-world
+spec:
+  nations:
+  - id: jp
+    name: Japan
+    cities:
+    - id: tokyo
+      name: Tokyo
+      villages:
+      - id: dev-village
+        name: Dev Village
+        companies:
+        - name: simple-dev-company
+          grid: 1x3
+          organizationRef: "simple-dev-org"
+          gitRepo:
+            url: "https://github.com/dai-motoki/haconiwa"
+            defaultBranch: "dev"
+            auth: "https"
+          buildings:
+          - id: hq
+            name: HQ
+            floors:
+            - id: floor-1
+              name: Dev Floor
+              rooms:
+              - id: room-dev
+                name: Dev Room
+                description: "Development room with 3 desks"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_auto_claude_01
+spec:
+  branch: task_auto_claude_01
+  worktree: true
+  assignee: dev01-dev-r1-d1
+  spaceRef: simple-dev-company
+  description: |
+    ## タスク: Claude自動実行機能の実装
+    
+    ### 概要
+    haconiwaで開発タスクを割り当ててapplyすると、tmuxのペインにてclaudeコマンドが自動で打ち込まれ、
+    タスクディスクリプションのmdファイル（YAMLからコピーされる）を読み取って実装する機能を開発する。
+    
+    ### 要件
+    1. タスク割り当て時にタスクディスクリプションをmdファイルとして生成
+    2. tmuxペインでclaude-codeコマンドを自動実行
+    3. mdファイルをclaudeに読み込ませて実装を開始
+    
+    ### 実装場所
+    - src/haconiwa/agent/claude_integration.py
+    - src/haconiwa/task/manager.py
+    - src/haconiwa/space/manager.py
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_order_command_02
+spec:
+  branch: task_order_command_02
+  worktree: true
+  assignee: dev01-dev-r1-d2
+  spaceRef: simple-dev-company
+  description: |
+    ## タスク: 会社へのタスク発注コマンドの実装
+    
+    ### 概要
+    会社にタスクを発注するコマンドを実装する。
+    
+    ### 要件
+    1. `haconiwa task order`コマンドの新規作成
+    2. 会社を指定してタスクを発注できる機能
+    3. タスクの自動割り当てロジック
+    
+    ### コマンド例
+    ```bash
+    haconiwa task order --company simple-dev-company --description "新機能の実装"
+    haconiwa task order -c simple-dev-company -d "バグ修正" --priority high
+    ```
+    
+    ### 実装場所
+    - src/haconiwa/task/cli.py
+    - src/haconiwa/task/manager.py
+    - src/haconiwa/organization/manager.py
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_space_info_03
+spec:
+  branch: task_space_info_03
+  worktree: true
+  assignee: dev01-dev-r1-d3
+  spaceRef: simple-dev-company
+  description: |
+    ## タスク: Space情報表示コマンドの実装
+    
+    ### 概要
+    haconiwa applyをすると作成のログが出てくるが、その際の組織図などの情報を
+    会社やワールド単位でhaconiwaコマンドで確認できるようにする。
+    
+    ### 要件
+    1. `haconiwa space info`コマンドの拡張
+    2. フラグで表示内容を切り替え
+    3. 組織図、階層構造、タスク状況などの表示
+    
+    ### コマンド例
+    ```bash
+    haconiwa space info --company simple-dev-company --show-org
+    haconiwa space info -c simple-dev-company --show-hierarchy
+    haconiwa space info -c simple-dev-company --show-tasks
+    haconiwa space info -c simple-dev-company --full
+    ```
+    
+    ### 実装場所
+    - src/haconiwa/space/cli.py
+    - src/haconiwa/space/manager.py
+    - src/haconiwa/core/state.py

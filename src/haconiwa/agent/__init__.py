@@ -1,5 +1,12 @@
 # haconiwa/agent/__init__.py
 
+"""
+Agent Integration Package
+エージェント統合パッケージ
+
+Claude Code、Cursor、その他のエージェントツールとの統合機能を提供します。
+"""
+
 class Agent:
     def __init__(self):
         self.agents = []

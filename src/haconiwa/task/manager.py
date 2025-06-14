@@ -4,7 +4,7 @@ Task Manager for Haconiwa v1.0
 
 import logging
 import subprocess
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -20,12 +20,18 @@ class TaskManager:
         if cls._instance is None:
             cls._instance = super(TaskManager, cls).__new__(cls)
             cls._instance.tasks = {}
+            cls._instance.default_branch = "main"  # Default value
             cls._initialized = True
         return cls._instance
     
     def __init__(self):
         # Only initialize once
         pass
+    
+    def set_default_branch(self, branch: str):
+        """Set the default branch to use for creating new branches"""
+        self.default_branch = branch
+        logger.info(f"TaskManager default branch set to: {branch}")
     
     def create_task(self, config: Dict[str, Any]) -> bool:
         """Create task from configuration with Git worktree"""
@@ -36,12 +42,14 @@ class TaskManager:
             assignee = config.get("assignee")
             space_ref = config.get("space_ref")
             description = config.get("description", "")
+            agent_config = config.get("agent_config")  # エージェント設定
+            company_agent_defaults = config.get("company_agent_defaults")  # 会社デフォルト設定
             
             logger.info(f"Creating task: {name} (branch: {branch}, assignee: {assignee})")
             
             # Create worktree if requested
             if worktree and space_ref:
-                success = self._create_worktree(name, branch, space_ref)
+                success = self._create_worktree(name, branch, space_ref, config)
                 if not success:
                     logger.warning(f"Failed to create worktree for task {name}, but continuing")
             
@@ -51,12 +59,18 @@ class TaskManager:
                 "status": "created",
                 "worktree_created": worktree and space_ref,
                 "assignee": assignee,
-                "description": description
+                "description": description,
+                "agent_config": agent_config
             }
             
             # IMPORTANT: Create agent assignment log immediately after task creation
             if assignee and worktree and space_ref:
                 self._create_immediate_agent_assignment_log(name, assignee, space_ref, description)
+                
+                # Claude Code統合: .claude/settings.local.json の作成
+                if agent_config or company_agent_defaults:
+                    logger.info(f"🔧 Setting up Claude Code integration for {assignee}...")
+                    self._create_claude_code_settings(name, space_ref, company_agent_defaults, agent_config)
             
             logger.info(f"✅ Created task: {name}")
             if worktree and space_ref:
@@ -70,7 +84,7 @@ class TaskManager:
             logger.error(f"Failed to create task: {e}")
             return False
     
-    def _create_worktree(self, task_name: str, branch: str, space_ref: str) -> bool:
+    def _create_worktree(self, task_name: str, branch: str, space_ref: str, config: Dict[str, Any]) -> bool:
         """Create Git worktree in tasks directory"""
         try:
             # Find space base path (assuming task_name follows naming convention)
@@ -98,18 +112,60 @@ class TaskManager:
             # Create new branch and worktree
             logger.info(f"Creating worktree: {worktree_path} for branch: {branch}")
             
-            # Create and checkout new branch (without changing directory)
-            result1 = subprocess.run(['git', '-C', str(main_repo_path), 'checkout', '-b', branch], 
-                                   capture_output=True, text=True)
-            if result1.returncode != 0:
-                # Branch might already exist, try to checkout
-                result1 = subprocess.run(['git', '-C', str(main_repo_path), 'checkout', branch], 
-                                       capture_output=True, text=True)
-                if result1.returncode != 0:
-                    logger.warning(f"Failed to create/checkout branch {branch}: {result1.stderr}")
+            # First, ensure we're on the default branch and it's up to date
+            logger.info(f"Fetching and syncing with origin/{self.default_branch}")
             
-            # Switch back to main branch
-            subprocess.run(['git', '-C', str(main_repo_path), 'checkout', 'main'], 
+            # Fetch all from origin to ensure we have latest refs
+            fetch_result = subprocess.run(['git', '-C', str(main_repo_path), 'fetch', 'origin'], 
+                                        capture_output=True, text=True)
+            if fetch_result.returncode != 0:
+                logger.warning(f"Failed to fetch from origin: {fetch_result.stderr}")
+            
+            # Checkout default branch
+            checkout_result = subprocess.run(['git', '-C', str(main_repo_path), 'checkout', self.default_branch], 
+                                           capture_output=True, text=True)
+            if checkout_result.returncode != 0:
+                logger.warning(f"Failed to checkout {self.default_branch}: {checkout_result.stderr}")
+            
+            # Hard reset to origin to ensure we're exactly at origin's state
+            reset_result = subprocess.run(['git', '-C', str(main_repo_path), 'reset', '--hard', f'origin/{self.default_branch}'], 
+                                        capture_output=True, text=True)
+            if reset_result.returncode != 0:
+                logger.warning(f"Failed to reset to origin/{self.default_branch}: {reset_result.stderr}")
+            
+            # Check if branch already exists
+            check_branch = subprocess.run(['git', '-C', str(main_repo_path), 'rev-parse', '--verify', branch], 
+                                        capture_output=True, text=True)
+            
+            if check_branch.returncode == 0:
+                # Branch exists, check if it's based on the correct branch
+                merge_base = subprocess.run(['git', '-C', str(main_repo_path), 'merge-base', branch, f'origin/{self.default_branch}'], 
+                                          capture_output=True, text=True)
+                default_branch_commit = subprocess.run(['git', '-C', str(main_repo_path), 'rev-parse', f'origin/{self.default_branch}'], 
+                                                     capture_output=True, text=True)
+                
+                if merge_base.stdout.strip() != default_branch_commit.stdout.strip():
+                    # Branch exists but is based on wrong branch, delete and recreate
+                    logger.info(f"Branch {branch} exists but is based on wrong branch, recreating from {self.default_branch}")
+                    subprocess.run(['git', '-C', str(main_repo_path), 'branch', '-D', branch], 
+                                 capture_output=True, text=True)
+                    # Create new branch from the default branch
+                    result1 = subprocess.run(['git', '-C', str(main_repo_path), 'checkout', '-b', branch, f'origin/{self.default_branch}'], 
+                                           capture_output=True, text=True)
+                else:
+                    # Branch exists and is based on correct branch, just checkout
+                    result1 = subprocess.run(['git', '-C', str(main_repo_path), 'checkout', branch], 
+                                           capture_output=True, text=True)
+            else:
+                # Branch doesn't exist, create it from the default branch
+                result1 = subprocess.run(['git', '-C', str(main_repo_path), 'checkout', '-b', branch, f'origin/{self.default_branch}'], 
+                                       capture_output=True, text=True)
+            
+            if result1.returncode != 0:
+                logger.warning(f"Failed to create/checkout branch {branch}: {result1.stderr}")
+            
+            # Switch back to default branch
+            subprocess.run(['git', '-C', str(main_repo_path), 'checkout', self.default_branch], 
                          capture_output=True, text=True)
             
             # Create worktree (using absolute paths)
@@ -119,6 +175,15 @@ class TaskManager:
             
             if result2.returncode == 0:
                 logger.info(f"✅ Successfully created worktree: {worktree_path}")
+                
+                # Copy .env files if they were specified
+                env_files = config.get('env_files', [])
+                if env_files:
+                    self._copy_env_files_to_worktree(worktree_path, env_files)
+                
+                # Copy AICodeConfig files if they were specified
+                self._copy_aicode_config_files_to_worktree(worktree_path, space_ref)
+                
                 return True
             else:
                 logger.error(f"Failed to create worktree: {result2.stderr}")
@@ -128,15 +193,96 @@ class TaskManager:
             logger.error(f"Error creating worktree: {e}")
             return False
     
+    def _copy_env_files_to_worktree(self, worktree_path: Path, env_files: List[str]) -> None:
+        """Copy .env files to the worktree directory"""
+        try:
+            if not env_files:
+                return
+            logger.info(f"📋 Copying {len(env_files)} environment file(s) to worktree")
+            
+            # Read and merge all env files
+            merged_env = {}
+            for env_file in env_files:
+                env_path = Path(env_file)
+                if not env_path.exists():
+                    logger.warning(f"Environment file not found: {env_file}")
+                    continue
+                
+                logger.info(f"Reading environment file: {env_file}")
+                with open(env_path, 'r') as f:
+                    for line in f:
+                        line = line.strip()
+                        # Skip empty lines and comments
+                        if not line or line.startswith('#'):
+                            continue
+                        # Parse KEY=VALUE format
+                        if '=' in line:
+                            key, value = line.split('=', 1)
+                            # Remove quotes if present
+                            if (value.startswith('"') and value.endswith('"')) or (
+                                value.startswith("'") and value.endswith("'")
+                            ):
+                                value = value[1:-1]
+                            merged_env[key] = value
+            
+            # Write merged .env file to worktree
+            if merged_env:
+                target_env_path = worktree_path / '.env'
+                with open(target_env_path, 'w') as f:
+                    f.write("# Auto-generated by Haconiwa\n")
+                    f.write(f"# Merged from: {', '.join(env_files)}\n\n")
+                    for key, value in sorted(merged_env.items()):
+                        # Quote values that contain spaces
+                        if ' ' in value and not (value.startswith('"') or value.startswith("'")):
+                            value = f'"{value}"'
+                        f.write(f"{key}={value}\n")
+                
+                logger.info(f"✅ Created .env file in worktree with {len(merged_env)} variables")
+                
+                # Also update .gitignore if it doesn't already include .env
+                gitignore_path = worktree_path / '.gitignore'
+                if gitignore_path.exists():
+                    with open(gitignore_path, 'r') as f:
+                        content = f.read()
+                    if '.env' not in content:
+                        with open(gitignore_path, 'a') as f:
+                            f.write('\n# Environment variables\n.env\n.env.local\n.env.*.local\n')
+                        logger.info("Updated .gitignore to exclude .env files")
+                else:
+                    with open(gitignore_path, 'w') as f:
+                        f.write('# Environment variables\n.env\n.env.local\n.env.*.local\n')
+                    logger.info("Created .gitignore with .env exclusions")
+            
+        except Exception as e:
+            logger.error(f"Error copying env files: {e}")
+    
     def _find_space_base_path(self, space_ref: str) -> Path:
         """Find base path for space reference"""
-        # Heuristic: look for common space patterns
+        # Strategy 1: Get from SpaceManager active sessions (most reliable)
+        try:
+            from ..space.manager import SpaceManager
+            space_manager = SpaceManager()
+            
+            # Check active sessions for matching space
+            for session_name, session_info in space_manager.active_sessions.items():
+                config = session_info.get("config", {})
+                # Check if this session matches our space_ref
+                if (config.get("name") == space_ref or 
+                    session_name == space_ref):
+                    base_path = Path(config.get("base_path", f"./{session_name}"))
+                    if base_path.exists() and (base_path / "tasks").exists():
+                        logger.info(f"Found space base path from SpaceManager: {base_path}")
+                        return base_path
+        except Exception as e:
+            logger.debug(f"Could not get base path from SpaceManager: {e}")
+        
+        # Strategy 2: Standard naming patterns (space_ref based)
         candidates = [
             Path(f"./{space_ref}"),
             Path(f"./{space_ref}-desks"),
             Path(f"./test-{space_ref}"),
             Path(f"./test-{space_ref}-desks"),
-            # Additional patterns for multiroom spaces
+            # Additional patterns for company-style spaces
             Path(f"./{space_ref.replace('-company', '-desks')}"),
             Path(f"./test-{space_ref.replace('-company', '-desks')}"),
             Path(f"./{space_ref.replace('company', 'desks')}"),
@@ -144,17 +290,34 @@ class TaskManager:
         
         for candidate in candidates:
             if candidate.exists() and (candidate / "tasks").exists():
-                logger.info(f"Found space base path: {candidate}")
+                logger.info(f"Found space base path via pattern matching: {candidate}")
                 return candidate
+        
+        # Strategy 3: Scan all directories for tasks subdirectory (fallback)
+        logger.debug("Scanning current directory for any directory with 'tasks' subdirectory...")
+        current_dirs = [p for p in Path(".").iterdir() if p.is_dir()]
+        for dir_path in current_dirs:
+            if (dir_path / "tasks").exists():
+                # Additional validation: check if it looks like a haconiwa workspace
+                tasks_dir = dir_path / "tasks"
+                if (tasks_dir / "main").exists() or any(tasks_dir.iterdir()):
+                    logger.info(f"Found space base path via directory scan: {dir_path}")
+                    return dir_path
         
         # Debug: list what actually exists
         logger.debug(f"Searching for space: {space_ref}")
         logger.debug(f"Checked candidates: {[str(c) for c in candidates]}")
-        current_dirs = [p for p in Path(".").iterdir() if p.is_dir()]
         logger.debug(f"Available directories: {[p.name for p in current_dirs]}")
         
         logger.warning(f"Could not find base path for space: {space_ref}")
         return None
+    
+    def _get_session_name_from_space_ref(self, space_ref: str) -> str:
+        """Get actual session name from space reference"""
+        # For most cases, the space_ref is actually the company name, which is the session name
+        # But we need to handle world-based naming where space_ref might be different
+        # For now, return space_ref as it should be the company name
+        return space_ref
     
     def list_tasks(self) -> Dict[str, Any]:
         """List all tasks"""
@@ -458,7 +621,7 @@ class TaskManager:
             
             # Create .haconiwa directory for agent logs
             haconiwa_dir = task_path / ".haconiwa"
-            haconiwa_dir.mkdir(exist_ok=True)
+            haconiwa_dir.mkdir(parents=True, exist_ok=True)
             
             # Agent assignment log file
             log_file = haconiwa_dir / "agent_assignment.json"
@@ -595,16 +758,20 @@ class TaskManager:
             
             # Create .haconiwa directory for agent logs
             haconiwa_dir = task_dir / ".haconiwa"
-            haconiwa_dir.mkdir(exist_ok=True)
+            haconiwa_dir.mkdir(parents=True, exist_ok=True)
             
             # Agent assignment log file
             log_file = haconiwa_dir / "agent_assignment.json"
+            
+            # Get the actual session name (company name) instead of using space_ref directly
+            # For haconiwa-world, the session name is the company name
+            session_name = self._get_session_name_from_space_ref(space_ref)
             
             # Prepare assignment information (without tmux pane info for now)
             assignment_info = {
                 "agent_id": assignee,
                 "task_name": task_name,
-                "space_session": space_ref,
+                "space_session": session_name,  # Use actual session name
                 "tmux_window": None,  # Will be set when pane is found
                 "tmux_pane": None,    # Will be set when pane is found
                 "assigned_at": datetime.now().isoformat(),
@@ -627,4 +794,98 @@ class TaskManager:
             
         except Exception as e:
             logger.error(f"Failed to create immediate agent assignment log: {e}")
-            return False 
+            return False
+    
+    def _create_claude_code_settings(self, task_name: str, space_ref: str, company_agent_defaults: Dict[str, Any], agent_config: Dict[str, Any]) -> bool:
+        """Create Claude Code settings file"""
+        try:
+            # Find space base path
+            base_path = self._find_space_base_path(space_ref)
+            if not base_path:
+                logger.warning(f"Could not find base path for space: {space_ref}")
+                return False
+            
+            # Task directory path
+            task_dir = base_path / "tasks" / task_name
+            if not task_dir.exists():
+                logger.warning(f"Task directory does not exist: {task_dir}")
+                return False
+            
+            # Claude Code統合を使用して設定ファイルを作成
+            from ..agent.claude_integration import ClaudeCodeIntegration
+            claude_integration = ClaudeCodeIntegration()
+            
+            # 設定ファイル作成
+            success = claude_integration.create_claude_settings(
+                task_dir, 
+                company_agent_defaults or {}, 
+                agent_config
+            )
+            
+            if success:
+                logger.info(f"📁 Created Claude Code settings for task: {task_name}")
+            else:
+                logger.warning(f"Failed to create Claude Code settings for task: {task_name}")
+            
+            return success
+            
+        except Exception as e:
+            logger.error(f"Failed to create Claude Code settings: {e}")
+            return False
+    
+    def _copy_aicode_config_files_to_worktree(self, worktree_path: Path, space_ref: str) -> None:
+        """Copy AICodeConfig files to the worktree directory"""
+        try:
+            # Get AICodeConfig from the current applier instance
+            import sys
+            applier = getattr(sys.modules.get('__main__'), '_current_applier', None)
+            if not applier or not hasattr(applier, 'ai_code_configs'):
+                return
+            
+            # Get AICodeConfig for this company
+            ai_code_config = applier.ai_code_configs.get(space_ref)
+            if not ai_code_config:
+                logger.debug(f"No AICodeConfig found for company: {space_ref}")
+                return
+            
+            logger.info(f"📋 Applying AICodeConfig for company: {space_ref}")
+            
+            # Only handle claude provider for now
+            if ai_code_config.spec.provider != "claude":
+                return
+            
+            claude_config = ai_code_config.spec.claude
+            
+            # Copy settings.local.json to .claude directory
+            if claude_config.settingsFile:
+                settings_path = Path(claude_config.settingsFile)
+                if settings_path.exists():
+                    # Create .claude directory
+                    claude_dir = worktree_path / ".claude"
+                    claude_dir.mkdir(exist_ok=True)
+                    
+                    # Copy settings file
+                    target_path = claude_dir / "settings.local.json"
+                    logger.info(f"📋 Copying Claude settings: {settings_path} -> {target_path}")
+                    
+                    import shutil
+                    shutil.copy2(settings_path, target_path)
+                    logger.info(f"✅ Successfully copied settings.local.json")
+                else:
+                    logger.warning(f"Settings file not found: {settings_path}")
+            
+            # Copy CLAUDE.md to root of worktree
+            if claude_config.guidelinesFile:
+                guidelines_path = Path(claude_config.guidelinesFile)
+                if guidelines_path.exists():
+                    target_path = worktree_path / "CLAUDE.md"
+                    logger.info(f"📋 Copying Claude guidelines: {guidelines_path} -> {target_path}")
+                    
+                    import shutil
+                    shutil.copy2(guidelines_path, target_path)
+                    logger.info(f"✅ Successfully copied CLAUDE.md")
+                else:
+                    logger.warning(f"Guidelines file not found: {guidelines_path}")
+                    
+        except Exception as e:
+            logger.error(f"Error copying AICodeConfig files: {e}") 

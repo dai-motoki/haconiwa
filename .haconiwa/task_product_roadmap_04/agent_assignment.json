@@ -1,0 +1,14 @@
+[
+  {
+    "agent_id": "vpp-suzuki",
+    "task_name": "task_product_roadmap_04",
+    "space_session": "haconiwa-dev-company",
+    "tmux_window": null,
+    "tmux_pane": null,
+    "assigned_at": "2025-06-14T21:45:59.459459",
+    "assignment_type": "automatic",
+    "task_directory": "haconiwa-dev-world/tasks/task_product_roadmap_04",
+    "status": "active",
+    "description": "## Product Roadmap Development\n\nCreate detailed product roadmap for next 12 months.\n\n### Requirements:\n- Feature prioritization\n- User research analysis\n- Market requirements\n- Timeline planning\n"
+  }
+]

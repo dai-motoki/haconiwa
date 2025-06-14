@@ -1,0 +1,16 @@
+# CodeRabbit Configuration
+# This file enables automatic code review for all branches
+
+reviews:
+  auto: true  # Enable automatic reviews
+  review_status: true  # Show status messages
+  # Review all branches by not specifying any filters
+  # This means CodeRabbit will review PRs to any branch
+
+# Optional: You can customize other settings
+language: "ja"  # Use Japanese for reviews
+path_filters:
+  # You can exclude certain paths if needed
+  # exclude:
+  #   - "docs/**"
+  #   - "*.md"

@@ -1,0 +1,46 @@
+# 簡易版テストYAML - AICodeConfig最小限実装テスト
+---
+apiVersion: haconiwa.dev/v1
+kind: AICodeConfig
+metadata:
+  name: test-claude-config
+spec:
+  provider: "claude"
+  claude:
+    settingsFile: "./claude-settings/settings.local.json"
+    guidelinesFile: "./claude-settings/CLAUDE.md"
+  targetCompany: "kamui-dev-company"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Space
+metadata:
+  name: kamui-dev-world-simple
+spec:
+  nations:
+    - id: jp
+      name: "Japan"
+      cities:
+        - id: tokyo
+          name: "Tokyo"
+          villages:
+            - id: kamui-village
+              name: "Kamui Village"
+              companies:
+                - name: kamui-dev-company
+                  gitRepo:
+                    url: "https://github.com/dai-motoki/haconiwa"
+                    defaultBranch: "main"
+                    auth: "https"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_test_01
+spec:
+  branch: "test/aicode-config"
+  worktree: true
+  assignee: "test-agent"
+  spaceRef: "kamui-dev-company"
+  description: "AICodeConfig test task"

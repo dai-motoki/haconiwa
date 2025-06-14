@@ -1,0 +1,1 @@
+{"permissions":{"allow":["Read(*)","Edit(*)","Write(*)","Bash(ls:*)","Bash(cat:*)","Bash(rg:*)","Bash(git:*)","Bash(python:*)","Bash(pytest:*)","Bash(ruff:*)","Bash(mypy:*)"],"deny":[]}}

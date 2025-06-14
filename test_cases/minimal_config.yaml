@@ -1,0 +1,87 @@
+apiVersion: haconiwa.dev/v1
+kind: Organization
+metadata:
+  name: minimal-org
+spec:
+  companyName: "Minimal Company"
+  industry: "Minimal"
+  basePath: "./test_output/minimal"
+  hierarchy:
+    departments:
+    - id: "executive"
+      name: "Executive"
+      roles:
+      - roleType: "executive"
+        title: "CEO"
+    - id: "frontend"
+      name: "Frontend"
+      roles:
+      - roleType: "management"
+        title: "Lead"
+    - id: "backend"
+      name: "Backend"
+      roles:
+      - roleType: "management"
+        title: "Lead"
+    - id: "devops"
+      name: "DevOps"
+      roles:
+      - roleType: "management"
+        title: "Lead"
+    - id: "qa"
+      name: "QA"
+      roles:
+      - roleType: "management"
+        title: "Lead"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Space
+metadata:
+  name: minimal-space
+spec:
+  nations:
+  - id: jp
+    name: Japan
+    cities:
+    - id: tokyo
+      name: Tokyo
+      villages:
+      - id: village
+        name: Village
+        companies:
+        - name: minimal-company
+          grid: 8x4
+          organizationRef: "minimal-org"
+          gitRepo:
+            url: "https://github.com/dai-motoki/haconiwa"
+            defaultBranch: "main"
+            auth: "https"
+          buildings:
+          - id: hq
+            name: HQ
+            floors:
+            - id: floor-1
+              name: Floor 1
+              rooms:
+              - id: room-01
+                name: Alpha
+              - id: room-02
+                name: Beta
+            - id: floor-2
+              name: Floor 2
+              rooms:
+              - id: room-executive
+                name: Executive
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: minimal_task
+spec:
+  branch: minimal_task
+  worktree: true
+  assignee: org05-ceo-re
+  spaceRef: minimal-company
+  description: "Minimal test task" 

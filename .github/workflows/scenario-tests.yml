@@ -1,0 +1,137 @@
+name: Scenario Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  scenario-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test-case:
+          - haconiwa-world.yaml
+          - test_cases/basic_executive_floor.yaml
+          - test_cases/error_case_test.yaml
+          - test_cases/full_structure_test.yaml
+          - test_cases/heavy_task_assignment.yaml
+          - test_cases/minimal_config.yaml
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tmux git
+
+      - name: Install haconiwa
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Run scenario test for ${{ matrix.test-case }}
+        run: |
+          echo "Testing ${{ matrix.test-case }}"
+          haconiwa apply -f ${{ matrix.test-case }} --force-clone --no-attach
+
+      - name: Verify space creation
+        run: |
+          if [[ "${{ matrix.test-case }}" == "haconiwa-world.yaml" ]]; then
+            SPACE_NAME="haconiwa-world"
+          elif [[ "${{ matrix.test-case }}" == "test_cases/basic_executive_floor.yaml" ]]; then
+            SPACE_NAME="basic-executive-space"
+          elif [[ "${{ matrix.test-case }}" == "test_cases/error_case_test.yaml" ]]; then
+            SPACE_NAME="error-test-space"
+          elif [[ "${{ matrix.test-case }}" == "test_cases/full_structure_test.yaml" ]]; then
+            SPACE_NAME="full-structure-space"
+          elif [[ "${{ matrix.test-case }}" == "test_cases/heavy_task_assignment.yaml" ]]; then
+            SPACE_NAME="heavy-task-space"
+          elif [[ "${{ matrix.test-case }}" == "test_cases/minimal_config.yaml" ]]; then
+            SPACE_NAME="minimal-space"
+          fi
+          
+          # Check if tmux session exists
+          tmux has-session -t $SPACE_NAME 2>/dev/null
+          if [ $? -eq 0 ]; then
+            echo "✅ Tmux session $SPACE_NAME created successfully"
+            
+            # List panes
+            echo "Panes in session:"
+            tmux list-panes -t $SPACE_NAME -F "#{pane_id} #{pane_title}"
+            
+            # Count panes
+            PANE_COUNT=$(tmux list-panes -t $SPACE_NAME | wc -l)
+            echo "Total panes: $PANE_COUNT"
+            
+            # Cleanup
+            tmux kill-session -t $SPACE_NAME
+          else
+            echo "❌ Tmux session $SPACE_NAME not found"
+            exit 1
+          fi
+
+  integration-test-all:
+    runs-on: ubuntu-latest
+    needs: scenario-tests
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tmux git
+
+      - name: Install haconiwa
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Run all scenario tests sequentially
+        run: |
+          # Test each YAML file in sequence
+          for yaml_file in haconiwa-world.yaml test_cases/*.yaml; do
+            echo "========================================="
+            echo "Testing: $yaml_file"
+            echo "========================================="
+            
+            # Apply the configuration
+            haconiwa apply -f $yaml_file --force-clone --no-attach
+            
+            # Extract space name from the output or file
+            if [[ "$yaml_file" == "haconiwa-world.yaml" ]]; then
+              SPACE_NAME="haconiwa-world"
+            else
+              # Extract space name from YAML file
+              SPACE_NAME=$(grep -A2 "kind: Space" $yaml_file | grep "name:" | head -1 | awk '{print $2}')
+            fi
+            
+            echo "Space name: $SPACE_NAME"
+            
+            # Verify tmux session
+            if tmux has-session -t $SPACE_NAME 2>/dev/null; then
+              echo "✅ Space $SPACE_NAME created successfully"
+              tmux kill-session -t $SPACE_NAME
+            else
+              echo "⚠️  Space $SPACE_NAME might not have created a tmux session (this is OK for some test cases)"
+            fi
+            
+            echo ""
+          done
+          
+          echo "✅ All scenario tests completed successfully"

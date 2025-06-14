@@ -1,0 +1,260 @@
+apiVersion: haconiwa.dev/v1
+kind: Organization
+metadata:
+  name: test-org-one-room
+spec:
+  companyName: "Test Company One Room"
+  industry: "Software Development"
+  basePath: "./test-one-room"
+  legalFramework:
+    enabled: true
+    lawDirectory: "law"
+    organizationRules: "organization-rules.md"
+    systemPrompts: "system-prompts"
+    permissions: "permissions"
+  hierarchy:
+    legalFramework:
+      enabled: true
+      lawDirectory: "law"
+      globalRules: "global-rules.md"
+      systemPrompts: "system-prompts"
+      permissions: "permissions"
+    departments:
+    - id: "development"
+      name: "Development Team"
+      description: "Software development team"
+      legalFramework:
+        enabled: true
+        lawDirectory: "law"
+        departmentRules: "development-rules.md"
+        systemPrompts: "system-prompts"
+        permissions: "permissions"
+      roles:
+      - roleType: "management"
+        title: "Team Lead"
+        agentId: "lead-pm-01"
+        responsibilities:
+          - "Task assignment"
+          - "Progress monitoring"
+          - "Quality assurance"
+      - roleType: "engineering"
+        title: "Senior Developer"
+        agentId: "motoki"
+        responsibilities:
+          - "Feature implementation"
+          - "Architecture design"
+          - "Code review"
+          - "Mentoring"
+        reportsTo: "Team Lead"
+      - roleType: "engineering"
+        title: "Developer"
+        agentId: "ai-dev-7523"
+        responsibilities:
+          - "Feature development"
+          - "Bug fixes"
+          - "Testing"
+          - "Documentation"
+        reportsTo: "Team Lead"
+      - roleType: "engineering"
+        title: "Junior Developer"
+        agentId: "rookie-001"
+        responsibilities:
+          - "Simple tasks"
+          - "Bug fixes"
+          - "Learning"
+          - "Testing"
+        reportsTo: "Team Lead"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Space
+metadata:
+  name: test-world-one-room
+spec:
+  nations:
+  - id: jp
+    name: Japan
+    legalFramework:
+      enabled: true
+      lawDirectory: "law"
+      globalRules: "global-rules.md"
+      systemPrompts: "system-prompts"
+      permissions: "permissions"
+    cities:
+    - id: tokyo
+      name: Tokyo
+      legalFramework:
+        enabled: true
+        lawDirectory: "law"
+        regionalRules: "regional-rules.md"
+        systemPrompts: "system-prompts"
+        permissions: "permissions"
+      villages:
+      - id: test-village
+        name: Test Village
+        legalFramework:
+          enabled: true
+          lawDirectory: "law"
+          localRules: "local-rules.md"
+          systemPrompts: "system-prompts"
+          permissions: "permissions"
+        companies:
+        - name: test-company-one-room
+          grid: 4x1
+          legalFramework:
+            enabled: true
+            lawDirectory: "law"
+            projectRules: "project-rules.md"
+            systemPrompts: "system-prompts"
+            permissions: "permissions"
+          agentDefaults:
+            type: "claude-code"
+            permissions:
+              allow:
+                - "Bash(python -m pytest)"
+                - "Bash(python -m ruff)"
+                - "Bash(python -m mypy)"
+                - "Bash(haconiwa *)"
+                - "Read(pyproject.toml)"
+                - "Read(src/**/*.py)"
+                - "Write(src/**/*.py)"
+                - "Edit(src/**/*.py)"
+              deny:
+                - "Bash(rm -rf /)"
+                - "Bash(curl:*)"
+            env:
+              HACONIWA_DEV_MODE: "1"
+              PYTHONPATH: "./src"
+          organizationRef: "test-org-one-room"
+          gitRepo:
+            url: "https://github.com/dai-motoki/haconiwa"
+            defaultBranch: "dev"
+            auth: "https"
+          buildings:
+          - id: headquarters
+            name: Headquarters
+            legalFramework:
+              enabled: true
+              lawDirectory: "law"
+              buildingRules: "building-rules.md"
+              systemPrompts: "system-prompts"
+              permissions: "permissions"
+            floors:
+            - id: floor-1
+              name: Development Floor
+              legalFramework:
+                enabled: true
+                lawDirectory: "law"
+                floorRules: "development-floor-rules.md"
+                systemPrompts: "system-prompts"
+                permissions: "permissions"
+              rooms:
+              - id: room-dev
+                name: Development Room
+                description: "Main development workspace with 3 desks"
+                legalFramework:
+                  enabled: true
+                  lawDirectory: "law"
+                  teamRules: "team-rules.md"
+                  systemPrompts: "system-prompts"
+                  permissions: "permissions"
+                  desksLaw:
+                    enabled: true
+                    lawDirectory: "law"
+                    agentRules: "agent-rules.md"
+                    systemPrompts: "system-prompts"
+                    permissions: "permissions"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_claude_auto_01
+spec:
+  branch: task_claude_auto_01
+  worktree: true
+  assignee: motoki
+  spaceRef: test-company-one-room
+  description: |
+    ## タスク: Claude自動実行機能の実装
+    
+    ### 概要
+    haconiwaで開発タスクを割り当ててapplyすると、tmuxのペインにてclaudeコマンドが自動で打ち込まれ、
+    タスクディスクリプションのmdファイル（YAMLからコピーされる）を読み取って実装する機能を開発する。
+    
+    ### 要件
+    1. タスク割り当て時にタスクディスクリプションをmdファイルとして生成
+    2. tmuxペインでclaude-codeコマンドを自動実行
+    3. mdファイルをclaudeに読み込ませて実装を開始
+    
+    ### 実装場所
+    - src/haconiwa/agent/claude_integration.py
+    - src/haconiwa/task/manager.py
+    - src/haconiwa/space/manager.py
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_order_cmd_02
+spec:
+  branch: task_order_cmd_02
+  worktree: true
+  assignee: ai-dev-7523
+  spaceRef: test-company-one-room
+  description: |
+    ## タスク: 会社へのタスク発注コマンドの実装
+    
+    ### 概要
+    会社にタスクを発注するコマンドを実装する。
+    
+    ### 要件
+    1. `haconiwa task order`コマンドの新規作成
+    2. 会社を指定してタスクを発注できる機能
+    3. タスクの自動割り当てロジック
+    
+    ### コマンド例
+    ```bash
+    haconiwa task order --company test-company-one-room --description "新機能の実装"
+    haconiwa task order -c test-company-one-room -d "バグ修正" --priority high
+    ```
+    
+    ### 実装場所
+    - src/haconiwa/task/cli.py
+    - src/haconiwa/task/manager.py
+    - src/haconiwa/organization/manager.py
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_space_info_03
+spec:
+  branch: task_space_info_03
+  worktree: true
+  assignee: rookie-001
+  spaceRef: test-company-one-room
+  description: |
+    ## タスク: Space情報表示コマンドの実装
+    
+    ### 概要
+    haconiwa applyをすると作成のログが出てくるが、その際の組織図などの情報を
+    会社やワールド単位でhaconiwaコマンドで確認できるようにする。
+    
+    ### 要件
+    1. `haconiwa space info`コマンドの拡張
+    2. フラグで表示内容を切り替え
+    3. 組織図、階層構造、タスク状況などの表示
+    
+    ### コマンド例
+    ```bash
+    haconiwa space info --company test-company-one-room --show-org
+    haconiwa space info -c test-company-one-room --show-hierarchy
+    haconiwa space info -c test-company-one-room --show-tasks
+    haconiwa space info -c test-company-one-room --full
+    ```
+    
+    ### 実装場所
+    - src/haconiwa/space/cli.py
+    - src/haconiwa/space/manager.py
+    - src/haconiwa/core/state.py

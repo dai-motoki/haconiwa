@@ -1,0 +1,14 @@
+[
+  {
+    "agent_id": "ceo-motoki",
+    "task_name": "task_ai_strategy_01",
+    "space_session": "haconiwa-dev-company",
+    "tmux_window": null,
+    "tmux_pane": null,
+    "assigned_at": "2025-06-14T18:33:02.972928",
+    "assignment_type": "automatic",
+    "task_directory": "haconiwa-dev-world/tasks/task_ai_strategy_01",
+    "status": "active",
+    "description": "## AI Strategy Development\n\nDevelop comprehensive AI strategy for Haconiwa platform.\n\n### Requirements:\n- Market analysis\n- Technology roadmap\n- Competitive analysis\n- Investment planning\n"
+  }
+]

@@ -8,7 +8,7 @@ from typing import Union, List, Dict, Any
 from pydantic import ValidationError
 
 from .models import (
-    SpaceCRD, AgentCRD, TaskCRD, PathScanCRD, DatabaseCRD, CommandPolicyCRD
+    SpaceCRD, AgentCRD, TaskCRD, PathScanCRD, DatabaseCRD, CommandPolicyCRD, OrganizationCRD, AICodeConfigCRD
 )
 
 
@@ -27,11 +27,13 @@ class CRDParser:
             "Task": TaskCRD,
             "PathScan": PathScanCRD,
             "Database": DatabaseCRD,
-            "CommandPolicy": CommandPolicyCRD
+            "CommandPolicy": CommandPolicyCRD,
+            "Organization": OrganizationCRD,
+            "AICodeConfig": AICodeConfigCRD
         }
         self.supported_api_versions = ["haconiwa.dev/v1"]
     
-    def parse_yaml(self, yaml_content: str) -> Union[SpaceCRD, AgentCRD, TaskCRD, PathScanCRD, DatabaseCRD, CommandPolicyCRD]:
+    def parse_yaml(self, yaml_content: str) -> Union[SpaceCRD, AgentCRD, TaskCRD, PathScanCRD, DatabaseCRD, CommandPolicyCRD, OrganizationCRD, AICodeConfigCRD]:
         """Parse single YAML document to CRD object"""
         try:
             data = yaml.safe_load(yaml_content)
@@ -41,7 +43,7 @@ class CRDParser:
         except ValidationError as e:
             raise CRDValidationError(f"Validation error: {e}")
     
-    def parse_multi_yaml(self, yaml_content: str) -> List[Union[SpaceCRD, AgentCRD, TaskCRD, PathScanCRD, DatabaseCRD, CommandPolicyCRD]]:
+    def parse_multi_yaml(self, yaml_content: str) -> List[Union[SpaceCRD, AgentCRD, TaskCRD, PathScanCRD, DatabaseCRD, CommandPolicyCRD, OrganizationCRD, AICodeConfigCRD]]:
         """Parse multi-document YAML to list of CRD objects"""
         try:
             documents = yaml.safe_load_all(yaml_content)
@@ -55,7 +57,7 @@ class CRDParser:
         except ValidationError as e:
             raise CRDValidationError(f"Validation error: {e}")
     
-    def parse_file(self, file_path: Path) -> Union[SpaceCRD, AgentCRD, TaskCRD, PathScanCRD, DatabaseCRD, CommandPolicyCRD]:
+    def parse_file(self, file_path: Path) -> Union[SpaceCRD, AgentCRD, TaskCRD, PathScanCRD, DatabaseCRD, CommandPolicyCRD, OrganizationCRD, AICodeConfigCRD]:
         """Parse YAML file to CRD object"""
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
@@ -66,7 +68,7 @@ class CRDParser:
         except Exception as e:
             raise CRDValidationError(f"Error reading file {file_path}: {e}")
     
-    def parse_multi_file(self, file_path: Path) -> List[Union[SpaceCRD, AgentCRD, TaskCRD, PathScanCRD, DatabaseCRD, CommandPolicyCRD]]:
+    def parse_multi_file(self, file_path: Path) -> List[Union[SpaceCRD, AgentCRD, TaskCRD, PathScanCRD, DatabaseCRD, CommandPolicyCRD, OrganizationCRD]]:
         """Parse multi-document YAML file to list of CRD objects"""
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
@@ -77,7 +79,7 @@ class CRDParser:
         except Exception as e:
             raise CRDValidationError(f"Error reading file {file_path}: {e}")
     
-    def _parse_crd_data(self, data: Dict[str, Any]) -> Union[SpaceCRD, AgentCRD, TaskCRD, PathScanCRD, DatabaseCRD, CommandPolicyCRD]:
+    def _parse_crd_data(self, data: Dict[str, Any]) -> Union[SpaceCRD, AgentCRD, TaskCRD, PathScanCRD, DatabaseCRD, CommandPolicyCRD, OrganizationCRD]:
         """Parse CRD data dictionary to CRD object"""
         # Validate required fields
         if not isinstance(data, dict):

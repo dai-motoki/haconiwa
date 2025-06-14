@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, dev ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, dev ]
 
 jobs:
   test:
@@ -52,6 +52,46 @@ jobs:
         run: |
           pytest --cov=haconiwa tests/
           coverage xml
+          
+      - name: Run .haconiwa directory structure tests
+        run: |
+          pytest tests/unit/test_haconiwa_directory_structure.py -v
+      
+      - name: Run env file copy tests
+        run: |
+          # Test env file functionality
+          pytest tests/unit/test_env_file_copy.py -v
+          pytest tests/integration/test_apply_with_env_files.py -v
+      
+      - name: Run task assignment fix tests
+        run: |
+          # Test task assignment json location fix
+          pytest tests/integration/test_task_assignment_fix.py -v
+      
+      - name: Run AICodeConfig tests
+        run: |
+          # Test AICodeConfig functionality
+          pytest tests/unit/test_aicode_config.py -v
+      
+      - name: Run task submit tests
+        run: |
+          # Test task submit functionality
+          pytest tests/unit/test_task_submit.py -v
+
+      - name: Run scenario tests
+        run: |
+          # Test core YAML configurations
+          echo "Testing haconiwa-world.yaml"
+          haconiwa apply -f haconiwa-world.yaml --force-clone --no-attach
+          
+          echo "Testing minimal configuration"
+          haconiwa apply -f test_cases/minimal_config.yaml --force-clone --no-attach
+          
+          # Test env file functionality
+          echo "Testing with env files"
+          echo "API_KEY=test123" > .env.test
+          echo "LOG_LEVEL=DEBUG" >> .env.test
+          haconiwa apply -f test_cases/minimal_config.yaml --env .env.test --dry-run --no-attach
 
       - name: Build package
         run: python -m build

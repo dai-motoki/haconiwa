@@ -1,11 +1,11 @@
 import typer
-from pathlib import Path
-from typing import Optional, List
+from typing import Optional
 from rich.console import Console
 from rich.table import Table
 from rich.progress import Progress
 
 from ..task.worktree import WorktreeManager
+from ..task.submit import TaskSubmitter
 from ..core.config import Config
 from ..core.logging import get_logger
 
@@ -116,6 +116,53 @@ def prune(
         console.print(f"🧹 Cleaned up {len(cleaned)} orphaned worktrees: {', '.join(cleaned)}")
     except Exception as e:
         logger.error(f"Failed to prune worktrees: {e}")
+        raise typer.Exit(1)
+
+@task_app.command()
+def submit(
+    company: str = typer.Option(..., "--company", "-c", help="Company name"),
+    assignee: str = typer.Option(..., "--assignee", "-a", help="Agent ID"),
+    title: str = typer.Option(..., "--title", "-t", help="Task title"),
+    branch: str = typer.Option(..., "--branch", "-b", help="Branch name (becomes directory name)"),
+    description: str = typer.Option("", "--description", "-d", help="Task description"),
+    description_file: Optional[str] = typer.Option(None, "--description-file", "-f", help="Markdown file with task description"),
+    base_branch: Optional[str] = typer.Option(None, "--base-branch", help="Base branch for worktree"),
+    priority: str = typer.Option("medium", "--priority", "-p", help="Task priority (high/medium/low)"),
+    room: Optional[str] = typer.Option(None, "--room", "-r", help="Target room/window"),
+    worktree_path: Optional[str] = typer.Option(None, "--worktree-path", help="Custom worktree path"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Show what would be done")
+):
+    """Submit a task to an existing company with automatic worktree creation"""
+    try:
+        submitter = TaskSubmitter()
+        
+        # Submit the task
+        result = submitter.submit_task(
+            company=company,
+            assignee=assignee,
+            title=title,
+            branch=branch,
+            description=description,
+            description_file=description_file,
+            base_branch=base_branch,
+            priority=priority,
+            room=room,
+            worktree_path=worktree_path,
+            dry_run=dry_run
+        )
+        
+        if not dry_run:
+            console.print(f"✅ Task successfully submitted: [bold green]{title}[/]")
+            console.print(f"📁 Worktree: [cyan]{result.get('worktree_path')}[/]")
+            console.print(f"👤 Assignee: [yellow]{assignee}[/]")
+            console.print(f"🌿 Branch: [blue]{branch}[/]")
+            
+            # Show suggestion to monitor
+            console.print(f"\n💡 To monitor progress, run:")
+            console.print(f"   [dim]haconiwa monitor -c {company} --japanese[/]")
+        
+    except Exception as e:
+        console.print(f"[red]Error:[/] {str(e)}")
         raise typer.Exit(1)
 
 if __name__ == "__main__":

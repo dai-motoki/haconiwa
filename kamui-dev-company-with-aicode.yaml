@@ -1,0 +1,537 @@
+apiVersion: haconiwa.dev/v1
+kind: Organization
+metadata:
+  name: kamui-dev-company-org
+spec:
+  companyName: "Kamui Development Company"
+  industry: "AI Development Tools & Infrastructure"
+  basePath: "./kamui-dev-company"
+  hierarchy:
+    departments:
+    - id: "executive"
+      name: "Executive Team"
+      description: "Company leadership and strategic decision making"
+      roles:
+      - roleType: "management"
+        title: "Chief Executive Officer"
+        agentId: "ceo-motoki"
+        responsibilities:
+          - "Strategic vision and direction"
+          - "Company-wide decision making"
+          - "Stakeholder relations"
+      - roleType: "management"
+        title: "Chief Technology Officer"
+        agentId: "cto-yamada"
+        responsibilities:
+          - "Technology strategy and innovation"
+          - "Technical architecture oversight"
+          - "R&D direction"
+      - roleType: "management"
+        title: "Chief Financial Officer"
+        agentId: "cfo-tanaka"
+        responsibilities:
+          - "Financial planning and analysis"
+          - "Budget management"
+          - "Investment strategies"
+      - roleType: "management"
+        title: "VP of Engineering"
+        agentId: "vpe-sato"
+        responsibilities:
+          - "Engineering team leadership"
+          - "Development process optimization"
+          - "Technical talent management"
+      - roleType: "management"
+        title: "VP of Product"
+        agentId: "vpp-suzuki"
+        responsibilities:
+          - "Product strategy and roadmap"
+          - "User experience vision"
+          - "Market analysis"
+      - roleType: "management"
+        title: "VP of Operations"
+        agentId: "vpo-watanabe"
+        responsibilities:
+          - "Operations strategy"
+          - "Process optimization"
+          - "Resource management"
+      - roleType: "engineering"
+        title: "Senior AI Engineer"
+        agentId: "ai-lead-nakamura"
+        responsibilities:
+          - "AI/ML model development"
+          - "Algorithm optimization"
+          - "Research implementation"
+      - roleType: "engineering"
+        title: "Senior Backend Engineer"
+        agentId: "backend-lead-kobayashi"
+        responsibilities:
+          - "Core backend architecture"
+          - "API design and implementation"
+          - "Database optimization"
+      - roleType: "engineering"
+        title: "Senior Frontend Engineer"
+        agentId: "frontend-lead-ishii"
+        responsibilities:
+          - "UI/UX implementation"
+          - "Frontend architecture"
+          - "Performance optimization"
+      - roleType: "engineering"
+        title: "Senior DevOps Engineer"
+        agentId: "devops-lead-matsui"
+        responsibilities:
+          - "Infrastructure automation"
+          - "CI/CD pipeline management"
+          - "Cloud architecture"
+      - roleType: "engineering"
+        title: "Security Engineer"
+        agentId: "security-lead-inoue"
+        responsibilities:
+          - "Security architecture"
+          - "Threat assessment"
+          - "Compliance management"
+      - roleType: "engineering"
+        title: "Data Engineer"
+        agentId: "data-lead-kimura"
+        responsibilities:
+          - "Data pipeline development"
+          - "Analytics infrastructure"
+          - "Data quality assurance"
+      - roleType: "management"
+        title: "QA Manager"
+        agentId: "qa-manager-hayashi"
+        responsibilities:
+          - "Quality assurance strategy"
+          - "Testing framework design"
+          - "Release validation"
+      - roleType: "engineering"
+        title: "Documentation Lead"
+        agentId: "docs-lead-yamamoto"
+        responsibilities:
+          - "Technical documentation"
+          - "API documentation"
+          - "User guides"
+      - roleType: "management"
+        title: "Community Manager"
+        agentId: "community-ito"
+        responsibilities:
+          - "Developer community engagement"
+          - "Open source strategy"
+          - "Technical evangelism"
+      - roleType: "engineering"
+        title: "Platform Engineer"
+        agentId: "platform-kato"
+        responsibilities:
+          - "Developer platform tools"
+          - "Internal tooling"
+          - "Developer experience"
+    
+    - id: "standby"
+      name: "Standby Team"
+      description: "Ready-to-deploy talent pool"
+      roles:
+      - roleType: "engineering"
+        title: "Standby Developer 01"
+        agentId: "standby-dev-01"
+        responsibilities:
+          - "Awaiting assignment"
+          - "Skill development"
+      - roleType: "engineering"
+        title: "Standby Developer 02"
+        agentId: "standby-dev-02"
+        responsibilities:
+          - "Awaiting assignment"
+          - "Skill development"
+      - roleType: "engineering"
+        title: "Standby Developer 03"
+        agentId: "standby-dev-03"
+        responsibilities:
+          - "Awaiting assignment"
+          - "Skill development"
+      - roleType: "engineering"
+        title: "Standby Developer 04"
+        agentId: "standby-dev-04"
+        responsibilities:
+          - "Awaiting assignment"
+          - "Skill development"
+      - roleType: "engineering"
+        title: "Standby Developer 05"
+        agentId: "standby-dev-05"
+        responsibilities:
+          - "Awaiting assignment"
+          - "Skill development"
+      - roleType: "engineering"
+        title: "Standby Developer 06"
+        agentId: "standby-dev-06"
+        responsibilities:
+          - "Awaiting assignment"
+          - "Skill development"
+      - roleType: "engineering"
+        title: "Standby Developer 07"
+        agentId: "standby-dev-07"
+        responsibilities:
+          - "Awaiting assignment"
+          - "Skill development"
+      - roleType: "engineering"
+        title: "Standby Developer 08"
+        agentId: "standby-dev-08"
+        responsibilities:
+          - "Awaiting assignment"
+          - "Skill development"
+      - roleType: "engineering"
+        title: "Standby Developer 09"
+        agentId: "standby-dev-09"
+        responsibilities:
+          - "Awaiting assignment"
+          - "Skill development"
+      - roleType: "engineering"
+        title: "Standby Developer 10"
+        agentId: "standby-dev-10"
+        responsibilities:
+          - "Awaiting assignment"
+          - "Skill development"
+      - roleType: "engineering"
+        title: "Standby Developer 11"
+        agentId: "standby-dev-11"
+        responsibilities:
+          - "Awaiting assignment"
+          - "Skill development"
+      - roleType: "engineering"
+        title: "Standby Developer 12"
+        agentId: "standby-dev-12"
+        responsibilities:
+          - "Awaiting assignment"
+          - "Skill development"
+      - roleType: "engineering"
+        title: "Standby Developer 13"
+        agentId: "standby-dev-13"
+        responsibilities:
+          - "Awaiting assignment"
+          - "Skill development"
+      - roleType: "engineering"
+        title: "Standby Developer 14"
+        agentId: "standby-dev-14"
+        responsibilities:
+          - "Awaiting assignment"
+          - "Skill development"
+      - roleType: "engineering"
+        title: "Standby Developer 15"
+        agentId: "standby-dev-15"
+        responsibilities:
+          - "Awaiting assignment"
+          - "Skill development"
+      - roleType: "engineering"
+        title: "Standby Developer 16"
+        agentId: "standby-dev-16"
+        responsibilities:
+          - "Awaiting assignment"
+          - "Skill development"
+
+---
+# AICodeConfig for Claude Code settings
+apiVersion: haconiwa.dev/v1
+kind: AICodeConfig
+metadata:
+  name: kamui-claude-config
+spec:
+  provider: "claude"
+  claude:
+    settingsFile: "./claude-settings/settings.local.json"
+    guidelinesFile: "./claude-settings/CLAUDE.md"
+  targetCompany: "kamui-dev-company"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Space
+metadata:
+  name: kamui-dev-world
+spec:
+  nations:
+  - id: jp
+    name: Japan
+    cities:
+    - id: tokyo
+      name: Tokyo
+      villages:
+      - id: kamui-village
+        name: "Kamui Village"
+        companies:
+        - name: kamui-dev-company
+          grid: "8x4"
+          basePath: "./kamui-dev-world"
+          organizationRef: "kamui-dev-company-org"
+          agentDefaults:
+            type: "claude-code"
+            permissions:
+              allow:
+                - "Bash(python -m pytest)"
+                - "Bash(python -m ruff)"
+                - "Bash(python -m mypy)"
+                - "Bash(kamui *)"
+                - "Read(pyproject.toml)"
+                - "Read(src/**/*.py)"
+                - "Write(src/**/*.py)"
+                - "Edit(src/**/*.py)"
+              deny:
+                - "Bash(rm -rf /)"
+                - "Bash(curl:*)"
+            env:
+              KAMUI_DEV_MODE: "1"
+              PYTHONPATH: "./src"
+          gitRepo:
+            url: "https://github.com/KandaQuantum1123/kamui_v3"
+            defaultBranch: "main"
+            auth: "https"
+          buildings:
+          - id: "hq-tower"
+            name: "Kamui HQ Tower"
+            floors:
+            - id: "executive-floor"
+              name: "Executive Floor"
+              rooms:
+              - id: room-executive
+                name: "Executive Room"
+                description: "C-level executives and senior leadership"
+              - id: room-standby
+                name: "Standby Room"
+                description: "Ready-to-deploy talent pool"
+
+---
+# Executive Room Tasks - Strategic initiatives
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_ai_strategy_01
+spec:
+  taskId: task_ai_strategy_01
+  title: "AI Strategy Development"
+  description: |
+    ## AI Strategy Development
+    
+    Develop comprehensive AI strategy for Kamui platform.
+    
+    ### Requirements:
+    - Market analysis
+    - Technology roadmap
+    - Competitive analysis
+    - Investment planning
+  assignee: "ceo-motoki"
+  spaceRef: "kamui-dev-company"
+  priority: "high"
+  worktree: true
+  branch: "strategy/ai-roadmap"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_tech_architecture_02
+spec:
+  taskId: task_tech_architecture_02
+  title: "Technical Architecture Review"
+  description: |
+    ## Technical Architecture Review
+    
+    Review and optimize current technical architecture.
+    
+    ### Requirements:
+    - System architecture analysis
+    - Performance optimization
+    - Scalability planning
+    - Technology stack evaluation
+  assignee: "cto-yamada"
+  spaceRef: "kamui-dev-company"
+  priority: "high"
+  worktree: true
+  branch: "architecture/system-review"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_financial_planning_03
+spec:
+  taskId: task_financial_planning_03
+  title: "Financial Planning & Analysis"
+  description: |
+    ## Financial Planning & Analysis
+    
+    Develop comprehensive financial model and planning.
+    
+    ### Requirements:
+    - Revenue projections
+    - Cost analysis
+    - Investment planning
+    - Financial reporting
+  assignee: "cfo-tanaka"
+  spaceRef: "kamui-dev-company"
+  priority: "high"
+  worktree: true
+  branch: "finance/planning-model"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_product_roadmap_04
+spec:
+  taskId: task_product_roadmap_04
+  title: "Product Roadmap Development"
+  description: |
+    ## Product Roadmap Development
+    
+    Create detailed product roadmap for next 12 months.
+    
+    ### Requirements:
+    - Feature prioritization
+    - User research analysis
+    - Market requirements
+    - Timeline planning
+  assignee: "vpp-suzuki"
+  spaceRef: "kamui-dev-company"
+  priority: "high"
+  worktree: true
+  branch: "product/roadmap-2025"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_ai_core_engine_05
+spec:
+  taskId: task_ai_core_engine_05
+  title: "AI Core Engine Enhancement"
+  description: |
+    ## AI Core Engine Enhancement
+    
+    Enhance the core AI engine for better agent coordination.
+    
+    ### Requirements:
+    - Multi-agent coordination
+    - Context sharing
+    - Performance optimization
+    - Memory management
+  assignee: "ai-lead-nakamura"
+  spaceRef: "kamui-dev-company"
+  priority: "high"
+  worktree: true
+  branch: "ai/core-engine"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_backend_optimization_06
+spec:
+  taskId: task_backend_optimization_06
+  title: "Backend Performance Optimization"
+  description: |
+    ## Backend Performance Optimization
+    
+    Optimize backend performance for large-scale deployments.
+    
+    ### Requirements:
+    - Database optimization
+    - API performance
+    - Caching strategy
+    - Load balancing
+  assignee: "backend-lead-kobayashi"
+  spaceRef: "kamui-dev-company"
+  priority: "high"
+  worktree: true
+  branch: "backend/performance-opt"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_frontend_innovation_07
+spec:
+  taskId: task_frontend_innovation_07
+  title: "Frontend Innovation Research"
+  description: |
+    ## Frontend Innovation Research
+    
+    Research and prototype next-generation frontend technologies.
+    
+    ### Requirements:
+    - React 19 features evaluation
+    - Web Components integration
+    - Performance benchmarking
+    - Innovation proposals
+  assignee: "frontend-lead-ishii"
+  spaceRef: "kamui-dev-company"
+  priority: "medium"
+  worktree: true
+  branch: "frontend/innovation-research"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_devops_automation_08
+spec:
+  taskId: task_devops_automation_08
+  title: "DevOps Automation Enhancement"
+  description: |
+    ## DevOps Automation Enhancement
+    
+    Enhance automation across the entire DevOps pipeline.
+    
+    ### Requirements:
+    - Infrastructure as Code improvements
+    - Automated testing integration
+    - Deployment automation
+    - Monitoring automation
+  assignee: "devops-lead-matsui"
+  spaceRef: "kamui-dev-company"
+  priority: "high"
+  worktree: true
+  branch: "devops/automation-enhancement"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_security_audit_09
+spec:
+  taskId: task_security_audit_09
+  title: "Security Architecture Audit"
+  description: |
+    ## Security Architecture Audit
+    
+    Comprehensive security audit and enhancement planning.
+    
+    ### Requirements:
+    - Vulnerability assessment
+    - Security architecture review
+    - Compliance evaluation
+    - Security roadmap development
+  assignee: "security-lead-inoue"
+  spaceRef: "kamui-dev-company"
+  priority: "high"
+  worktree: true
+  branch: "security/architecture-audit"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_data_platform_10
+spec:
+  taskId: task_data_platform_10
+  title: "Data Platform Development"
+  description: |
+    ## Data Platform Development
+    
+    Build comprehensive data platform for analytics and insights.
+    
+    ### Requirements:
+    - Data lake architecture
+    - Real-time streaming
+    - Analytics dashboard
+    - ML pipeline integration
+  assignee: "data-lead-kimura"
+  spaceRef: "kamui-dev-company"
+  priority: "high"
+  worktree: true
+  branch: "data/platform-development"

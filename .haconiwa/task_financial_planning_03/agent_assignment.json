@@ -1,0 +1,14 @@
+[
+  {
+    "agent_id": "cfo-tanaka",
+    "task_name": "task_financial_planning_03",
+    "space_session": "haconiwa-dev-company",
+    "tmux_window": null,
+    "tmux_pane": null,
+    "assigned_at": "2025-06-14T18:33:03.010894",
+    "assignment_type": "automatic",
+    "task_directory": "haconiwa-dev-world/tasks/task_financial_planning_03",
+    "status": "active",
+    "description": "## Financial Planning & Analysis\n\nDevelop comprehensive financial model and planning.\n\n### Requirements:\n- Revenue projections\n- Cost analysis\n- Investment planning\n- Financial reporting\n"
+  }
+]

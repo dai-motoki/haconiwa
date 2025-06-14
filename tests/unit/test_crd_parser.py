@@ -11,7 +11,7 @@ from unittest.mock import patch, mock_open
 
 from haconiwa.core.crd.parser import CRDParser, CRDValidationError
 from haconiwa.core.crd.models import (
-    SpaceCRD, AgentCRD, TaskCRD, PathScanCRD, DatabaseCRD, CommandPolicyCRD
+    SpaceCRD, AgentCRD, TaskCRD, PathScanCRD, DatabaseCRD, CommandPolicyCRD, AICodeConfigCRD
 )
 
 
@@ -321,4 +321,65 @@ spec:
         """
         
         with pytest.raises(CRDValidationError, match="branch name contains invalid characters"):
-            self.parser.parse_yaml(invalid_task_yaml) 
+            self.parser.parse_yaml(invalid_task_yaml)
+            
+    def test_parse_aicode_config_crd_valid(self):
+        """有効なAICodeConfig CRDのパースをテスト"""
+        aicode_yaml = """
+apiVersion: haconiwa.dev/v1
+kind: AICodeConfig
+metadata:
+  name: claude-config
+spec:
+  provider: claude
+  claude:
+    settingsFile: ./claude-settings/settings.local.json
+    guidelinesFile: ./claude-settings/CLAUDE.md
+  targetCompany: test-company
+        """
+        
+        crd = self.parser.parse_yaml(aicode_yaml)
+        
+        assert isinstance(crd, AICodeConfigCRD)
+        assert crd.metadata.name == "claude-config"
+        assert crd.spec.provider == "claude"
+        assert crd.spec.claude.settingsFile == "./claude-settings/settings.local.json"
+        assert crd.spec.claude.guidelinesFile == "./claude-settings/CLAUDE.md"
+        assert crd.spec.targetCompany == "test-company"
+        
+    def test_parse_aicode_config_invalid_provider(self):
+        """無効なプロバイダーでのAICodeConfigパースをテスト"""
+        invalid_yaml = """
+apiVersion: haconiwa.dev/v1
+kind: AICodeConfig
+metadata:
+  name: invalid-config
+spec:
+  provider: invalid-provider
+  targetCompany: test-company
+        """
+        
+        # パース自体は成功するが、プロバイダーが無効
+        crd = self.parser.parse_yaml(invalid_yaml)
+        assert isinstance(crd, AICodeConfigCRD)
+        assert crd.spec.provider == "invalid-provider"
+        assert crd.spec.claude is None  # claudeプロバイダーではないのでNone
+        
+    def test_parse_aicode_config_missing_claude_fields(self):
+        """Claude設定が不完全なAICodeConfigのパースをテスト"""
+        invalid_yaml = """
+apiVersion: haconiwa.dev/v1
+kind: AICodeConfig
+metadata:
+  name: incomplete-config
+spec:
+  provider: claude
+  claude:
+    settingsFile: ./settings.json
+    # guidelinesFile is missing
+  targetCompany: test-company
+        """
+        
+        # Pydanticの検証でエラーになる
+        with pytest.raises(Exception):  # ValidationError or similar
+            self.parser.parse_yaml(invalid_yaml) 

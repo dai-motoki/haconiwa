@@ -1,0 +1,214 @@
+apiVersion: haconiwa.dev/v1
+kind: Organization
+metadata:
+  name: test-org-no-floor2
+spec:
+  companyName: "Test Company No Floor2"
+  industry: "Software Development"
+  basePath: "./test-no-floor2"
+  legalFramework:
+    enabled: true
+    lawDirectory: "law"
+    organizationRules: "organization-rules.md"
+    systemPrompts: "system-prompts"
+    permissions: "permissions"
+  hierarchy:
+    legalFramework:
+      enabled: true
+      lawDirectory: "law"
+      globalRules: "global-rules.md"
+      systemPrompts: "system-prompts"
+      permissions: "permissions"
+    departments:
+    - id: "frontend"
+      name: "Frontend Development Team"
+      description: "UI/UX development and user interface engineering"
+      parentDepartment: "engineering"
+      legalFramework:
+        enabled: true
+        lawDirectory: "law"
+        departmentRules: "frontend-rules.md"
+        systemPrompts: "system-prompts"
+        permissions: "permissions"
+      roles:
+      - roleType: "management"
+        title: "Frontend Team Lead"
+        responsibilities:
+          - "Frontend architecture decisions"
+          - "Team coordination and planning"
+          - "Code review and quality assurance"
+          - "Technology stack evaluation"
+        reportsTo: "CTO"
+      - roleType: "engineering"
+        title: "Senior Frontend Developer"
+        responsibilities:
+          - "Complex UI component development"
+          - "Performance optimization"
+          - "Mentoring junior developers"
+          - "Technical documentation"
+        reportsTo: "Frontend Team Lead"
+      - roleType: "engineering"
+        title: "Frontend Developer"
+        responsibilities:
+          - "Feature implementation"
+          - "Bug fixes and maintenance"
+          - "Unit testing"
+          - "Cross-browser compatibility"
+        reportsTo: "Senior Frontend Developer"
+      - roleType: "design"
+        title: "UI/UX Designer"
+        responsibilities:
+          - "User interface design"
+          - "User experience research"
+          - "Design system maintenance"
+          - "Prototyping and wireframing"
+        reportsTo: "Frontend Team Lead"
+    
+    - id: "backend"
+      name: "Backend Development Team"
+      description: "Server-side development and API engineering"
+      parentDepartment: "engineering"
+      legalFramework:
+        enabled: true
+        lawDirectory: "law"
+        departmentRules: "backend-rules.md"
+        systemPrompts: "system-prompts"
+        permissions: "permissions"
+      roles:
+      - roleType: "management"
+        title: "Backend Team Lead"
+        responsibilities:
+          - "Backend architecture design"
+          - "API strategy and standards"
+          - "Database optimization"
+          - "Team coordination"
+        reportsTo: "CTO"
+      - roleType: "engineering"
+        title: "Senior Backend Developer"
+        responsibilities:
+          - "Microservices architecture"
+          - "Database design and optimization"
+          - "API development and documentation"
+          - "Security implementation"
+        reportsTo: "Backend Team Lead"
+      - roleType: "engineering"
+        title: "Backend Developer"
+        responsibilities:
+          - "REST API implementation"
+          - "Database queries and optimization"
+          - "Integration testing"
+          - "Documentation maintenance"
+        reportsTo: "Senior Backend Developer"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Space
+metadata:
+  name: test-world-no-floor2
+spec:
+  nations:
+  - id: jp
+    name: Japan
+    legalFramework:
+      enabled: true
+      lawDirectory: "law"
+      globalRules: "global-rules.md"
+      systemPrompts: "system-prompts"
+      permissions: "permissions"
+    cities:
+    - id: tokyo
+      name: Tokyo
+      legalFramework:
+        enabled: true
+        lawDirectory: "law"
+        regionalRules: "regional-rules.md"
+        systemPrompts: "system-prompts"
+        permissions: "permissions"
+      villages:
+      - id: test-village
+        name: Test Village
+        legalFramework:
+          enabled: true
+          lawDirectory: "law"
+          localRules: "local-rules.md"
+          systemPrompts: "system-prompts"
+          permissions: "permissions"
+        companies:
+        - name: test-company-no-floor2
+          grid: 8x4
+          legalFramework:
+            enabled: true
+            lawDirectory: "law"
+            projectRules: "project-rules.md"
+            systemPrompts: "system-prompts"
+            permissions: "permissions"
+          agentDefaults:
+            type: "claude-code"
+            permissions:
+              allow:
+                - "Bash(npm run lint)"
+                - "Bash(npm run test:*)"
+                - "Bash(npm run build)"
+                - "Read(~/.zshrc)"
+                - "Read(package.json)"
+                - "Read(tsconfig.json)"
+              deny:
+                - "Bash(curl:*)"
+                - "Bash(rm -rf *)"
+            env:
+              CLAUDE_CODE_ENABLE_TELEMETRY: "1"
+              OTEL_METRICS_EXPORTER: "otlp"
+          organizationRef: "test-org-no-floor2"
+          gitRepo:
+            url: "https://github.com/dai-motoki/haconiwa"
+            defaultBranch: "main"
+            auth: "https"
+          buildings:
+          - id: headquarters
+            name: Headquarters
+            legalFramework:
+              enabled: true
+              lawDirectory: "law"
+              buildingRules: "building-rules.md"
+              systemPrompts: "system-prompts"
+              permissions: "permissions"
+            floors:
+            - id: floor-1
+              name: Engineering Floor
+              legalFramework:
+                enabled: true
+                lawDirectory: "law"
+                floorRules: "engineering-floor-rules.md"
+                systemPrompts: "system-prompts"
+                permissions: "permissions"
+              rooms:
+              - id: room-01
+                name: Alpha Development Room
+                description: "Main development environment for active features"
+                legalFramework:
+                  enabled: true
+                  lawDirectory: "law"
+                  teamRules: "team-rules.md"
+                  systemPrompts: "system-prompts"
+                  permissions: "permissions"
+                  desksLaw:
+                    enabled: true
+                    lawDirectory: "law"
+                    agentRules: "agent-rules.md"
+                    systemPrompts: "system-prompts"
+                    permissions: "permissions"
+              - id: room-02
+                name: Beta Testing Room
+                description: "Testing and QA environment for feature validation"
+                legalFramework:
+                  enabled: true
+                  lawDirectory: "law"
+                  teamRules: "team-rules.md"
+                  systemPrompts: "system-prompts"
+                  permissions: "permissions"
+                  desksLaw:
+                    enabled: true
+                    lawDirectory: "law"
+                    agentRules: "agent-rules.md"
+                    systemPrompts: "system-prompts"
+                    permissions: "permissions"

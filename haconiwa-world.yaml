@@ -1,0 +1,634 @@
+apiVersion: haconiwa.dev/v1
+kind: Organization
+metadata:
+  name: synergy-development-org
+spec:
+  companyName: "Synergy Development Company"
+  industry: "Software Development"
+  basePath: "./haconiwa-world"
+  legalFramework:
+    enabled: true
+    lawDirectory: "law"
+    organizationRules: "organization-rules.md"
+    systemPrompts: "system-prompts"
+    permissions: "permissions"
+  hierarchy:
+    legalFramework:
+      enabled: true
+      lawDirectory: "law"
+      globalRules: "global-rules.md"
+      systemPrompts: "system-prompts"
+      permissions: "permissions"
+    departments:
+    - id: "executive"
+      name: "Executive Leadership"
+      description: "C-level executives and strategic leadership"
+      legalFramework:
+        enabled: true
+        lawDirectory: "law"
+        departmentRules: "executive-rules.md"
+        systemPrompts: "system-prompts"
+        permissions: "permissions"
+      roles:
+      - roleType: "executive"
+        title: "CEO"
+        responsibilities:
+          - "Overall company strategy and vision"
+          - "Board communication and governance"
+          - "Major business decisions"
+          - "Company culture and values"
+        reportsTo: "Board of Directors"
+      - roleType: "executive"
+        title: "CTO"
+        responsibilities:
+          - "Technology strategy and roadmap"
+          - "Technical architecture decisions"
+          - "Engineering team leadership"
+          - "Innovation and R&D oversight"
+        reportsTo: "CEO"
+      - roleType: "executive"
+        title: "COO"
+        responsibilities:
+          - "Day-to-day operations management"
+          - "Process optimization"
+          - "Resource allocation"
+          - "Cross-department coordination"
+        reportsTo: "CEO"
+    
+    - id: "frontend"
+      name: "Frontend Development Team"
+      description: "UI/UX development and user interface engineering"
+      parentDepartment: "engineering"
+      legalFramework:
+        enabled: true
+        lawDirectory: "law"
+        departmentRules: "frontend-rules.md"
+        systemPrompts: "system-prompts"
+        permissions: "permissions"
+      roles:
+      - roleType: "management"
+        title: "Frontend Team Lead"
+        responsibilities:
+          - "Frontend architecture decisions"
+          - "Team coordination and planning"
+          - "Code review and quality assurance"
+          - "Technology stack evaluation"
+        reportsTo: "CTO"
+      - roleType: "engineering"
+        title: "Senior Frontend Developer"
+        responsibilities:
+          - "Complex UI component development"
+          - "Performance optimization"
+          - "Mentoring junior developers"
+          - "Technical documentation"
+        reportsTo: "Frontend Team Lead"
+      - roleType: "engineering"
+        title: "Frontend Developer"
+        responsibilities:
+          - "Feature implementation"
+          - "Bug fixes and maintenance"
+          - "Unit testing"
+          - "Cross-browser compatibility"
+        reportsTo: "Senior Frontend Developer"
+      - roleType: "design"
+        title: "UI/UX Designer"
+        responsibilities:
+          - "User interface design"
+          - "User experience research"
+          - "Design system maintenance"
+          - "Prototyping and wireframing"
+        reportsTo: "Frontend Team Lead"
+    
+    - id: "backend"
+      name: "Backend Development Team"
+      description: "Server-side development and API engineering"
+      parentDepartment: "engineering"
+      legalFramework:
+        enabled: true
+        lawDirectory: "law"
+        departmentRules: "backend-rules.md"
+        systemPrompts: "system-prompts"
+        permissions: "permissions"
+      roles:
+      - roleType: "management"
+        title: "Backend Team Lead"
+        responsibilities:
+          - "Backend architecture design"
+          - "API strategy and standards"
+          - "Database optimization"
+          - "Team coordination"
+        reportsTo: "CTO"
+      - roleType: "engineering"
+        title: "Senior Backend Developer"
+        responsibilities:
+          - "Microservices architecture"
+          - "Database design and optimization"
+          - "API development and documentation"
+          - "Security implementation"
+        reportsTo: "Backend Team Lead"
+      - roleType: "engineering"
+        title: "Backend Developer"
+        responsibilities:
+          - "REST API implementation"
+          - "Database queries and optimization"
+          - "Integration testing"
+          - "Documentation maintenance"
+        reportsTo: "Senior Backend Developer"
+    
+    - id: "devops"
+      name: "DevOps Infrastructure Team"
+      description: "Infrastructure, deployment, and operations"
+      parentDepartment: "engineering"
+      legalFramework:
+        enabled: true
+        lawDirectory: "law"
+        departmentRules: "devops-rules.md"
+        systemPrompts: "system-prompts"
+        permissions: "permissions"
+      roles:
+      - roleType: "management"
+        title: "DevOps Team Lead"
+        responsibilities:
+          - "Infrastructure strategy"
+          - "CI/CD pipeline design"
+          - "Cloud architecture"
+          - "Security and compliance"
+        reportsTo: "CTO"
+      - roleType: "engineering"
+        title: "Senior DevOps Engineer"
+        responsibilities:
+          - "Infrastructure as Code"
+          - "Monitoring and alerting"
+          - "Container orchestration"
+          - "Performance optimization"
+        reportsTo: "DevOps Team Lead"
+      - roleType: "engineering"
+        title: "DevOps Engineer"
+        responsibilities:
+          - "CI/CD maintenance"
+          - "Deployment automation"
+          - "System monitoring"
+          - "Incident response"
+        reportsTo: "Senior DevOps Engineer"
+    
+    - id: "qa"
+      name: "Quality Assurance Team"
+      description: "Testing, quality control, and release management"
+      parentDepartment: "engineering"
+      legalFramework:
+        enabled: true
+        lawDirectory: "law"
+        departmentRules: "qa-rules.md"
+        systemPrompts: "system-prompts"
+        permissions: "permissions"
+      roles:
+      - roleType: "management"
+        title: "QA Team Lead"
+        responsibilities:
+          - "Testing strategy and planning"
+          - "Quality standards definition"
+          - "Release coordination"
+          - "Team management"
+        reportsTo: "CTO"
+      - roleType: "engineering"
+        title: "Senior QA Engineer"
+        responsibilities:
+          - "Test automation framework"
+          - "Performance testing"
+          - "Security testing"
+          - "Test case design"
+        reportsTo: "QA Team Lead"
+      - roleType: "engineering"
+        title: "QA Engineer"
+        responsibilities:
+          - "Manual testing"
+          - "Bug reporting and tracking"
+          - "Test execution"
+          - "Documentation testing"
+        reportsTo: "Senior QA Engineer"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Space
+metadata:
+  name: haconiwa-world
+spec:
+  nations:
+  - id: jp
+    name: Japan
+    legalFramework:
+      enabled: true
+      lawDirectory: "law"
+      globalRules: "global-rules.md"
+      systemPrompts: "system-prompts"
+      permissions: "permissions"
+    cities:
+    - id: tokyo
+      name: Tokyo
+      legalFramework:
+        enabled: true
+        lawDirectory: "law"
+        regionalRules: "regional-rules.md"
+        systemPrompts: "system-prompts"
+        permissions: "permissions"
+      villages:
+      - id: harmony-village
+        name: Harmony Village
+        legalFramework:
+          enabled: true
+          lawDirectory: "law"
+          localRules: "local-rules.md"
+          systemPrompts: "system-prompts"
+          permissions: "permissions"
+        companies:
+        - name: synergy-development-company
+          grid: 8x4
+          legalFramework:
+            enabled: true
+            lawDirectory: "law"
+            projectRules: "project-rules.md"
+            systemPrompts: "system-prompts"
+            permissions: "permissions"
+          agentDefaults:
+            type: "claude-code"
+            permissions:
+              allow:
+                - "Bash(npm run lint)"
+                - "Bash(npm run test:*)"
+                - "Bash(npm run build)"
+                - "Read(~/.zshrc)"
+                - "Read(package.json)"
+                - "Read(tsconfig.json)"
+              deny:
+                - "Bash(curl:*)"
+                - "Bash(rm -rf *)"
+            env:
+              CLAUDE_CODE_ENABLE_TELEMETRY: "1"
+              OTEL_METRICS_EXPORTER: "otlp"
+          organizationRef: "synergy-development-org"
+          gitRepo:
+            url: "https://github.com/dai-motoki/haconiwa"
+            defaultBranch: "main"
+            auth: "https"
+          buildings:
+          - id: headquarters
+            name: Headquarters
+            legalFramework:
+              enabled: true
+              lawDirectory: "law"
+              buildingRules: "building-rules.md"
+              systemPrompts: "system-prompts"
+              permissions: "permissions"
+            floors:
+            - id: floor-1
+              name: Engineering Floor
+              legalFramework:
+                enabled: true
+                lawDirectory: "law"
+                floorRules: "engineering-floor-rules.md"
+                systemPrompts: "system-prompts"
+                permissions: "permissions"
+              rooms:
+              - id: room-01
+                name: Alpha Development Room
+                description: "Main development environment for active features"
+                legalFramework:
+                  enabled: true
+                  lawDirectory: "law"
+                  teamRules: "team-rules.md"
+                  systemPrompts: "system-prompts"
+                  permissions: "permissions"
+                  desksLaw:
+                    enabled: true
+                    lawDirectory: "law"
+                    agentRules: "agent-rules.md"
+                    systemPrompts: "system-prompts"
+                    permissions: "permissions"
+              - id: room-02
+                name: Beta Testing Room
+                description: "Testing and QA environment for feature validation"
+                legalFramework:
+                  enabled: true
+                  lawDirectory: "law"
+                  teamRules: "team-rules.md"
+                  systemPrompts: "system-prompts"
+                  permissions: "permissions"
+                  desksLaw:
+                    enabled: true
+                    lawDirectory: "law"
+                    agentRules: "agent-rules.md"
+                    systemPrompts: "system-prompts"
+                    permissions: "permissions"
+            - id: floor-2
+              name: Executive Floor
+              legalFramework:
+                enabled: true
+                lawDirectory: "law"
+                floorRules: "executive-floor-rules.md"
+                systemPrompts: "system-prompts"
+                permissions: "permissions"
+              rooms:
+              - id: room-executive
+                name: Executive Leadership Room
+                description: "C-level executives and strategic leadership workspace"
+                legalFramework:
+                  enabled: true
+                  lawDirectory: "law"
+                  teamRules: "executive-team-rules.md"
+                  systemPrompts: "system-prompts"
+                  permissions: "permissions"
+                  desksLaw:
+                    enabled: true
+                    lawDirectory: "law"
+                    agentRules: "executive-agent-rules.md"
+                    systemPrompts: "system-prompts"
+                    permissions: "permissions"
+
+---
+# Task CRDs - 日時時間スタイル命名規則（YYYYMMDDHHMMSS_task-content_識別番号）
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20250609061748_frontend-ui-design_01
+spec:
+  branch: 20250609061748_frontend-ui-design_01
+  worktree: true
+  assignee: org01-pm-r1
+  spaceRef: synergy-development-company
+  description: "フロントエンドUI設計とコンポーネント実装"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20250609061749_backend-api-development_02
+spec:
+  branch: 20250609061749_backend-api-development_02
+  worktree: true
+  assignee: org02-pm-r1
+  spaceRef: synergy-development-company
+  description: "REST API開発とデータベース連携"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20250609061750_database-schema-design_03
+spec:
+  branch: 20250609061750_database-schema-design_03
+  worktree: true
+  assignee: org03-wk-a-r1
+  spaceRef: synergy-development-company
+  description: "データベーススキーマ設計とマイグレーション作成"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20250609061751_devops-ci-cd-pipeline_04
+spec:
+  branch: 20250609061751_devops-ci-cd-pipeline_04
+  worktree: true
+  assignee: org04-wk-a-r1
+  spaceRef: synergy-development-company
+  description: "CI/CDパイプライン構築とインフラ自動化"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20250609061752_user-authentication_05
+spec:
+  branch: 20250609061752_user-authentication_05
+  worktree: true
+  assignee: org01-wk-a-r2
+  spaceRef: synergy-development-company
+  description: "ユーザー認証機能の実装とセキュリティ強化"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20250609061753_performance-optimization_06
+spec:
+  branch: 20250609061753_performance-optimization_06
+  worktree: true
+  assignee: org02-wk-b-r2
+  spaceRef: synergy-development-company
+  description: "パフォーマンス最適化とクエリ改善"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20250609061754_mobile-responsive-design_07
+spec:
+  branch: 20250609061754_mobile-responsive-design_07
+  worktree: true
+  assignee: org01-wk-a-r1
+  spaceRef: synergy-development-company
+  description: "モバイル対応レスポンシブデザイン実装"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20250609061755_api-security-enhancement_08
+spec:
+  branch: 20250609061755_api-security-enhancement_08
+  worktree: true
+  assignee: org02-wk-a-r1
+  spaceRef: synergy-development-company
+  description: "API セキュリティ強化と認証機能追加"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20250609061756_automated-testing-framework_09
+spec:
+  branch: 20250609061756_automated-testing-framework_09
+  worktree: true
+  assignee: org04-pm-r1
+  spaceRef: synergy-development-company
+  description: "自動テストフレームワーク構築"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20250609061757_data-analytics-dashboard_10
+spec:
+  branch: 20250609061757_data-analytics-dashboard_10
+  worktree: true
+  assignee: org01-wk-b-r1
+  spaceRef: synergy-development-company
+  description: "データ分析ダッシュボード開発"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20250609061758_microservices-architecture_11
+spec:
+  branch: 20250609061758_microservices-architecture_11
+  worktree: true
+  assignee: org02-wk-c-r1
+  spaceRef: synergy-development-company
+  description: "マイクロサービスアーキテクチャ設計"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20250609061759_docker-containerization_12
+spec:
+  branch: 20250609061759_docker-containerization_12
+  worktree: true
+  assignee: org04-wk-b-r1
+  spaceRef: synergy-development-company
+  description: "Docker コンテナ化とオーケストレーション"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20250609061800_user-experience-optimization_13
+spec:
+  branch: 20250609061800_user-experience-optimization_13
+  worktree: true
+  assignee: org01-wk-c-r1
+  spaceRef: synergy-development-company
+  description: "ユーザーエクスペリエンス最適化"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20250609061801_payment-system-integration_14
+spec:
+  branch: 20250609061801_payment-system-integration_14
+  worktree: true
+  assignee: org02-pm-r2
+  spaceRef: synergy-development-company
+  description: "決済システム統合と実装"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20250609061802_cloud-infrastructure-migration_15
+spec:
+  branch: 20250609061802_cloud-infrastructure-migration_15
+  worktree: true
+  assignee: org04-wk-c-r1
+  spaceRef: synergy-development-company
+  description: "クラウドインフラ移行とスケーリング"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20250609061803_real-time-notifications_16
+spec:
+  branch: 20250609061803_real-time-notifications_16
+  worktree: true
+  assignee: org01-wk-b-r2
+  spaceRef: synergy-development-company
+  description: "リアルタイム通知システム開発"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20250609061804_database-backup-strategy_17
+spec:
+  branch: 20250609061804_database-backup-strategy_17
+  worktree: true
+  assignee: org03-pm-r1
+  spaceRef: synergy-development-company
+  description: "データベースバックアップ戦略構築"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20250609061805_monitoring-alerting-system_18
+spec:
+  branch: 20250609061805_monitoring-alerting-system_18
+  worktree: true
+  assignee: org04-pm-r2
+  spaceRef: synergy-development-company
+  description: "監視・アラートシステム構築"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20250609061806_api-documentation-portal_19
+spec:
+  branch: 20250609061806_api-documentation-portal_19
+  worktree: true
+  assignee: org02-wk-a-r2
+  spaceRef: synergy-development-company
+  description: "API ドキュメンテーションポータル構築"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20250609061807_executive-dashboard_20
+spec:
+  branch: 20250609061807_executive-dashboard_20
+  worktree: true
+  assignee: org05-ceo-re
+  spaceRef: synergy-development-company
+  description: "経営ダッシュボード開発とKPI可視化"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20250609061808_business-intelligence_21
+spec:
+  branch: 20250609061808_business-intelligence_21
+  worktree: true
+  assignee: org05-cto-re
+  spaceRef: synergy-development-company
+  description: "ビジネスインテリジェンス基盤構築"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20250609061809_operations-automation_22
+spec:
+  branch: 20250609061809_operations-automation_22
+  worktree: true
+  assignee: org05-coo-re
+  spaceRef: synergy-development-company
+  description: "業務プロセス自動化とワークフロー最適化"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20250609061810_load-testing-performance_23
+spec:
+  branch: 20250609061810_load-testing-performance_23
+  worktree: true
+  assignee: org03-wk-b-r1
+  spaceRef: synergy-development-company
+  description: "負荷テストとパフォーマンス検証"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: 20250609061811_accessibility-compliance_24
+spec:
+  branch: 20250609061811_accessibility-compliance_24
+  worktree: true
+  assignee: org01-wk-c-r2
+  spaceRef: synergy-development-company
+  description: "アクセシビリティ対応とコンプライアンス" 

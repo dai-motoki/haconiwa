@@ -23,13 +23,17 @@ wheels/
 *.egg
 
 # Virtual environments
-.env
 .venv
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
+
+# Environment variables
+.env
+.env.*
+!.env.*.example
 
 # IDE
 .vscode/
@@ -47,3 +51,30 @@ Thumbs.db
 /organizations/*/tasks/in-progress/*
 /organizations/*/tasks/done/*
 .haconiwa_cache/
+haconiwa-world/
+haconiwa-dev-world/
+haconiwa-dev-company/
+kamui-dev-company.yaml
+kamui-dev-world/
+kamui-dev-company/
+
+# Test output and temporary directories
+test_output/
+basic-executive-space/
+test_cases/basic_executive/
+test_cases/heavy_tasks/
+test_cases/error_cases/
+test_cases/minimal/
+test-*/
+*-test-*/
+*.test-*
+
+# Parallel-dev specific
+parallel-dev-results/
+test_claude_direct.py
+test_claude_sdk.py
+test_simple_claude.py
+test_parallel_yaml.yaml
+
+# Test results
+command_test_results.json

@@ -1,0 +1,348 @@
+apiVersion: haconiwa.dev/v1
+kind: Organization
+metadata:
+  name: heavy-task-org
+spec:
+  companyName: "Heavy Task Company"
+  industry: "Enterprise Software"
+  basePath: "./test_output/heavy_tasks"
+  hierarchy:
+    departments:
+    - id: "executive"
+      name: "Executive Leadership"
+      roles:
+      - roleType: "executive"
+        title: "CEO"
+      - roleType: "executive"
+        title: "CTO"
+      - roleType: "executive"
+        title: "COO"
+    - id: "frontend"
+      name: "Frontend Engineering"
+      roles:
+      - roleType: "management"
+        title: "Frontend Team Lead"
+      - roleType: "engineering"
+        title: "Senior Frontend Developer"
+      - roleType: "engineering"
+        title: "Frontend Developer"
+      - roleType: "engineering"
+        title: "Junior Frontend Developer"
+    - id: "backend"
+      name: "Backend Engineering"
+      roles:
+      - roleType: "management"
+        title: "Backend Team Lead"
+      - roleType: "engineering"
+        title: "Senior Backend Developer"
+      - roleType: "engineering"
+        title: "Backend Developer"
+      - roleType: "engineering"
+        title: "Junior Backend Developer"
+    - id: "devops"
+      name: "DevOps Engineering"
+      roles:
+      - roleType: "management"
+        title: "DevOps Team Lead"
+      - roleType: "engineering"
+        title: "Senior DevOps Engineer"
+      - roleType: "engineering"
+        title: "DevOps Engineer"
+      - roleType: "engineering"
+        title: "Cloud Engineer"
+    - id: "qa"
+      name: "Quality Assurance"
+      roles:
+      - roleType: "management"
+        title: "QA Team Lead"
+      - roleType: "engineering"
+        title: "Senior QA Engineer"
+      - roleType: "engineering"
+        title: "QA Engineer"
+      - roleType: "engineering"
+        title: "Test Automation Engineer"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Space
+metadata:
+  name: heavy-task-space
+spec:
+  nations:
+  - id: jp
+    name: Japan
+    cities:
+    - id: tokyo
+      name: Tokyo
+      villages:
+      - id: enterprise-village
+        name: Enterprise Village
+        companies:
+        - name: heavy-task-company
+          grid: 8x4
+          organizationRef: "heavy-task-org"
+          gitRepo:
+            url: "https://github.com/dai-motoki/haconiwa"
+            defaultBranch: "main"
+            auth: "https"
+          buildings:
+          - id: headquarters
+            name: Enterprise HQ
+            floors:
+            - id: floor-1
+              name: Engineering Floor
+              rooms:
+              - id: room-01
+                name: Alpha Room
+              - id: room-02
+                name: Beta Room
+            - id: floor-2
+              name: Executive Floor
+              rooms:
+              - id: room-executive
+                name: Executive Leadership Room
+
+---
+# Frontend Tasks
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: ui_component_library
+spec:
+  branch: ui_component_library
+  worktree: true
+  assignee: org01-pm-r1
+  spaceRef: heavy-task-company
+  description: "UI Component Library Development"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: responsive_design_system
+spec:
+  branch: responsive_design_system
+  worktree: true
+  assignee: org01-wk-a-r1
+  spaceRef: heavy-task-company
+  description: "Responsive Design System Implementation"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: frontend_testing_framework
+spec:
+  branch: frontend_testing_framework
+  worktree: true
+  assignee: org01-wk-b-r1
+  spaceRef: heavy-task-company
+  description: "Frontend Testing Framework Setup"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: performance_optimization_frontend
+spec:
+  branch: performance_optimization_frontend
+  worktree: true
+  assignee: org01-wk-c-r1
+  spaceRef: heavy-task-company
+  description: "Frontend Performance Optimization"
+
+---
+# Backend Tasks
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: microservices_architecture
+spec:
+  branch: microservices_architecture
+  worktree: true
+  assignee: org02-pm-r1
+  spaceRef: heavy-task-company
+  description: "Microservices Architecture Design"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: api_gateway_implementation
+spec:
+  branch: api_gateway_implementation
+  worktree: true
+  assignee: org02-wk-a-r1
+  spaceRef: heavy-task-company
+  description: "API Gateway Implementation"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: database_optimization
+spec:
+  branch: database_optimization
+  worktree: true
+  assignee: org02-wk-b-r1
+  spaceRef: heavy-task-company
+  description: "Database Performance Optimization"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: authentication_service
+spec:
+  branch: authentication_service
+  worktree: true
+  assignee: org02-wk-c-r1
+  spaceRef: heavy-task-company
+  description: "Authentication Service Implementation"
+
+---
+# DevOps Tasks
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: kubernetes_cluster_setup
+spec:
+  branch: kubernetes_cluster_setup
+  worktree: true
+  assignee: org03-pm-r2
+  spaceRef: heavy-task-company
+  description: "Kubernetes Cluster Setup"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: ci_cd_pipeline_advanced
+spec:
+  branch: ci_cd_pipeline_advanced
+  worktree: true
+  assignee: org03-wk-a-r2
+  spaceRef: heavy-task-company
+  description: "Advanced CI/CD Pipeline"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: monitoring_alerting_system
+spec:
+  branch: monitoring_alerting_system
+  worktree: true
+  assignee: org03-wk-b-r2
+  spaceRef: heavy-task-company
+  description: "Monitoring and Alerting System"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: infrastructure_as_code
+spec:
+  branch: infrastructure_as_code
+  worktree: true
+  assignee: org03-wk-c-r2
+  spaceRef: heavy-task-company
+  description: "Infrastructure as Code Implementation"
+
+---
+# QA Tasks
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: automated_testing_suite
+spec:
+  branch: automated_testing_suite
+  worktree: true
+  assignee: org04-pm-r2
+  spaceRef: heavy-task-company
+  description: "Automated Testing Suite Development"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: load_testing_framework
+spec:
+  branch: load_testing_framework
+  worktree: true
+  assignee: org04-wk-a-r2
+  spaceRef: heavy-task-company
+  description: "Load Testing Framework"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: security_testing
+spec:
+  branch: security_testing
+  worktree: true
+  assignee: org04-wk-b-r2
+  spaceRef: heavy-task-company
+  description: "Security Testing Implementation"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: qa_automation_tools
+spec:
+  branch: qa_automation_tools
+  worktree: true
+  assignee: org04-wk-c-r2
+  spaceRef: heavy-task-company
+  description: "QA Automation Tools Development"
+
+---
+# Executive Tasks
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: strategic_planning_2024
+spec:
+  branch: strategic_planning_2024
+  worktree: true
+  assignee: org05-ceo-re
+  spaceRef: heavy-task-company
+  description: "Strategic Planning for 2024"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: technology_innovation_roadmap
+spec:
+  branch: technology_innovation_roadmap
+  worktree: true
+  assignee: org05-cto-re
+  spaceRef: heavy-task-company
+  description: "Technology Innovation Roadmap"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: operational_excellence_program
+spec:
+  branch: operational_excellence_program
+  worktree: true
+  assignee: org05-coo-re
+  spaceRef: heavy-task-company
+  description: "Operational Excellence Program"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: executive_dashboard_analytics
+spec:
+  branch: executive_dashboard_analytics
+  worktree: true
+  assignee: org05-assistant-re
+  spaceRef: heavy-task-company
+  description: "Executive Dashboard Analytics" 

@@ -1,0 +1,126 @@
+apiVersion: haconiwa.dev/v1
+kind: Organization
+metadata:
+  name: error-test-org
+spec:
+  companyName: "Error Test Company"
+  industry: "Testing"
+  basePath: "./test_output/error_cases"
+  hierarchy:
+    departments:
+    - id: "executive"
+      name: "Executive Leadership"
+      roles:
+      - roleType: "executive"
+        title: "CEO"
+    - id: "frontend"
+      name: "Frontend"
+      roles:
+      - roleType: "management"
+        title: "Lead"
+    - id: "backend"
+      name: "Backend"
+      roles:
+      - roleType: "management"
+        title: "Lead"
+    - id: "devops"
+      name: "DevOps"
+      roles:
+      - roleType: "management"
+        title: "Lead"
+    - id: "qa"
+      name: "QA"
+      roles:
+      - roleType: "management"
+        title: "Lead"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Space
+metadata:
+  name: error-test-space
+spec:
+  nations:
+  - id: jp
+    name: Japan
+    cities:
+    - id: tokyo
+      name: Tokyo
+      villages:
+      - id: test-village
+        name: Test Village
+        companies:
+        - name: error-test-company
+          grid: 8x4
+          organizationRef: "error-test-org"
+          gitRepo:
+            url: "https://github.com/dai-motoki/haconiwa"
+            defaultBranch: "main"
+            auth: "https"
+          buildings:
+          - id: headquarters
+            name: HQ
+            floors:
+            - id: floor-1
+              name: Floor 1
+              rooms:
+              - id: room-01
+                name: Alpha Room
+              - id: room-02
+                name: Beta Room
+            - id: floor-2
+              name: Floor 2
+              rooms:
+              - id: room-executive
+                name: Executive Room
+
+---
+# Test case: Task assigned to non-existent agent
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: invalid_agent_task
+spec:
+  branch: invalid_agent_task
+  worktree: true
+  assignee: org99-invalid-agent
+  spaceRef: error-test-company
+  description: "Task assigned to invalid agent"
+
+---
+# Test case: Task assigned to valid agent
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: valid_agent_task
+spec:
+  branch: valid_agent_task
+  worktree: true
+  assignee: org05-ceo-re
+  spaceRef: error-test-company
+  description: "Task assigned to valid executive agent"
+
+---
+# Test case: Duplicate task assignment
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: duplicate_task_1
+spec:
+  branch: duplicate_task_1
+  worktree: true
+  assignee: org01-pm-r1
+  spaceRef: error-test-company
+  description: "First duplicate task"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: duplicate_task_2
+spec:
+  branch: duplicate_task_2
+  worktree: true
+  assignee: org01-pm-r1
+  spaceRef: error-test-company
+  description: "Second duplicate task (should override)" 

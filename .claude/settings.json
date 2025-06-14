@@ -1,0 +1,21 @@
+{
+  "tools": {
+    "ripgrep": {
+      "path": "~/bin/rg",
+      "description": "Fast file content search tool"
+    }
+  },
+  "commands": {
+    "lint": {
+      "python": "ruff check src/"
+    },
+    "typecheck": {
+      "python": "mypy src/"
+    }
+  },
+  "project": {
+    "name": "haconiwa",
+    "type": "python",
+    "description": "Multiroom tmux session management with CRD-based configuration"
+  }
+}

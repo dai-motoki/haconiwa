@@ -1,0 +1,338 @@
+apiVersion: haconiwa.dev/v1
+kind: Organization
+metadata:
+  name: test-org-multiroom-tasks
+spec:
+  companyName: "Test Company Multiroom with Tasks"
+  industry: "Software Development"
+  basePath: "./test-multiroom-tasks"
+  hierarchy:
+    departments:
+    - id: "frontend"
+      name: "Frontend Team"
+      description: "Frontend development department"
+      roles:
+      - roleType: "management"
+        title: "Frontend Lead"
+        responsibilities:
+          - "Frontend architecture"
+          - "Team coordination"
+      - roleType: "engineering"
+        title: "UI Developer"
+        responsibilities:
+          - "UI component development"
+          - "Design implementation"
+      - roleType: "engineering"
+        title: "UX Engineer"
+        responsibilities:
+          - "User experience optimization"
+          - "Performance tuning"
+      - roleType: "engineering"
+        title: "Frontend Tester"
+        responsibilities:
+          - "Frontend testing"
+          - "Visual regression tests"
+    
+    - id: "backend"
+      name: "Backend Team"
+      description: "Backend development department"
+      roles:
+      - roleType: "management"
+        title: "Backend Lead"
+        responsibilities:
+          - "Backend architecture"
+          - "API design"
+      - roleType: "engineering"
+        title: "API Developer"
+        responsibilities:
+          - "API implementation"
+          - "Database design"
+      - roleType: "engineering"
+        title: "DevOps Engineer"
+        responsibilities:
+          - "Infrastructure management"
+          - "CI/CD pipelines"
+      - roleType: "engineering"
+        title: "Backend Tester"
+        responsibilities:
+          - "API testing"
+          - "Load testing"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Space
+metadata:
+  name: test-world-multiroom-tasks
+spec:
+  nations:
+  - id: jp
+    name: Japan
+    cities:
+    - id: tokyo
+      name: Tokyo
+      villages:
+      - id: tech-village
+        name: "Tech Village"
+        companies:
+        - name: test-company-multiroom-tasks
+          grid: "8x4"
+          basePath: "./test-world-multiroom-tasks"
+          organizationRef: "test-org-multiroom-tasks"
+          gitRepo:
+            url: "https://github.com/anthropics/claude-code.git"
+            defaultBranch: "main"
+            auth: "https"
+          buildings:
+          - id: "tech-tower"
+            name: "Tech Tower"
+            floors:
+            - id: "floor-1"
+              name: "Development Floor"
+              rooms:
+              - id: room-frontend
+                name: "Frontend Room"
+              - id: room-backend
+                name: "Backend Room"
+
+---
+# Frontend Room Tasks (Room 1)
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_react_components_01
+spec:
+  taskId: task_react_components_01
+  title: "React Component Library"
+  description: |
+    ## React Component Library Development
+    
+    Build reusable React component library.
+    
+    ### Requirements:
+    - TypeScript components
+    - Storybook integration
+    - Unit tests
+    - Documentation
+  assignee: "org01-pm-r1"
+  spaceRef: "test-company-multiroom-tasks"
+  priority: "high"
+  worktree: true
+  branch: "feature/react-components"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_design_system_02
+spec:
+  taskId: task_design_system_02
+  title: "Design System Implementation"
+  description: |
+    ## Design System Implementation
+    
+    Implement comprehensive design system.
+    
+    ### Requirements:
+    - Color palette
+    - Typography system
+    - Spacing guidelines
+    - Component patterns
+  assignee: "org01-wk-a-r1"
+  spaceRef: "test-company-multiroom-tasks"
+  priority: "high"
+  worktree: true
+  branch: "feature/design-system"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_mobile_responsive_03
+spec:
+  taskId: task_mobile_responsive_03
+  title: "Mobile Responsive Design"
+  description: |
+    ## Mobile Responsive Design
+    
+    Ensure all components are mobile responsive.
+    
+    ### Requirements:
+    - Responsive layouts
+    - Touch interactions
+    - Performance optimization
+    - Cross-device testing
+  assignee: "org01-wk-b-r1"
+  spaceRef: "test-company-multiroom-tasks"
+  priority: "medium"
+  worktree: true
+  branch: "feature/mobile-responsive"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_accessibility_04
+spec:
+  taskId: task_accessibility_04
+  title: "Accessibility Compliance"
+  description: |
+    ## Accessibility Compliance
+    
+    Implement WCAG 2.1 AA compliance.
+    
+    ### Requirements:
+    - Screen reader support
+    - Keyboard navigation
+    - Color contrast
+    - ARIA labels
+  assignee: "org01-wk-c-r1"
+  spaceRef: "test-company-multiroom-tasks"
+  priority: "high"
+  worktree: true
+  branch: "feature/accessibility"
+
+---
+# Backend Room Tasks (Room 2)
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_microservices_05
+spec:
+  taskId: task_microservices_05
+  title: "Microservices Architecture"
+  description: |
+    ## Microservices Architecture
+    
+    Design and implement microservices architecture.
+    
+    ### Requirements:
+    - Service mesh setup
+    - API gateway
+    - Service discovery
+    - Container orchestration
+  assignee: "org01-pm-r2"
+  spaceRef: "test-company-multiroom-tasks"
+  priority: "high"
+  worktree: true
+  branch: "feature/microservices"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_graphql_api_06
+spec:
+  taskId: task_graphql_api_06
+  title: "GraphQL API Development"
+  description: |
+    ## GraphQL API Development
+    
+    Implement GraphQL API layer.
+    
+    ### Requirements:
+    - Schema design
+    - Resolvers implementation
+    - Subscriptions
+    - Performance optimization
+  assignee: "org01-wk-a-r2"
+  spaceRef: "test-company-multiroom-tasks"
+  priority: "high"
+  worktree: true
+  branch: "feature/graphql-api"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_kubernetes_deploy_07
+spec:
+  taskId: task_kubernetes_deploy_07
+  title: "Kubernetes Deployment"
+  description: |
+    ## Kubernetes Deployment
+    
+    Set up Kubernetes deployment pipeline.
+    
+    ### Requirements:
+    - Helm charts
+    - Auto-scaling
+    - Health checks
+    - Monitoring integration
+  assignee: "org01-wk-b-r2"
+  spaceRef: "test-company-multiroom-tasks"
+  priority: "high"
+  worktree: true
+  branch: "feature/kubernetes-deploy"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_load_testing_08
+spec:
+  taskId: task_load_testing_08
+  title: "Load Testing Framework"
+  description: |
+    ## Load Testing Framework
+    
+    Implement comprehensive load testing.
+    
+    ### Requirements:
+    - JMeter scripts
+    - Performance baselines
+    - Stress testing
+    - Report generation
+  assignee: "org01-wk-c-r2"
+  spaceRef: "test-company-multiroom-tasks"
+  priority: "medium"
+  worktree: true
+  branch: "feature/load-testing"
+
+---
+# Additional tasks for second organization in each room
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_state_management_09
+spec:
+  taskId: task_state_management_09
+  title: "State Management Solution"
+  description: |
+    ## State Management Solution
+    
+    Implement Redux Toolkit state management.
+    
+    ### Requirements:
+    - Store configuration
+    - Async actions
+    - Middleware setup
+    - DevTools integration
+  assignee: "org02-pm-r1"
+  spaceRef: "test-company-multiroom-tasks"
+  priority: "high"
+  worktree: true
+  branch: "feature/state-management"
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+metadata:
+  name: task_auth_system_10
+spec:
+  taskId: task_auth_system_10
+  title: "Authentication System"
+  description: |
+    ## Authentication System
+    
+    Implement OAuth2 authentication system.
+    
+    ### Requirements:
+    - JWT tokens
+    - Social login
+    - MFA support
+    - Session management
+  assignee: "org02-pm-r2"
+  spaceRef: "test-company-multiroom-tasks"
+  priority: "high"
+  worktree: true
+  branch: "feature/auth-system"
