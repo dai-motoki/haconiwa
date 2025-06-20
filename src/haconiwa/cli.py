@@ -137,6 +137,17 @@ def apply(
         if env:
             typer.echo(f"🔧 環境変数ファイルを使用します: {', '.join(env)}")
     
+    def extract_all_company_names(crd):
+        """Extract all company names from a Space CRD"""
+        company_names = []
+        if crd.kind == "Space":
+            for nation in crd.spec.nations:
+                for city in nation.cities:
+                    for village in city.villages:
+                        for company in village.companies:
+                            company_names.append(company.name)
+        return company_names
+    
     created_sessions = []  # Track created sessions for attach
     
     try:
@@ -157,14 +168,14 @@ def apply(
                 # Extract session names from applied Space CRDs
                 for i, (crd, result) in enumerate(zip(crds, results)):
                     if result and crd.kind == "Space":
-                        session_name = crd.spec.nations[0].cities[0].villages[0].companies[0].name
-                        created_sessions.append(session_name)
+                        company_names = extract_all_company_names(crd)
+                        created_sessions.extend(company_names)
             else:
                 for crd in crds:
                     typer.echo(f"  - {crd.kind}: {crd.metadata.name}")
                     if crd.kind == "Space":
-                        session_name = crd.spec.nations[0].cities[0].villages[0].companies[0].name
-                        created_sessions.append(session_name)
+                        company_names = extract_all_company_names(crd)
+                        created_sessions.extend(company_names)
         else:
             # Single document
             crd = parser.parse_file(file_path)
@@ -175,17 +186,17 @@ def apply(
                 if success:
                     typer.echo("✅ 1個の設定を正常に適用しました")
                     
-                    # Extract session name for Space CRD
+                    # Extract session names for Space CRD
                     if crd.kind == "Space":
-                        session_name = crd.spec.nations[0].cities[0].villages[0].companies[0].name
-                        created_sessions.append(session_name)
+                        company_names = extract_all_company_names(crd)
+                        created_sessions.extend(company_names)
                 else:
                     typer.echo("❌ 設定の適用に失敗しました", err=True)
                     raise typer.Exit(1)
             else:
                 if crd.kind == "Space":
-                    session_name = crd.spec.nations[0].cities[0].villages[0].companies[0].name
-                    created_sessions.append(session_name)
+                    company_names = extract_all_company_names(crd)
+                    created_sessions.extend(company_names)
         
         # Auto-attach to session if requested
         if should_attach and created_sessions and not dry_run:
@@ -226,9 +237,16 @@ def apply(
         elif should_attach and not created_sessions:
             typer.echo("⚠️ 会社が設立されませんでした。入室できません")
         elif not should_attach and created_sessions:
-            typer.echo(f"\n💡 会社を設立しました: {created_sessions[0]}")
-            typer.echo(f"   入室するには: haconiwa space attach -c {created_sessions[0]} -r {room}")
-            typer.echo(f"   削除するには: haconiwa space delete -c {created_sessions[0]} --clean-dirs --force")
+            if len(created_sessions) == 1:
+                typer.echo(f"\n💡 会社を設立しました: {created_sessions[0]}")
+                typer.echo(f"   入室するには: haconiwa space attach -c {created_sessions[0]} -r {room}")
+                typer.echo(f"   削除するには: haconiwa space delete -c {created_sessions[0]} --clean-dirs --force")
+            else:
+                typer.echo(f"\n💡 {len(created_sessions)}社の会社を設立しました:")
+                for i, company_name in enumerate(created_sessions, 1):
+                    typer.echo(f"   {i}. {company_name}")
+                typer.echo(f"\n   入室例: haconiwa space attach -c {created_sessions[0]} -r {room}")
+                typer.echo(f"   削除例: haconiwa space delete -c {created_sessions[0]} --clean-dirs --force")
     
     except CRDValidationError as e:
         typer.echo(f"❌ バリデーションエラー: {e}", err=True)

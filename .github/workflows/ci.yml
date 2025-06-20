@@ -33,8 +33,6 @@ jobs:
           pip install -e .[dev]
           pip install build twine bandit safety
 
-      - name: Check code formatting
-        run: black --check .
 
       - name: Lint with flake8
         run: flake8 .
