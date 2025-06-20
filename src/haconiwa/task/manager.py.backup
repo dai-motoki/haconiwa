@@ -1,11 +1,9 @@
 """
-
 Task Manager for Haconiwa v1.0
 """
 
 import logging
 import subprocess
-import json
 from typing import Dict, Any, Optional, List
 from pathlib import Path
 
@@ -30,12 +28,6 @@ class TaskManager:
         # Only initialize once
         pass
     
-    def validate_tasks(self, space_ref: Optional[str] = None) -> int:
-        """DISABLED - We don't need memory validation anymore"""
-        # メモリ管理は削除 - 常に新しく作成する
-        logger.info("✅ Task validation disabled - will always create fresh worktrees")
-        return 0
-    
     def set_default_branch(self, branch: str):
         """Set the default branch to use for creating new branches"""
         self.default_branch = branch
@@ -58,15 +50,11 @@ class TaskManager:
             
             logger.info(f"Creating task: {name} (branch: {branch}, assignee: {assignee})")
             
-            # ALWAYS create worktree if requested - 絶対に作成する！
+            # Create worktree if requested
             if worktree and space_ref:
-                logger.info(f"🔨 Creating worktree for task {name} - WILL CREATE NO MATTER WHAT")
                 success = self._create_worktree(name, branch, space_ref, config)
                 if not success:
-                    logger.error(f"❌ Failed to create worktree for task {name}")
-                    # Try again with force
-                    logger.warning(f"🔄 Retrying worktree creation with force for task {name}")
-                    success = self._create_worktree(name, branch, space_ref, config, force=True)
+                    logger.warning(f"Failed to create worktree for task {name}, but continuing")
             
             # Store task info
             self.tasks[name] = {
@@ -101,9 +89,12 @@ class TaskManager:
             logger.error(f"Failed to create task: {e}")
             return False
     
-    def _create_worktree(self, task_name: str, branch: str, space_ref: str, config: Dict[str, Any], force: bool = False) -> bool:
-        """Create Git worktree in tasks directory - ALWAYS CREATE IT!"""
+    def _create_worktree(self, task_name: str, branch: str, space_ref: str, config: Dict[str, Any]) -> bool:
+        """Create Git worktree in tasks directory"""
         try:
+            # Find space base path (assuming task_name follows naming convention)
+            # e.g., "2025-01-09-frontend-ui-design-agent001" -> space should be in "./test-multiroom-desks"
+            # For now, we'll use a heuristic to find the space
             base_path = self._find_space_base_path(space_ref)
             if not base_path:
                 logger.error(f"Could not find base path for space: {space_ref}")
@@ -111,62 +102,80 @@ class TaskManager:
             
             tasks_path = base_path / "tasks"
             main_repo_path = tasks_path / "main"
-            worktree_path = tasks_path / task_name
+            # Replace '/' in task name with '__' to avoid creating subdirectories
+            safe_task_name = task_name.replace('/', '__')
+            worktree_path = tasks_path / safe_task_name
             
+            # Check if main repository exists
             if not main_repo_path.exists():
                 logger.error(f"Main repository not found at: {main_repo_path}")
                 return False
             
-            parent_dir = worktree_path.parent
-            if not parent_dir.exists():
-                logger.info(f"📁 Creating parent directory: {parent_dir}")
-                parent_dir.mkdir(parents=True, exist_ok=True)
-            
+            # Check if worktree already exists
             if worktree_path.exists():
-                logger.warning(f"🗑️ Worktree already exists, DELETING IT: {worktree_path}")
-                subprocess.run(['git', '-C', str(main_repo_path), 'worktree', 'remove', '--force', str(worktree_path)], 
-                              capture_output=True, text=True)
-                if worktree_path.exists():
-                    import shutil
-                    shutil.rmtree(worktree_path)
-                logger.info(f"✅ Deleted existing worktree, will create fresh one")
+                logger.info(f"Worktree already exists: {worktree_path}")
+                return True
             
+            # Create new branch and worktree
             logger.info(f"Creating worktree: {worktree_path} for branch: {branch}")
             
+            # First, ensure we're on the default branch and it's up to date
             logger.info(f"Fetching and syncing with origin/{self.default_branch}")
             
+            # Fetch all from origin to ensure we have latest refs
             fetch_result = subprocess.run(['git', '-C', str(main_repo_path), 'fetch', 'origin'], 
                                         capture_output=True, text=True)
             if fetch_result.returncode != 0:
                 logger.warning(f"Failed to fetch from origin: {fetch_result.stderr}")
             
+            # Checkout default branch
             checkout_result = subprocess.run(['git', '-C', str(main_repo_path), 'checkout', self.default_branch], 
                                            capture_output=True, text=True)
             if checkout_result.returncode != 0:
                 logger.warning(f"Failed to checkout {self.default_branch}: {checkout_result.stderr}")
             
+            # Hard reset to origin to ensure we're exactly at origin's state
             reset_result = subprocess.run(['git', '-C', str(main_repo_path), 'reset', '--hard', f'origin/{self.default_branch}'], 
                                         capture_output=True, text=True)
             if reset_result.returncode != 0:
                 logger.warning(f"Failed to reset to origin/{self.default_branch}: {reset_result.stderr}")
             
+            # Check if branch already exists
             check_branch = subprocess.run(['git', '-C', str(main_repo_path), 'rev-parse', '--verify', branch], 
                                         capture_output=True, text=True)
             
             if check_branch.returncode == 0:
-                logger.info(f"Branch {branch} exists. Deleting and recreating to ensure it's fresh.")
-                subprocess.run(['git', '-C', str(main_repo_path), 'branch', '-D', branch], 
-                             capture_output=True, text=True)
-
-            result1 = subprocess.run(['git', '-C', str(main_repo_path), 'checkout', '-b', branch, f'origin/{self.default_branch}'], 
-                                   capture_output=True, text=True)
+                # Branch exists, check if it's based on the correct branch
+                merge_base = subprocess.run(['git', '-C', str(main_repo_path), 'merge-base', branch, f'origin/{self.default_branch}'], 
+                                          capture_output=True, text=True)
+                default_branch_commit = subprocess.run(['git', '-C', str(main_repo_path), 'rev-parse', f'origin/{self.default_branch}'], 
+                                                     capture_output=True, text=True)
+                
+                if merge_base.stdout.strip() != default_branch_commit.stdout.strip():
+                    # Branch exists but is based on wrong branch, delete and recreate
+                    logger.info(f"Branch {branch} exists but is based on wrong branch, recreating from {self.default_branch}")
+                    subprocess.run(['git', '-C', str(main_repo_path), 'branch', '-D', branch], 
+                                 capture_output=True, text=True)
+                    # Create new branch from the default branch
+                    result1 = subprocess.run(['git', '-C', str(main_repo_path), 'checkout', '-b', branch, f'origin/{self.default_branch}'], 
+                                           capture_output=True, text=True)
+                else:
+                    # Branch exists and is based on correct branch, just checkout
+                    result1 = subprocess.run(['git', '-C', str(main_repo_path), 'checkout', branch], 
+                                           capture_output=True, text=True)
+            else:
+                # Branch doesn't exist, create it from the default branch
+                result1 = subprocess.run(['git', '-C', str(main_repo_path), 'checkout', '-b', branch, f'origin/{self.default_branch}'], 
+                                       capture_output=True, text=True)
             
             if result1.returncode != 0:
-                logger.warning(f"Failed to create branch {branch}: {result1.stderr}")
-
+                logger.warning(f"Failed to create/checkout branch {branch}: {result1.stderr}")
+            
+            # Switch back to default branch
             subprocess.run(['git', '-C', str(main_repo_path), 'checkout', self.default_branch], 
                          capture_output=True, text=True)
             
+            # Create worktree (using absolute paths)
             result2 = subprocess.run(['git', '-C', str(main_repo_path), 'worktree', 'add', 
                                    str(worktree_path.absolute()), branch], 
                                    capture_output=True, text=True)
@@ -174,10 +183,12 @@ class TaskManager:
             if result2.returncode == 0:
                 logger.info(f"✅ Successfully created worktree: {worktree_path}")
                 
+                # Copy .env files if they were specified
                 env_files = config.get('env_files', [])
                 if env_files:
                     self._copy_env_files_to_worktree(worktree_path, env_files)
                 
+                # Copy AICodeConfig files if they were specified
                 self._copy_aicode_config_files_to_worktree(worktree_path, space_ref)
                 
                 return True
@@ -215,8 +226,9 @@ class TaskManager:
                         if '=' in line:
                             key, value = line.split('=', 1)
                             # Remove quotes if present
-                            if (value.startswith('"') and value.endswith('"')) or \
-                               (value.startswith("'") and value.endswith("'")):
+                            if (value.startswith('"') and value.endswith('"')) or (
+                                value.startswith("'") and value.endswith("'")
+                            ):
                                 value = value[1:-1]
                             merged_env[key] = value
             
@@ -430,92 +442,80 @@ class TaskManager:
             return False
     
     def _find_pane_for_agent(self, assignee: str, session_name: str) -> Optional[Dict[str, Any]]:
-        """Find tmux pane for specific agent using dynamic assignment lookup"""
+        """Find tmux pane for specific agent"""
         try:
-            # Use dynamic assignment lookup from agent_assignment.json files
-            logger.debug(f"Looking for agent {assignee} in session {session_name}")
+            # Parse assignee: org01-pm-r1 or org01-wk-a-r1
+            parts = assignee.split("-")
             
-            # Find base path for this session
-            session_base_path = Path.cwd() / session_name
-            if not session_base_path.exists():
-                logger.error(f"Session base path not found: {session_base_path}")
-                return None
-            
-            # Search for agent_assignment.json files containing this agent
-            tasks_path = session_base_path / "tasks"
-            if not tasks_path.exists():
-                logger.error(f"Tasks path not found: {tasks_path}")
-                return None
-            
-            # Find agent assignment file for this agent
-            for assignment_file in tasks_path.rglob(".haconiwa/agent_assignment.json"):
-                try:
-                    with open(assignment_file, 'r') as f:
-                        assignments = json.load(f)
-                    
-                    for assignment in assignments:
-                        if assignment.get("agent_id") == assignee:
-                            # Found the agent assignment
-                            task_name = assignment.get("task_name")
-                            logger.debug(f"Found agent {assignee} assigned to task {task_name}")
-                            
-                            # Look for existing tmux_window and tmux_pane in assignment
-                            tmux_window = assignment.get("tmux_window")
-                            tmux_pane = assignment.get("tmux_pane")
-                            
-                            if tmux_window is not None and tmux_pane is not None:
-                                # Use existing assignment
-                                logger.debug(f"Using existing assignment: window {tmux_window}, pane {tmux_pane}")
-                                return {
-                                    "window_id": str(tmux_window),
-                                    "pane_index": str(tmux_pane),
-                                    "current_path": str(assignment_file.parent.parent),
-                                    "title": f"exec-{tmux_pane+1:02d}"
-                                }
-                            else:
-                                # Need to find an available pane and assign it
-                                logger.debug(f"No existing tmux assignment for {assignee}, finding available pane")
-                                available_pane = self._find_available_pane_for_assignment(assignee, session_name)
-                                if available_pane:
-                                    # Update the assignment file with the pane assignment
-                                    assignment["tmux_window"] = int(available_pane["window_id"])
-                                    assignment["tmux_pane"] = int(available_pane["pane_index"])
-                                    
-                                    # Write back to file
-                                    with open(assignment_file, 'w') as f:
-                                        json.dump(assignments, f, indent=2, ensure_ascii=False)
-                                    
-                                    logger.info(f"Assigned agent {assignee} to window {available_pane['window_id']}, pane {available_pane['pane_index']}")
-                                    return available_pane
-                                else:
-                                    logger.warning(f"No available pane found for agent {assignee}")
-                                    return None
-                except Exception as e:
-                    logger.debug(f"Error reading assignment file {assignment_file}: {e}")
-                    continue
-            
-            logger.warning(f"No agent assignment found for {assignee}")
-            return None
-        
-        except Exception as e:
-            logger.error(f"Error finding pane for agent {assignee}: {e}")
-            return None
-    
-    def _find_available_pane_for_assignment(self, assignee: str, session_name: str) -> Optional[Dict[str, Any]]:
-        """Find an available pane for assignment based on agent role"""
-        try:
-            # Determine the appropriate window based on assignee role
-            assignee_lower = assignee.lower()
-            if any(assignee_lower.startswith(role + "-") for role in 
-                  ["ceo", "cto", "cfo", "vpe", "vpp", "vpo", "ai-lead", 
-                   "backend-lead", "frontend-lead", "devops-lead", 
-                   "security-lead", "data-lead", "qa-manager", 
-                   "docs-lead", "community", "platform"]):
-                window_id = "0"  # Executive Room
+            if len(parts) == 3:
+                # Format: org01-pm-r1
+                org_part = parts[0]  # org01
+                role_part = parts[1]  # pm
+                room_part = parts[2]  # r1, r2
+                worker_type = None
+            elif len(parts) == 4:
+                # Format: org01-wk-a-r1
+                org_part = parts[0]  # org01
+                role_part = parts[1]  # wk
+                worker_type = parts[2]  # a, b, c
+                room_part = parts[3]  # r1, r2
             else:
-                window_id = "1"  # Standby Room
+                logger.warning(f"Invalid assignee format: {assignee}")
+                return None
             
-            # Get all panes in the target window
+            # Extract organization number
+            org_num = org_part[3:]  # "01"
+            
+            # Map room to window
+            if room_part == "r1":
+                window_id = "0"
+            elif room_part == "r2":
+                window_id = "1"
+            else:
+                logger.warning(f"Unknown room part: {room_part}")
+                return None
+            
+            # Calculate expected pane index based on desk mapping logic
+            # Alpha Room (r1): org1=0-3, org2=4-7, org3=8-11, org4=12-15
+            # Beta Room (r2): org1=0-3, org2=4-7, org3=8-11, org4=12-15
+            org_index = int(org_num) - 1  # 01->0, 02->1, 03->2, 04->3
+            
+            if role_part == "pm":
+                role_offset = 0
+            elif role_part == "wk" and worker_type:
+                # a=1, b=2, c=3
+                role_offset = ord(worker_type) - ord('a') + 1
+            else:
+                logger.warning(f"Unknown role: {role_part}")
+                return None
+            
+            # Calculate pane index: org_base + role_offset
+            expected_pane_index = org_index * 4 + role_offset
+            
+            # Also generate directory patterns for verification
+            if room_part == "r1":
+                # Alpha Room patterns: 01pm, 01a, 01b, 01c, 02pm, etc.
+                if role_part == "pm":
+                    expected_patterns = [f"/org-{org_num}/{org_num}pm"]
+                elif role_part == "wk" and worker_type:
+                    expected_patterns = [f"/org-{org_num}/{org_num}{worker_type}"]
+                else:
+                    logger.warning(f"Unknown role: {role_part}")
+                    return None
+            else:
+                # Beta Room patterns: 11pm, 11a, 11b, 11c, 12pm, etc.
+                if role_part == "pm":
+                    expected_patterns = [f"/org-{org_num}/1{int(org_num)}pm"]
+                elif role_part == "wk" and worker_type:
+                    expected_patterns = [f"/org-{org_num}/1{int(org_num)}{worker_type}"]
+                else:
+                    logger.warning(f"Unknown role: {role_part}")
+                    return None
+            
+            logger.debug(f"Looking for pane {expected_pane_index} with patterns: {expected_patterns} in window {window_id}")
+            logger.debug(f"Assignee: {assignee} → org_index: {org_index}, role_offset: {role_offset}, expected_pane: {expected_pane_index}")
+            
+            # Get all panes in the window
             cmd = ["tmux", "list-panes", "-t", f"{session_name}:{window_id}", 
                    "-F", "#{pane_index}:#{pane_current_path}:#{pane_title}"]
             result = subprocess.run(cmd, capture_output=True, text=True)
@@ -524,7 +524,38 @@ class TaskManager:
                 logger.error(f"Failed to list panes: {result.stderr}")
                 return None
             
-            # Find the first available pane (should be in standby directory)
+            # Debug: show all panes in this window
+            logger.debug(f"All panes in window {window_id}:")
+            panes_info = {}
+            for line in result.stdout.strip().split('\n'):
+                if line:
+                    parts = line.split(':', 2)
+                    if len(parts) >= 2:
+                        pane_idx = parts[0]
+                        pane_path = parts[1]
+                        panes_info[int(pane_idx)] = pane_path
+                        logger.debug(f"  Pane {pane_idx}: {pane_path}")
+            
+            # Strategy 1: Try exact pane index match first
+            if expected_pane_index in panes_info:
+                pane_path = panes_info[expected_pane_index]
+                # Check if it matches expected pattern OR is already a task directory
+                for pattern in expected_patterns:
+                    if pane_path.endswith(pattern) or "/tasks/" in pane_path:
+                        logger.debug(f"Found target pane {expected_pane_index}: {pane_path}")
+                        # Get full info for this pane
+                        for line in result.stdout.strip().split('\n'):
+                            if line.startswith(f"{expected_pane_index}:"):
+                                parts = line.split(':', 2)
+                                if len(parts) >= 3:
+                                    return {
+                                        "window_id": window_id,
+                                        "pane_index": str(expected_pane_index),
+                                        "current_path": parts[1],
+                                        "title": parts[2]
+                                    }
+            
+            # Strategy 2: Fallback to pattern matching if exact index doesn't work
             for line in result.stdout.strip().split('\n'):
                 if not line:
                     continue
@@ -534,21 +565,22 @@ class TaskManager:
                     current_path = parts[1]
                     pane_title = parts[2]
                     
-                    # Check if this pane is in standby (meaning it's available)
-                    if "/standby" in current_path:
-                        logger.debug(f"Found available pane {pane_index} at {current_path}")
-                        return {
-                            "window_id": window_id,
-                            "pane_index": pane_index,
-                            "current_path": current_path,
-                            "title": pane_title
-                        }
+                    # Check if this pane matches any expected patterns
+                    for pattern in expected_patterns:
+                        if current_path.endswith(pattern):
+                            logger.debug(f"Found matching pane {pane_index}: {current_path} (pattern: {pattern})")
+                            return {
+                                "window_id": window_id,
+                                "pane_index": pane_index,
+                                "current_path": current_path,
+                                "title": pane_title
+                            }
             
-            logger.warning(f"No available panes found in window {window_id} for {assignee}")
+            logger.warning(f"Could not find pane {expected_pane_index} with patterns {expected_patterns} in window {window_id}")
             return None
-        
+            
         except Exception as e:
-            logger.error(f"Error finding available pane for {assignee}: {e}")
+            logger.error(f"Error finding pane for agent {assignee}: {e}")
             return None
     
     def _update_agent_pane_directory(self, session_name: str, pane_info: Dict[str, Any], 
@@ -558,32 +590,22 @@ class TaskManager:
             window_id = pane_info["window_id"]
             pane_index = pane_info["pane_index"]
             
-            # Find space base path from current path or use session name
+            # Find space base path from current path
             current_path = pane_info["current_path"]
-            
-            # For company sessions, base path should be the company directory
-            # e.g., /Users/motokidaisuke/haconiwa/haconiwa-dev-company
-            if session_name.endswith("-company"):
-                # Find the company directory in the current path
-                path_parts = current_path.split("/")
-                base_path_parts = []
-                for i, part in enumerate(path_parts):
-                    base_path_parts.append(part)
-                    if part == session_name:
-                        break
-                base_path = "/".join(base_path_parts)
-            else:
-                # Original logic for -desks sessions
-                path_parts = current_path.split("/")
-                base_path_parts = []
-                for part in path_parts:
-                    base_path_parts.append(part)
-                    if part.endswith("-desks"):
-                        break
-                base_path = "/".join(base_path_parts)
+            # Extract base path: /path/to/test-multiroom-desks/org-01/01pm → /path/to/test-multiroom-desks
+            path_parts = current_path.split("/")
+            base_path_parts = []
+            for part in path_parts:
+                base_path_parts.append(part)
+                if part.endswith("-desks"):
+                    break
+            base_path = "/".join(base_path_parts)
             
             # Build task directory path
             task_dir = f"{base_path}/{worktree_path}"
+            
+            # Create agent assignment log in task directory
+            self._create_agent_assignment_log(task_dir, assignee, task_name, session_name, window_id, pane_index)
             
             # Update pane working directory
             cmd = ["tmux", "send-keys", "-t", f"{session_name}:{window_id}.{pane_index}", 
@@ -598,21 +620,146 @@ class TaskManager:
             result2 = subprocess.run(cmd, capture_output=True, text=True)
             
             if result1.returncode == 0 and result2.returncode == 0:
-                logger.info(f"✅ Updated pane {pane_index} for {assignee} to {task_dir}")
+                logger.debug(f"Updated pane {window_id}.{pane_index}: {task_dir}")
                 return True
             else:
-                logger.error(f"Failed to update pane for {assignee}: cmd1={result1.returncode}, cmd2={result2.returncode}")
+                logger.error(f"Failed to update pane {window_id}.{pane_index}")
                 return False
-                
+            
         except Exception as e:
-            logger.error(f"Exception updating pane for {assignee}: {e}")
+            logger.error(f"Error updating pane directory: {e}")
             return False
     
-    def _create_agent_assignment_log(self, task_dir: str, assignee: str, task_name: str,
-                                   session_name: str, window_id: str, pane_index: str):
-        # worker_type = parts[2]  # a, b, c
-        # room_part = parts[3]  # r1, r2
-        pass
+    def _create_agent_assignment_log(self, task_dir: str, assignee: str, task_name: str, 
+                                   session_name: str, window_id: str, pane_index: str) -> bool:
+        """Create agent assignment log file in task directory"""
+        try:
+            from datetime import datetime
+            import json
+            
+            task_path = Path(task_dir)
+            if not task_path.exists():
+                logger.warning(f"Task directory does not exist: {task_dir}")
+                return False
+            
+            # Create .haconiwa directory for agent logs
+            haconiwa_dir = task_path / ".haconiwa"
+            haconiwa_dir.mkdir(parents=True, exist_ok=True)
+            
+            # Agent assignment log file
+            log_file = haconiwa_dir / "agent_assignment.json"
+            
+            # Prepare assignment information
+            assignment_info = {
+                "agent_id": assignee,
+                "task_name": task_name,
+                "space_session": session_name,
+                "tmux_window": window_id,
+                "tmux_pane": pane_index,
+                "assigned_at": datetime.now().isoformat(),
+                "assignment_type": "automatic",
+                "task_directory": task_dir,
+                "status": "active"
+            }
+            
+            # Load existing assignments if file exists
+            assignments = []
+            if log_file.exists():
+                try:
+                    with open(log_file, 'r', encoding='utf-8') as f:
+                        existing_data = json.load(f)
+                        if isinstance(existing_data, list):
+                            assignments = existing_data
+                        elif isinstance(existing_data, dict):
+                            assignments = [existing_data]  # Convert single assignment to list
+                except Exception as e:
+                    logger.warning(f"Could not read existing assignment log: {e}")
+            
+            # Add new assignment
+            assignments.append(assignment_info)
+            
+            # Write updated assignments to file
+            with open(log_file, 'w', encoding='utf-8') as f:
+                json.dump(assignments, f, indent=2, ensure_ascii=False)
+            
+            # Also create a human-readable log
+            readme_file = haconiwa_dir / "README.md"
+            self._create_agent_readme(readme_file, assignee, task_name, assignment_info)
+            
+            logger.info(f"📝 Created agent assignment log: {log_file}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to create agent assignment log: {e}")
+            return False
+    
+    def _create_agent_readme(self, readme_file: Path, assignee: str, task_name: str, assignment_info: Dict[str, Any]) -> bool:
+        """Create human-readable README for agent assignment"""
+        try:
+            readme_content = f"""# エージェント割り当て情報
+
+## 基本情報
+- **エージェントID**: `{assignee}`
+- **タスクブランチ名**: `{task_name}`
+- **割り当て日時**: {assignment_info['assigned_at']}
+- **ステータス**: {assignment_info['status']}
+
+## 環境情報
+- **スペースセッション**: `{assignment_info['space_session']}`
+- **tmuxウィンドウ**: {assignment_info['tmux_window']}
+- **tmuxペイン**: {assignment_info['tmux_pane']}
+- **タスクブランチディレクトリ**: `{assignment_info['task_directory']}`
+
+## エージェント役割
+{self._get_agent_role_description(assignee)}
+
+## このディレクトリについて
+このディレクトリは、GitのWorktree機能を使用して作成された専用の作業ディレクトリです。
+このエージェント専用のブランチで作業を行い、他のエージェントとは独立した開発環境を提供します。
+
+## ログファイル
+- `agent_assignment.json`: 割り当て履歴のJSON形式ログ
+- `README.md`: この説明ファイル
+
+---
+*このファイルは Haconiwa v1.0 によって自動生成されました*
+"""
+            
+            with open(readme_file, 'w', encoding='utf-8') as f:
+                f.write(readme_content)
+            
+            logger.debug(f"Created agent README: {readme_file}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to create agent README: {e}")
+            return False
+    
+    def _get_agent_role_description(self, assignee: str) -> str:
+        """Get role description for agent"""
+        try:
+            parts = assignee.split("-")
+            if len(parts) >= 2:
+                org_part = parts[0]  # org01
+                role_part = parts[1]  # pm or wk
+                
+                org_num = org_part[3:]  # "01"
+                
+                if role_part == "pm":
+                    return f"**役割**: プロジェクトマネージャー (組織{org_num})\n**責任範囲**: プロジェクト全体の管理、チームコーディネーション、進捗管理"
+                elif role_part == "wk" and len(parts) >= 3:
+                    worker_type = parts[2]  # a, b, c
+                    worker_roles = {
+                        "a": "**役割**: シニア開発者\n**責任範囲**: 技術設計、コードレビュー、アーキテクチャ決定",
+                        "b": "**役割**: 中級開発者\n**責任範囲**: 機能実装、テスト作成、ドキュメント作成", 
+                        "c": "**役割**: ジュニア開発者\n**責任範囲**: 基本実装、学習、サポート業務"
+                    }
+                    return worker_roles.get(worker_type, f"**役割**: 開発者-{worker_type.upper()}")
+            
+            return "**役割**: 未定義"
+            
+        except Exception:
+            return "**役割**: 解析エラー"
     
     def _create_immediate_agent_assignment_log(self, task_name: str, assignee: str, space_ref: str, description: str) -> bool:
         """Create agent assignment log immediately when task is created"""
@@ -764,72 +911,4 @@ class TaskManager:
                     logger.warning(f"Guidelines file not found: {guidelines_path}")
                     
         except Exception as e:
-            logger.error(f"Error copying AICodeConfig files: {e}")
-    
-    def _create_agent_readme(self, readme_file: Path, assignee: str, task_name: str, assignment_info: Dict[str, Any]) -> bool:
-        """Create human-readable README for agent assignment"""
-        try:
-            readme_content = f"""# エージェント割り当て情報
-
-## 基本情報
-- **エージェントID**: `{assignee}`
-- **タスクブランチ名**: `{task_name}`
-- **割り当て日時**: {assignment_info['assigned_at']}
-- **ステータス**: {assignment_info['status']}
-
-## 環境情報
-- **スペースセッション**: `{assignment_info['space_session']}`
-- **tmuxウィンドウ**: {assignment_info['tmux_window']}
-- **tmuxペイン**: {assignment_info['tmux_pane']}
-- **タスクブランチディレクトリ**: `{assignment_info['task_directory']}`
-
-## エージェント役割
-{self._get_agent_role_description(assignee)}
-
-## このディレクトリについて
-このディレクトリは、GitのWorktree機能を使用して作成された専用の作業ディレクトリです。
-このエージェント専用のブランチで作業を行い、他のエージェントとは独立した開発環境を提供します。
-
-## ログファイル
-- `agent_assignment.json`: 割り当て履歴のJSON形式ログ
-- `README.md`: この説明ファイル
-
----
-*このファイルは Haconiwa v1.0 によって自動生成されました*
-"""
-            
-            with open(readme_file, 'w', encoding='utf-8') as f:
-                f.write(readme_content)
-            
-            logger.debug(f"Created agent README: {readme_file}")
-            return True
-            
-        except Exception as e:
-            logger.error(f"Failed to create agent README: {e}")
-            return False
-    
-    def _get_agent_role_description(self, assignee: str) -> str:
-        """Get role description for agent"""
-        try:
-            parts = assignee.split("-")
-            if len(parts) >= 2:
-                org_part = parts[0]  # org01
-                role_part = parts[1]  # pm or wk
-                
-                org_num = org_part[3:]  # "01"
-                
-                if role_part == "pm":
-                    return f"**役割**: プロジェクトマネージャー (組織{org_num})\n**責任範囲**: プロジェクト全体の管理、チームコーディネーション、進捗管理"
-                elif role_part == "wk" and len(parts) >= 3:
-                    worker_type = parts[2]  # a, b, c
-                    worker_roles = {
-                        "a": "**役割**: シニア開発者\n**責任範囲**: 技術設計、コードレビュー、アーキテクチャ決定",
-                        "b": "**役割**: 中級開発者\n**責任範囲**: 機能実装、テスト作成、ドキュメント作成", 
-                        "c": "**役割**: ジュニア開発者\n**責任範囲**: 基本実装、学習、サポート業務"
-                    }
-                    return worker_roles.get(worker_type, f"**役割**: 開発者-{worker_type.upper()}")
-            
-            return "**役割**: 未定義"
-            
-        except Exception:
-            return "**役割**: 解析エラー" 
+            logger.error(f"Error copying AICodeConfig files: {e}") 

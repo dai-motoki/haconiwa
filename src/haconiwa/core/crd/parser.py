@@ -91,7 +91,8 @@ class CRDParser:
         if "kind" not in data:
             raise CRDValidationError("kind is required")
         
-        if "metadata" not in data:
+        # For Task CRD, metadata is optional
+        if data.get("kind") != "Task" and "metadata" not in data:
             raise CRDValidationError("metadata is required")
         
         if "spec" not in data:

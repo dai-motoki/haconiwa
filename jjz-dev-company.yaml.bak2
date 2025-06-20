@@ -1,7 +1,5 @@
 apiVersion: haconiwa.dev/v1
 kind: Organization
-metadata:
-  name: jjz-dev-company-org
 spec:
   companyName: "JJZ Development Company"
   industry: "AI Development Tools & Infrastructure"
@@ -230,8 +228,6 @@ spec:
 # AICodeConfig for Claude Code settings
 apiVersion: haconiwa.dev/v1
 kind: AICodeConfig
-metadata:
-  name: jjz-claude-config
 spec:
   provider: "claude"
   claude:

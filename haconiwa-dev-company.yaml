@@ -244,10 +244,8 @@ spec:
 # Executive Room Tasks - Strategic initiatives
 apiVersion: haconiwa.dev/v1
 kind: Task
-metadata:
-  name: feature/01_ai_strategy
 spec:
-  taskId: feature/01_ai_strategy
+  taskBranchName: feature/01_ai_strategy
   title: "AI Strategy Development"
   description: |
     ## AI Strategy Development
@@ -263,15 +261,12 @@ spec:
   spaceRef: "haconiwa-dev-company"
   priority: "high"
   worktree: true
-  branch: "strategy/ai-roadmap"
 
 ---
 apiVersion: haconiwa.dev/v1
 kind: Task
-metadata:
-  name: feature-02_tech_architecture
 spec:
-  taskId: feature-02_tech_architecture
+  taskBranchName: feature/02_tech_architecture
   title: "Technical Architecture Review"
   description: |
     ## Technical Architecture Review
@@ -287,15 +282,12 @@ spec:
   spaceRef: "haconiwa-dev-company"
   priority: "high"
   worktree: true
-  branch: "architecture/system-review"
 
 ---
 apiVersion: haconiwa.dev/v1
 kind: Task
-metadata:
-  name: feature_03_financial_planning
 spec:
-  taskId: feature_03_financial_planning
+  taskBranchName: feature/03_financial_planning
   title: "Financial Planning & Analysis"
   description: |
     ## Financial Planning & Analysis
@@ -311,15 +303,12 @@ spec:
   spaceRef: "haconiwa-dev-company"
   priority: "high"
   worktree: true
-  branch: "finance/planning-model"
 
 ---
 apiVersion: haconiwa.dev/v1
 kind: Task
-metadata:
-  name: bugfix/04_product_roadmap
 spec:
-  taskId: bugfix/04_product_roadmap
+  taskBranchName: feature/04_product_roadmap
   title: "Product Roadmap Development"
   description: |
     ## Product Roadmap Development
@@ -335,15 +324,12 @@ spec:
   spaceRef: "haconiwa-dev-company"
   priority: "high"
   worktree: true
-  branch: "product/roadmap-2025"
 
 ---
 apiVersion: haconiwa.dev/v1
 kind: Task
-metadata:
-  name: hotfix/05_ai_core_engine
 spec:
-  taskId: hotfix/05_ai_core_engine
+  taskBranchName: feature/05_ai_core_engine
   title: "AI Core Engine Enhancement"
   description: |
     ## AI Core Engine Enhancement
@@ -359,15 +345,12 @@ spec:
   spaceRef: "haconiwa-dev-company"
   priority: "high"
   worktree: true
-  branch: "ai/core-engine"
 
 ---
 apiVersion: haconiwa.dev/v1
 kind: Task
-metadata:
-  name: enhancement/06_backend_optimization
 spec:
-  taskId: enhancement/06_backend_optimization
+  taskBranchName: feature/06_backend_optimization
   title: "Backend Performance Optimization"
   description: |
     ## Backend Performance Optimization
@@ -383,15 +366,12 @@ spec:
   spaceRef: "haconiwa-dev-company"
   priority: "high"
   worktree: true
-  branch: "backend/performance-opt"
 
 ---
 apiVersion: haconiwa.dev/v1
 kind: Task
-metadata:
-  name: refactor/07_frontend_innovation
 spec:
-  taskId: refactor/07_frontend_innovation
+  taskBranchName: feature/07_frontend_innovation
   title: "Frontend Innovation Research"
   description: |
     ## Frontend Innovation Research
@@ -407,15 +387,12 @@ spec:
   spaceRef: "haconiwa-dev-company"
   priority: "medium"
   worktree: true
-  branch: "frontend/innovation-research"
 
 ---
 apiVersion: haconiwa.dev/v1
 kind: Task
-metadata:
-  name: docs/08_devops_automation
 spec:
-  taskId: docs/08_devops_automation
+  taskBranchName: feature/08_devops_automation
   title: "DevOps Automation Enhancement"
   description: |
     ## DevOps Automation Enhancement
@@ -431,15 +408,12 @@ spec:
   spaceRef: "haconiwa-dev-company"
   priority: "high"
   worktree: true
-  branch: "devops/automation-enhancement"
 
 ---
 apiVersion: haconiwa.dev/v1
 kind: Task
-metadata:
-  name: test/09_security_audit
 spec:
-  taskId: test/09_security_audit
+  taskBranchName: feature/09_security_audit
   title: "Security Architecture Audit"
   description: |
     ## Security Architecture Audit
@@ -455,15 +429,12 @@ spec:
   spaceRef: "haconiwa-dev-company"
   priority: "high"
   worktree: true
-  branch: "security/architecture-audit"
 
 ---
 apiVersion: haconiwa.dev/v1
 kind: Task
-metadata:
-  name: perf/10_data_platform
 spec:
-  taskId: perf/10_data_platform
+  taskBranchName: feature/10_data_platform
   title: "Data Platform Development"
   description: |
     ## Data Platform Development
@@ -479,15 +450,12 @@ spec:
   spaceRef: "haconiwa-dev-company"
   priority: "high"
   worktree: true
-  branch: "data/platform-development"
 
 ---
 apiVersion: haconiwa.dev/v1
 kind: Task
-metadata:
-  name: feature/11_qa_framework
 spec:
-  taskId: feature/11_qa_framework
+  taskBranchName: feature/11_qa_framework
   title: "QA Framework Modernization"
   description: |
     ## QA Framework Modernization
@@ -503,15 +471,12 @@ spec:
   spaceRef: "haconiwa-dev-company"
   priority: "high"
   worktree: true
-  branch: "qa/framework-modernization"
 
 ---
 apiVersion: haconiwa.dev/v1
 kind: Task
-metadata:
-  name: feature/12_documentation_system
 spec:
-  taskId: feature/12_documentation_system
+  taskBranchName: feature/12_documentation_system
   title: "Documentation System Enhancement"
   description: |
     ## Documentation System Enhancement
@@ -527,15 +492,12 @@ spec:
   spaceRef: "haconiwa-dev-company"
   priority: "medium"
   worktree: true
-  branch: "docs/system-enhancement"
 
 ---
 apiVersion: haconiwa.dev/v1
 kind: Task
-metadata:
-  name: feature/13_community_platform
 spec:
-  taskId: feature/13_community_platform
+  taskBranchName: feature/13_community_platform
   title: "Community Platform Development"
   description: |
     ## Community Platform Development
@@ -551,15 +513,12 @@ spec:
   spaceRef: "haconiwa-dev-company"
   priority: "medium"
   worktree: true
-  branch: "community/platform-development"
 
 ---
 apiVersion: haconiwa.dev/v1
 kind: Task
-metadata:
-  name: feature/14_developer_tools
 spec:
-  taskId: feature/14_developer_tools
+  taskBranchName: feature/14_developer_tools
   title: "Developer Tools Enhancement"
   description: |
     ## Developer Tools Enhancement
@@ -575,15 +534,12 @@ spec:
   spaceRef: "haconiwa-dev-company"
   priority: "medium"
   worktree: true
-  branch: "tools/developer-enhancement"
 
 ---
 apiVersion: haconiwa.dev/v1
 kind: Task
-metadata:
-  name: feature/15_operations_optimization
 spec:
-  taskId: feature/15_operations_optimization
+  taskBranchName: feature/15_operations_optimization
   title: "Operations Process Optimization"
   description: |
     ## Operations Process Optimization
@@ -599,15 +555,12 @@ spec:
   spaceRef: "haconiwa-dev-company"
   priority: "high"
   worktree: true
-  branch: "ops/process-optimization"
 
 ---
 apiVersion: haconiwa.dev/v1
 kind: Task
-metadata:
-  name: feature/16_engineering_excellence
 spec:
-  taskId: feature/16_engineering_excellence
+  taskBranchName: feature/16_engineering_excellence
   title: "Engineering Excellence Initiative"
   description: |
     ## Engineering Excellence Initiative
@@ -623,4 +576,3 @@ spec:
   spaceRef: "haconiwa-dev-company"
   priority: "high"
   worktree: true
-  branch: "engineering/excellence-initiative" 

@@ -3,7 +3,7 @@ CRD Data Models for Haconiwa v1.0
 """
 
 from typing import List, Dict, Any, Optional, Union
-from pydantic import BaseModel, Field, field_validator, ConfigDict
+from pydantic import BaseModel, Field, field_validator, model_validator, ConfigDict
 import re
 
 
@@ -219,28 +219,37 @@ class AgentCRD(BaseModel):
 
 class TaskSpec(BaseModel):
     """Task CRD specification"""
-    branch: str = Field(..., description="Git branch name")
+    name: str = Field(..., description="Task name, used for directory creation", alias="taskBranchName")
+    branch: Optional[str] = Field(None, description="Git branch name, defaults to name if not provided")
+    title: Optional[str] = Field(None, description="Task title")
     worktree: bool = Field(True, description="Use git worktree")
     assignee: Optional[str] = Field(None, description="Assigned agent")
     spaceRef: Optional[str] = Field(None, description="Reference to Space")
+    priority: Optional[str] = Field("medium", description="Task priority: high, medium, low")
     description: Optional[str] = Field(None, description="Task description")
     agentConfig: Optional[AgentConfig] = Field(None, description="Agent configuration for this task")
     envFiles: Optional[List[str]] = Field(None, description="List of environment files to copy to task worktree")
     
-    @field_validator('branch')
+    @field_validator('name')
     @classmethod
-    def validate_branch(cls, v):
+    def validate_task_branch_name(cls, v):
         # Git branch name validation
         if not re.match(r'^[a-zA-Z0-9._/-]+$', v):
-            raise ValueError('branch name contains invalid characters')
+            raise ValueError('task branch name contains invalid characters')
         return v
+    
+    @model_validator(mode='before')
+    def set_branch_default(cls, values):
+        if isinstance(values, dict) and values.get('branch') is None:
+            values['branch'] = values.get('taskBranchName') or values.get('name')
+        return values
 
 
 class TaskCRD(BaseModel):
     """Task CRD - Git worktree task"""
     apiVersion: str = Field("haconiwa.dev/v1", description="API version")
     kind: str = Field("Task", description="Resource kind")
-    metadata: Metadata
+    metadata: Optional[Metadata] = None
     spec: TaskSpec
 
 

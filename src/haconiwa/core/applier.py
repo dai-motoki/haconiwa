@@ -6,6 +6,7 @@ from typing import Union, List, Dict
 from pathlib import Path
 import logging
 import sys
+import json
 
 from .crd.models import (
     SpaceCRD, AgentCRD, TaskCRD, PathScanCRD, DatabaseCRD, CommandPolicyCRD, OrganizationCRD, AICodeConfigCRD
@@ -50,8 +51,9 @@ class CRDApplier:
             else:
                 raise CRDApplierError(f"Unknown CRD type: {type(crd)}")
         except Exception as e:
-            logger.error(f"Failed to apply CRD {crd.metadata.name}: {e}")
-            raise CRDApplierError(f"Failed to apply CRD {crd.metadata.name}: {e}")
+            crd_name = getattr(crd.metadata, 'name', None) if hasattr(crd, 'metadata') and crd.metadata else getattr(crd.spec, 'name', 'unknown') if hasattr(crd, 'spec') else 'unknown'
+            logger.error(f"Failed to apply CRD {crd_name}: {e}")
+            raise CRDApplierError(f"Failed to apply CRD {crd_name}: {e}")
     
     def apply_multiple(self, crds: List[Union[SpaceCRD, AgentCRD, TaskCRD, PathScanCRD, DatabaseCRD, CommandPolicyCRD, OrganizationCRD, AICodeConfigCRD]]) -> List[bool]:
         """Apply multiple CRDs to the system"""
@@ -118,7 +120,15 @@ class CRDApplier:
             
             for category, items in crd_categories.items():
                 if items:
-                    names = ", ".join([item.metadata.name for item in items[:3]])
+                    names_list = []
+                    for item in items[:3]:
+                        if hasattr(item, 'metadata') and item.metadata and hasattr(item.metadata, 'name'):
+                            names_list.append(item.metadata.name)
+                        elif hasattr(item, 'spec') and hasattr(item.spec, 'name'):
+                            names_list.append(item.spec.name)
+                        else:
+                            names_list.append("unnamed")
+                    names = ", ".join(names_list)
                     if len(items) > 3:
                         names += f" +{len(items)-3} more"
                     summary_table.add_row(category, str(len(items)), names)
@@ -140,7 +150,13 @@ class CRDApplier:
                 
                 for i, crd in enumerate(crds):
                     crd_type = type(crd).__name__.replace("CRD", "")
-                    task_desc = f"[{crd_type}] {crd.metadata.name}"
+                    if hasattr(crd, 'metadata') and crd.metadata and hasattr(crd.metadata, 'name'):
+                        crd_name = crd.metadata.name
+                    elif hasattr(crd, 'spec') and hasattr(crd.spec, 'name'):
+                        crd_name = crd.spec.name
+                    else:
+                        crd_name = "unnamed"
+                    task_desc = f"[{crd_type}] {crd_name}"
                     
                     current_task = progress.add_task(f"{task_desc} を適用中", total=1)
                     
@@ -235,6 +251,103 @@ class CRDApplier:
                 logging.getLogger(logger_name).setLevel(original_level)
         
         return results
+    
+    def _update_company_agent_panes(self, company_name: str):
+        """Update agent pane directories for a specific company after config file processing"""
+        try:
+            import subprocess
+            from pathlib import Path
+            from ..task.manager import TaskManager
+            from rich.console import Console
+            from rich.table import Table
+
+            logger.info(f"🔄 Updating agent pane directories for company: {company_name}")
+            session_name = company_name
+
+            task_manager = TaskManager()
+            task_assignments = {}
+            for task_name, task_data in task_manager.tasks.items():
+                config = task_data.get("config", {})
+                if config.get("space_ref") == company_name:
+                    assignee = config.get("assignee")
+                    if assignee:
+                        task_assignments[assignee] = {
+                            "name": task_name,
+                            "worktree_path": f"tasks/{task_name}",
+                            "description": config.get("description", "")
+                        }
+            
+            if not task_assignments:
+                logger.warning(f"No task assignments found for company: {company_name}")
+                return
+
+            all_panes_cmd = ["tmux", "list-panes", "-s", "-t", session_name, "-F", "#{window_index}:#{pane_index}:#{pane_title}"]
+            all_panes_result = subprocess.run(all_panes_cmd, capture_output=True, text=True, check=True)
+
+            panes_by_agent = {}
+            for line in all_panes_result.stdout.strip().split('\n'):
+                if not line: continue
+                try:
+                    win_idx, pane_idx, pane_title = line.split(':', 2)
+                    agent_id_part = pane_title.split(' ')[0]
+                    panes_by_agent[agent_id_part] = {"window": win_idx, "pane": pane_idx}
+                except ValueError:
+                    logger.warning(f"Could not parse pane info: {line}")
+            
+            updated_count = 0
+            unassigned_agents = list(task_assignments.keys())
+            
+            console = Console()
+            table = Table(title=f"🎯 {company_name} Agent Pane Assignment", show_header=True, header_style="bold cyan")
+            table.add_column("Agent ID", style="yellow")
+            table.add_column("Task Branch", style="green")
+            table.add_column("Pane", style="magenta")
+            table.add_column("Status", style="cyan")
+
+            base_path = Path.cwd() / company_name
+            
+            for agent_id, pane_info in panes_by_agent.items():
+                if agent_id in task_assignments:
+                    task_info = task_assignments[agent_id]
+                    task_dir = base_path / task_info["worktree_path"]
+                    
+                    if task_dir.exists():
+                        home_dir = str(Path.home())
+                        abs_path = str(task_dir.absolute())
+                        if abs_path.startswith(home_dir):
+                            cd_path = "~" + abs_path[len(home_dir):]
+                        else:
+                            cd_path = abs_path
+                        
+                        cd_cmd = f"cd {cd_path}"
+                        tmux_target = f"{session_name}:{pane_info['window']}.{pane_info['pane']}"
+                        
+                        # Use send-keys with C-m to ensure execution
+                        subprocess.run(["tmux", "send-keys", "-t", tmux_target, cd_cmd, "C-m"], check=True)
+                        
+                        new_title = f"{agent_id} [{task_info['name']}]"
+                        subprocess.run(["tmux", "select-pane", "-t", tmux_target, "-T", new_title], check=True)
+                        
+                        logger.info(f"✅ Moved agent {agent_id} to {task_dir.name}")
+                        table.add_row(agent_id, task_info['name'], f"W:{pane_info['window']}/P:{pane_info['pane']}", "✅ Moved")
+                        updated_count += 1
+                    else:
+                        logger.warning(f"Task directory not found for {agent_id}: {task_dir}")
+                        table.add_row(agent_id, task_info['name'], "N/A", "❌ Dir Not Found")
+                    
+                    if agent_id in unassigned_agents:
+                        unassigned_agents.remove(agent_id)
+
+            for agent_id in unassigned_agents:
+                 table.add_row(agent_id, task_assignments[agent_id]['name'], "N/A", "❌ Pane Not Found")
+
+            console.print(table)
+            logger.info(f"✅ Updated {updated_count} agent panes for company: {company_name}")
+
+        except Exception as e:
+            logger.error(f"Failed to update company agent panes: {e}")
+            import traceback
+            logger.debug(f"Stack trace: {traceback.format_exc()}")
     
     def _update_all_agent_pane_directories(self, space_sessions: List[Dict[str, str]]):
         """Update agent pane directories for all space sessions"""
@@ -369,6 +482,12 @@ class CRDApplier:
                 from ..task.manager import TaskManager
                 task_manager = TaskManager()
                 
+                # Validate tasks in memory against actual worktree directories
+                logger.info(f"Validating tasks for company: {config['name']}")
+                cleaned_count = task_manager.validate_tasks(config['name'])
+                if cleaned_count > 0:
+                    logger.info(f"Cleaned up {cleaned_count} invalid tasks for {config['name']}")
+                
                 # Set default branch from Space configuration
                 if config.get("git_repo") and config["git_repo"].get("defaultBranch"):
                     default_branch = config["git_repo"]["defaultBranch"]
@@ -420,11 +539,25 @@ class CRDApplier:
                 # Pass force_clone flag to SpaceManager
                 space_manager._force_clone = self.force_clone
                 
+                # Attach organization_crd to config if available
+                organization_ref = config.get("organizationRef")
+                if organization_ref:
+                    config['organization_crd'] = self._get_organization_crd_by_ref(organization_ref)
+
                 result = space_manager.create_multiroom_session(config)
                 
                 if result:
                     # Simple success message - details are shown by SpaceManager's Rich display
                     logger.info(f"✅ Company {config['name']} session created successfully")
+                    
+                    # Process config file if specified (AFTER creating session)
+                    if config.get("config_file"):
+                        logger.info(f"📄 Processing config file for {config['name']}: {config['config_file']}")
+                        self._process_company_config_file(config["config_file"], config['name'])
+                        
+                        # After processing config file, update agent panes
+                        logger.info(f"🔄 Updating agent panes after config file processing")
+                        self._update_company_agent_panes(config['name'])
                 else:
                     logger.error(f"❌ Failed to create session for company {config['name']}")
             
@@ -434,6 +567,73 @@ class CRDApplier:
         except Exception as e:
             logger.error(f"Space CRD {crd.metadata.name} 適用中に例外が発生: {e}")
             return False
+    
+    def _process_company_config_file(self, config_file_path: str, company_name: str):
+        """Process external configuration file for a company"""
+        try:
+            from pathlib import Path
+            from ..core.crd.parser import CRDParser
+            
+            logger.info(f"Loading company config file: {config_file_path}")
+            
+            # Resolve file path
+            file_path = Path(config_file_path)
+            if not file_path.is_absolute():
+                file_path = Path.cwd() / file_path
+            
+            if not file_path.exists():
+                logger.error(f"Config file not found: {file_path}")
+                return
+            
+            # Parse multi-document YAML
+            parser = CRDParser()
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            crds = parser.parse_multi_yaml(content)
+            logger.info(f"Found {len(crds)} CRDs in {config_file_path}")
+            
+            # Apply each CRD with company context
+            for crd in crds:
+                logger.info(f"Processing CRD: kind={crd.kind}, has_metadata={hasattr(crd, 'metadata')}, metadata={getattr(crd, 'metadata', None)}")
+                
+                # Set space_ref for Task CRDs
+                if crd.kind == "Task":
+                    if hasattr(crd.spec, 'spaceRef'):
+                        logger.info(f"Overriding spaceRef from '{crd.spec.spaceRef}' to '{company_name}' for Task: {crd.spec.name}")
+                        crd.spec.spaceRef = company_name
+                    else:
+                        logger.warning(f"Task {crd.spec.name} has no spaceRef field")
+                
+                # Apply the CRD
+                try:
+                    result = self.apply(crd)
+
+                    # If this was an Organization CRD, update the pane titles now
+                    if isinstance(crd, OrganizationCRD) and result:
+                        from ..space.manager import SpaceManager
+                        space_manager = SpaceManager()
+                        space_manager.update_pane_titles_from_org(company_name, crd)
+                        logger.info(f"Pane titles updated for {company_name} based on Organization CRD.")
+
+                    if result:
+                        name = getattr(crd.metadata, 'name', None) or getattr(crd.spec, 'name', 'unknown')
+                        logger.info(f"✅ Applied {crd.kind}/{name} from config file")
+                    else:
+                        logger.error(f"❌ Failed to apply {crd.kind} from config file")
+                except Exception as apply_error:
+                    logger.error(f"❌ Exception applying {crd.kind}: {apply_error}")
+                    import traceback
+                    logger.debug(f"Stack trace: {traceback.format_exc()}")
+            
+            # After processing all CRDs from config file, update agent pane directories for this company
+            logger.info(f"🔄 Updating agent pane directories for company: {company_name}")
+            self._update_company_agent_panes(company_name)
+        
+        except Exception as e:
+            logger.error(f"Failed to process config file {config_file_path}: {e}")
+            import traceback
+            logger.debug(f"Stack trace: {traceback.format_exc()}")
     
     def _apply_hierarchical_legal_framework(self, crd: SpaceCRD, config: dict) -> bool:
         """Apply Hierarchical Legal Framework from Space CRD"""
@@ -748,10 +948,11 @@ class CRDApplier:
     
     def _apply_task_crd(self, crd: TaskCRD) -> bool:
         """Apply Task CRD"""
-        logger.info(f"Applying Task CRD: {crd.metadata.name}")
+        task_name = crd.spec.name if hasattr(crd.spec, 'name') else 'unknown'
+        logger.info(f"Applying Task CRD: {task_name}")
         
         # Store CRD for later reference
-        self.applied_resources[f"Task/{crd.metadata.name}"] = crd
+        self.applied_resources[f"Task/{task_name}"] = crd
         
         # Import task manager here to avoid circular import
         from ..task.manager import TaskManager
@@ -769,8 +970,10 @@ class CRDApplier:
         
         # Create task configuration
         task_config = {
-            "name": crd.metadata.name,
+            "name": crd.spec.name,
             "branch": crd.spec.branch,
+            "title": crd.spec.title,
+            "priority": crd.spec.priority,
             "worktree": crd.spec.worktree,
             "assignee": crd.spec.assignee,
             "space_ref": crd.spec.spaceRef,
@@ -792,10 +995,13 @@ class CRDApplier:
         if combined_env_files:
             task_config["env_files"] = combined_env_files
         
+        import json
+        logger.info(f"DEBUG: Task config being passed to TaskManager: {json.dumps(task_config, indent=2, ensure_ascii=False)}")
+
         # Apply task configuration
         result = task_manager.create_task(task_config)
         
-        logger.info(f"Task CRD {crd.metadata.name} applied successfully: {result}")
+        logger.info(f"Task CRD {task_name} applied successfully: {result}")
         return result
     
     def _get_company_agent_defaults(self, space_ref: str) -> dict:

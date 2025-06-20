@@ -1,0 +1,71 @@
+apiVersion: haconiwa.dev/v1
+kind: Organization
+metadata:
+  name: kamui-dev-company-org
+spec:
+  companyName: "Kamui Development Company"
+  industry: "AI Development Tools & Infrastructure"
+  basePath: "./kamui-dev-company"
+  hierarchy:
+    departments:
+    - id: "executive"
+      name: "Executive Team"
+      description: "Company leadership and strategic decision making"
+      roles:
+      - roleType: "management"
+        title: "Chief Executive Officer"
+        agentId: "ceo-kamui"
+        responsibilities:
+          - "Strategic vision and direction"
+      - roleType: "management"
+        title: "Chief Technology Officer"
+        agentId: "cto-kanda"
+        responsibilities:
+          - "Technology strategy and innovation"
+    - id: "standby"
+      name: "Standby Team"
+      description: "Ready-to-deploy talent pool"
+      roles:
+      - roleType: "engineering"
+        title: "Standby Developer 01"
+        agentId: "standby-dev-01"
+        responsibilities:
+          - "Awaiting assignment"
+
+---
+# AICodeConfig for Claude Code settings
+apiVersion: haconiwa.dev/v1
+kind: AICodeConfig
+metadata:
+  name: kamui-claude-config
+spec:
+  provider: "claude"
+  claude:
+    settingsFile: "./claude-settings/settings.local.json"
+    guidelinesFile: "./claude-settings/CLAUDE.md"
+  targetCompany: "kamui-dev-company"
+
+---
+# Executive Room Tasks - Strategic initiatives
+apiVersion: haconiwa.dev/v1
+kind: Task
+spec:
+  taskBranchName: kamui_ai_strategy_01
+  title: "AI Strategy Development"
+  description: "Develop comprehensive AI strategy for Kamui platform."
+  assignee: "ceo-kamui"
+  spaceRef: "kamui-dev-company"
+  priority: "high"
+  worktree: true
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+spec:
+  taskBranchName: kamui_tech_architecture_02
+  title: "Technical Architecture Review"
+  description: "Review and optimize current technical architecture."
+  assignee: "cto-kanda"
+  spaceRef: "kamui-dev-company"
+  priority: "high"
+  worktree: true

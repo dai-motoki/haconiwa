@@ -1,0 +1,9 @@
+📄 haconiwa-dev-company.yaml に 18 個の設定を発見しました
+
+
+╭─────────────────────────╮
+│ 🚀 Haconiwa CRD設定適用 │
+│ 18 個の設定を適用中...  │
+╰─────────────────────────╯
+
+❌ エラー: 'NoneType' object has no attribute 'name'

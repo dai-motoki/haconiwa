@@ -1,0 +1,135 @@
+apiVersion: haconiwa.dev/v1
+kind: Space
+metadata:
+  name: haconiwa-dev-world
+spec:
+  nations:
+  - id: jp
+    name: Japan
+    cities:
+    - id: tokyo
+      name: Tokyo
+      villages:
+      - id: haconiwa-village
+        name: "Haconiwa Village"
+        companies:
+        - name: haconiwa-dev-company
+          grid: "8x4"
+          basePath: "./haconiwa-dev-company"
+          organizationRef: "haconiwa-dev-company-org"
+          configFile: "test_cases/test-haconiwa-dev-company-ci.yaml"
+          agentDefaults:
+            type: "claude-code"
+            permissions:
+              allow:
+                - "Bash(python -m pytest)"
+                - "Bash(python -m ruff)"
+                - "Bash(python -m mypy)"
+                - "Bash(haconiwa *)"
+                - "Read(pyproject.toml)"
+                - "Read(src/**/*.py)"
+                - "Write(src/**/*.py)"
+                - "Edit(src/**/*.py)"
+              deny:
+                - "Bash(rm -rf /)"
+                - "Bash(curl:*)"
+            env:
+              HACONIWA_DEV_MODE: "1"
+              PYTHONPATH: "./src"
+          gitRepo:
+            url: "https://github.com/dai-motoki/haconiwa"
+            defaultBranch: "dev"
+            auth: "https"
+          buildings:
+          - id: "hq-tower"
+            name: "Haconiwa HQ Tower"
+            floors:
+            - id: "executive-floor"
+              name: "Executive Floor"
+              rooms:
+              - id: room-executive
+                name: "Executive Room"
+                description: "C-level executives and senior leadership"
+              - id: room-standby
+                name: "Standby Room"
+                description: "Ready-to-deploy talent pool"
+        - name: kamui-dev-company
+          grid: "8x4"
+          basePath: "./kamui-dev-company"
+          organizationRef: "kamui-dev-company-org"
+          configFile: "test_cases/test-kamui-dev-company-ci.yaml"
+          agentDefaults:
+            type: "claude-code"
+            permissions:
+              allow:
+                - "Bash(python -m pytest)"
+                - "Bash(python -m ruff)"
+                - "Bash(python -m mypy)"
+                - "Bash(kamui *)"
+                - "Read(pyproject.toml)"
+                - "Read(src/**/*.py)"
+                - "Write(src/**/*.py)"
+                - "Edit(src/**/*.py)"
+              deny:
+                - "Bash(rm -rf /)"
+                - "Bash(curl:*)"
+            env:
+              KAMUI_DEV_MODE: "1"
+              PYTHONPATH: "./src"
+          gitRepo:
+            url: "https://github.com/KandaQuantum1123/kamui_v3"
+            defaultBranch: "main"
+            auth: "https"
+          buildings:
+          - id: "hq-tower"
+            name: "Kamui HQ Tower"
+            floors:
+            - id: "executive-floor"
+              name: "Executive Floor"
+              rooms:
+              - id: room-executive
+                name: "Executive Room"
+                description: "C-level executives and senior leadership"
+              - id: room-standby
+                name: "Standby Room"
+                description: "Ready-to-deploy talent pool"
+        - name: jjz-dev-company
+          grid: "8x4"
+          basePath: "./jjz-dev-company"
+          organizationRef: "jjz-dev-company-org"
+          configFile: "test_cases/test-jjz-dev-company-ci.yaml"
+          agentDefaults:
+            type: "claude-code"
+            permissions:
+              allow:
+                - "Bash(python -m pytest)"
+                - "Bash(python -m ruff)"
+                - "Bash(python -m mypy)"
+                - "Bash(jjz *)"
+                - "Read(pyproject.toml)"
+                - "Read(src/**/*.py)"
+                - "Write(src/**/*.py)"
+                - "Edit(src/**/*.py)"
+              deny:
+                - "Bash(rm -rf /)"
+                - "Bash(curl:*)"
+            env:
+              JJZ_DEV_MODE: "1"
+              PYTHONPATH: "./src"
+          gitRepo:
+            url: "https://github.com/jjz-dev/jjz-platform"
+            defaultBranch: "main"
+            auth: "https"
+          buildings:
+          - id: "hq-tower"
+            name: "JJZ HQ Tower"
+            floors:
+            - id: "executive-floor"
+              name: "Executive Floor"
+              rooms:
+              - id: room-executive
+                name: "Executive Room"
+                description: "C-level executives and senior leadership"
+              - id: room-standby
+                name: "Standby Room"
+                description: "Ready-to-deploy talent pool"

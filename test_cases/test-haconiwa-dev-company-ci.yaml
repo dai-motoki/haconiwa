@@ -1,0 +1,95 @@
+apiVersion: haconiwa.dev/v1
+kind: Organization
+metadata:
+  name: haconiwa-dev-company-org
+spec:
+  companyName: "Haconiwa Development Company"
+  industry: "AI Development Tools & Infrastructure"
+  basePath: "./haconiwa-dev-company"
+  hierarchy:
+    departments:
+    - id: "executive"
+      name: "Executive Team"
+      description: "Company leadership and strategic decision making"
+      roles:
+      - roleType: "management"
+        title: "Chief Executive Officer"
+        agentId: "ceo-motoki"
+        responsibilities:
+          - "Strategic vision and direction"
+          - "Company-wide decision making"
+          - "Stakeholder relations"
+      - roleType: "management"
+        title: "Chief Technology Officer"
+        agentId: "cto-yamada"
+        responsibilities:
+          - "Technology strategy and innovation"
+          - "Technical architecture oversight"
+          - "R&D direction"
+    - id: "standby"
+      name: "Standby Team"
+      description: "Ready-to-deploy talent pool"
+      roles:
+      - roleType: "engineering"
+        title: "Standby Developer 01"
+        agentId: "standby-dev-01"
+        responsibilities:
+          - "Awaiting assignment"
+          - "Skill development"
+
+---
+# AICodeConfig for Claude Code settings
+apiVersion: haconiwa.dev/v1
+kind: AICodeConfig
+metadata:
+  name: haconiwa-claude-config
+spec:
+  provider: "claude"
+  claude:
+    settingsFile: "./claude-settings/settings.local.json"
+    guidelinesFile: "./claude-settings/CLAUDE.md"
+  targetCompany: "haconiwa-dev-company"
+
+
+---
+# Executive Room Tasks - Strategic initiatives
+apiVersion: haconiwa.dev/v1
+kind: Task
+spec:
+  taskBranchName: feature/01_ai_strategy
+  title: "AI Strategy Development"
+  description: |
+    ## AI Strategy Development
+    
+    Develop comprehensive AI strategy for Haconiwa platform.
+    
+    ### Requirements:
+    - Market analysis
+    - Technology roadmap
+    - Competitive analysis
+    - Investment planning
+  assignee: "ceo-motoki"
+  spaceRef: "haconiwa-dev-company"
+  priority: "high"
+  worktree: true
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+spec:
+  taskBranchName: feature/02_tech_architecture
+  title: "Technical Architecture Review"
+  description: |
+    ## Technical Architecture Review
+    
+    Review and optimize current technical architecture.
+    
+    ### Requirements:
+    - System architecture analysis
+    - Performance optimization
+    - Scalability planning
+    - Technology stack evaluation
+  assignee: "cto-yamada"
+  spaceRef: "haconiwa-dev-company"
+  priority: "high"
+  worktree: true

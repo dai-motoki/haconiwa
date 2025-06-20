@@ -1,0 +1,55 @@
+name: Haconiwa End-to-End Test
+
+on:
+  push:
+    branches: [ dev ]
+  pull_request:
+    branches: [ dev ]
+
+jobs:
+  test:
+    runs-on: macos-latest # tmux is required, so macos is safer
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install .
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install Node dependencies
+      run: npm install
+
+    - name: Run Unit and Integration Tests
+      run: python -m pytest tests/unit/ tests/integration/
+
+    - name: Run Jest tests
+      run: npx jest __tests__/utils/
+      
+    - name: Clean up previous runs
+      run: |
+        for company in haconiwa-dev-company kamui-dev-company jjz-dev-company; do
+            if [ -d "$company" ]; then
+                echo "Deleting company: $company"
+                python -m haconiwa space delete -c $company --clean-dirs --force
+            else
+                echo "Company directory $company not found, skipping delete."
+            fi
+        done
+      
+    - name: Apply Haconiwa World for Test
+      run: python -m haconiwa apply -f test_cases/test-haconiwa-world-ci.yaml --no-attach
+      
+    - name: Verify TMUX pane paths
+      run: ./scripts/verify-pane-paths.sh 

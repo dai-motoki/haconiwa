@@ -243,6 +243,8 @@ spec:
 # Executive Room Tasks - Strategic initiatives
 apiVersion: haconiwa.dev/v1
 kind: Task
+metadata:
+  name: jjz_ai_strategy_01
 spec:
   taskBranchName: jjz_ai_strategy_01
   title: "AI Strategy Development"
@@ -264,6 +266,8 @@ spec:
 ---
 apiVersion: haconiwa.dev/v1
 kind: Task
+metadata:
+  name: jjz_tech_architecture_02
 spec:
   taskBranchName: jjz_tech_architecture_02
   title: "Technical Architecture Review"
@@ -285,6 +289,8 @@ spec:
 ---
 apiVersion: haconiwa.dev/v1
 kind: Task
+metadata:
+  name: jjz_financial_planning_03
 spec:
   taskBranchName: jjz_financial_planning_03
   title: "Financial Planning & Analysis"
@@ -306,6 +312,8 @@ spec:
 ---
 apiVersion: haconiwa.dev/v1
 kind: Task
+metadata:
+  name: jjz_product_roadmap_04
 spec:
   taskBranchName: jjz_product_roadmap_04
   title: "Product Roadmap Development"
@@ -327,6 +335,8 @@ spec:
 ---
 apiVersion: haconiwa.dev/v1
 kind: Task
+metadata:
+  name: jjz_ai_core_engine_05
 spec:
   taskBranchName: jjz_ai_core_engine_05
   title: "AI Core Engine Enhancement"
@@ -348,6 +358,8 @@ spec:
 ---
 apiVersion: haconiwa.dev/v1
 kind: Task
+metadata:
+  name: jjz_backend_optimization_06
 spec:
   taskBranchName: jjz_backend_optimization_06
   title: "Backend Performance Optimization"
@@ -369,6 +381,8 @@ spec:
 ---
 apiVersion: haconiwa.dev/v1
 kind: Task
+metadata:
+  name: jjz_frontend_innovation_07
 spec:
   taskBranchName: jjz_frontend_innovation_07
   title: "Frontend Innovation Research"
@@ -390,6 +404,8 @@ spec:
 ---
 apiVersion: haconiwa.dev/v1
 kind: Task
+metadata:
+  name: jjz_devops_automation_08
 spec:
   taskBranchName: jjz_devops_automation_08
   title: "DevOps Automation Enhancement"
@@ -411,6 +427,8 @@ spec:
 ---
 apiVersion: haconiwa.dev/v1
 kind: Task
+metadata:
+  name: jjz_security_audit_09
 spec:
   taskBranchName: jjz_security_audit_09
   title: "Security Architecture Audit"
@@ -432,6 +450,8 @@ spec:
 ---
 apiVersion: haconiwa.dev/v1
 kind: Task
+metadata:
+  name: jjz_data_platform_10
 spec:
   taskBranchName: jjz_data_platform_10
   title: "Data Platform Development"

@@ -9,7 +9,7 @@ import logging
 import json
 import glob
 
-from ..core.crd.models import SpaceCRD
+from ..core.crd.models import SpaceCRD, OrganizationCRD
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +53,7 @@ class SpaceManager:
             base_path = Path(config.get("base_path", f"./{session_name}"))
             rooms = config.get("rooms", [])
             organizations = config.get("organizations", [])
+            organization_crd = config.get("organization_crd")
             
             logger.info(f"会社を作成中: {session_name} ({len(rooms)} ルーム)")
             
@@ -80,7 +81,7 @@ class SpaceManager:
                     logger.warning("tasks/main/ での Git リポジトリセットアップに失敗、Git なしで継続します")
             
             # Generate desk mappings with organization info and room configuration
-            desk_mappings = self.generate_desk_mappings(organizations, rooms, grid, base_path)
+            desk_mappings = self.generate_desk_mappings(organizations, rooms, grid, base_path, organization_crd=organization_crd)
             
             # Create tmux session (initial window 0) with base_path as working directory
             self._create_tmux_session(session_name, base_path)
@@ -190,7 +191,7 @@ class SpaceManager:
             logger.error(f"会社 {config.get('name', 'unknown')} の作成に失敗: {e}")
             return False
     
-    def generate_desk_mappings(self, organizations: List[Dict[str, Any]] = None, rooms: List[Dict[str, Any]] = None, grid: str = "8x4", base_path: Path = None) -> List[Dict[str, Any]]:
+    def generate_desk_mappings(self, organizations: List[Dict[str, Any]] = None, rooms: List[Dict[str, Any]] = None, grid: str = "8x4", base_path: Path = None, organization_crd: OrganizationCRD = None) -> List[Dict[str, Any]]:
         """Generate desk mappings based on actual room configuration and grid size"""
         if not organizations:
             # Fallback to default organization names
@@ -213,8 +214,7 @@ class SpaceManager:
         
         desk_counter = 0
         
-        # Try to get organization CRD for role details
-        organization_crd = self._get_organization_crd_for_display()
+        # organization_crd is now passed as an argument
         dept_roles_cache = {}
         
         # Generate desk mappings for each room
@@ -346,6 +346,12 @@ class SpaceManager:
         
         for company in companies:
             config = self._convert_single_company_to_config(crd, company)
+            
+            # Fetch and attach the full Organization CRD object to the config
+            organization_ref = getattr(company, 'organizationRef', None)
+            if organization_ref:
+                config['organization_crd'] = self._get_organization_crd_by_ref(organization_ref)
+            
             configs.append(config)
         
         return configs
@@ -418,10 +424,11 @@ class SpaceManager:
                 "auth": company.gitRepo.auth
             }
         
-        # Load external configuration file if specified
+        # Store config file path for later processing
         config_file = getattr(company, 'configFile', None)
         if config_file:
-            self._load_external_config_file(config_file, company.name)
+            config["config_file"] = config_file
+            logger.info(f"Config file specified for {company.name}: {config_file}")
         
         # Get organization reference and fetch organization data
         organization_ref = getattr(company, 'organizationRef', None)
@@ -465,12 +472,8 @@ class SpaceManager:
             logger.info(f"Looking for Organization CRD: {organization_ref}")
             logger.info(f"Available resources: {list(applied_resources.keys())}")
             
-            for resource_key, resource in applied_resources.items():
-                if resource_key.startswith("Organization/") and resource.metadata.name == organization_ref:
-                    organization_crd = resource
-                    logger.info(f"Found Organization CRD: {organization_ref}")
-                    break
-            
+            organization_crd = self._get_organization_crd_by_ref(organization_ref)
+
             if organization_crd:
                 # Map Organization CRD departments to 32-pane structure
                 departments = organization_crd.spec.hierarchy.departments
@@ -564,7 +567,8 @@ class SpaceManager:
                 applier = getattr(sys.modules['__main__'], '_current_applier')
                 for crd in crds:
                     applier.apply(crd)
-                    logger.info(f"Applied {crd.kind}/{crd.metadata.name} from config file {config_file_path}")
+                    name = crd.metadata.name if crd.metadata else crd.spec.taskBranchName if hasattr(crd.spec, 'taskBranchName') else 'unknown'
+                    logger.info(f"Applied {crd.kind}/{name} from config file {config_file_path}")
             else:
                 logger.warning("No current applier found, cannot apply CRDs from config file")
         
@@ -1547,7 +1551,7 @@ class SpaceManager:
             return False
     
     def list_spaces(self) -> List[Dict[str, Any]]:
-        """List all active spaces from tmux sessions"""
+        """List all running Haconiwa spaces (tmux sessions)"""
         spaces = []
         
         try:
@@ -1597,14 +1601,14 @@ class SpaceManager:
             return spaces
     
     def _is_haconiwa_session(self, session_name: str) -> bool:
-        """Check if session looks like a haconiwa session"""
+        """Check if a tmux session is a Haconiwa session"""
         # Simple heuristic: sessions ending with "-company" or having specific patterns
         return (session_name.endswith('-company') or 
                 session_name in self.active_sessions or
                 any(keyword in session_name.lower() for keyword in ['test', 'multiroom', 'enterprise']))
     
     def _send_claude_command_to_all_panes(self, session_name: str, rooms: List[Dict[str, Any]], desk_distribution: Dict[str, List[Dict[str, Any]]]) -> None:
-        """Send claude command to all panes after creation"""
+        """Send 'claude' command to all panes after setup"""
         try:
             logger.info("🤖 Sending claude command to all panes...")
             
@@ -1633,17 +1637,14 @@ class SpaceManager:
             logger.error(f"Failed to send claude commands: {e}")
     
     def start_company(self, company_name: str) -> bool:
-        """Start company session"""
-        # This is a placeholder - would integrate with existing company logic
-        return True
-    
+        """Not implemented"""
+        return False
     def clone_repository(self, company_name: str) -> bool:
-        """Clone repository for company"""
-        # This is a placeholder - would integrate with Git operations
-        return True
-
+        """Not implemented"""
+        return False
+    
     def _configure_pane_borders(self, session_name: str):
-        """Configure pane borders and titles for all windows"""
+        """Configure pane borders and titles for tmux session"""
         try:
             # Configure pane borders and titles at session level
             cmd1 = ["tmux", "set-option", "-t", session_name, "pane-border-status", "top"]
@@ -1799,7 +1800,7 @@ class SpaceManager:
             return False
     
     def update_all_panes_from_task_logs(self, session_name: str, space_ref: str) -> int:
-        """Update all panes in session based on task assignment logs"""
+        """Update pane directories from all .haconiwa/agent_assignment.json files"""
         try:
             updated_count = 0
             
@@ -1872,28 +1873,17 @@ class SpaceManager:
             return 0
     
     def _reconstruct_mapping_from_position(self, window_id: str, pane_index: int) -> Dict[str, Any]:
-        """Reconstruct agent mapping from window/pane position"""
-        # Window 0 = Frontend room (r1), Window 1 = Backend room (r2)
-        room_id = "room-frontend" if window_id == "0" else "room-backend"
-        
-        # Calculate organization and role from pane index
-        # Each org has 4 agents (pm, worker-a, worker-b, worker-c)
-        org_idx = pane_index // 4
-        role_idx = pane_index % 4
-        
-        org_id = f"org-{org_idx + 1:02d}"
-        roles = ["pm", "worker-a", "worker-b", "worker-c"]
-        role = roles[role_idx]
-        
+        """Reconstruct desk mapping based on window and pane position"""
+        # This is a fallback method and may not be fully accurate
         return {
-            "org_id": org_id,
-            "role": role,
-            "room_id": room_id,
-            "desk_id": f"desk-{room_id}-{org_idx + 1:02d}-{role_idx:02d}"
+            "org_id": f"org-{pane_index // 4 + 1:02d}",
+            "role": ["pm", "worker-a", "worker-b", "worker-c"][pane_index % 4],
+            "room_id": "room-frontend" if window_id == "0" else "room-backend",
+            "desk_id": f"desk-{'room-frontend' if window_id == '0' else 'room-backend'}-{pane_index // 4 + 1:02d}-{pane_index % 4:02d}"
         }
     
     def _check_if_pane_moved_to_task(self, session_name: str, window_id: str, pane_index: int) -> bool:
-        """Check if pane was successfully moved to task directory"""
+        """Check if a pane is already in a task directory"""
         try:
             # Get current path of the pane
             cmd = ["tmux", "list-panes", "-t", f"{session_name}:{window_id}", 
@@ -1914,7 +1904,7 @@ class SpaceManager:
             return False
     
     def _cleanup_existing_session(self, session_name: str):
-        """Clean up existing tmux session"""
+        """Cleanup existing tmux session and associated directories"""
         try:
             # Check if session exists first
             check_cmd = ["tmux", "has-session", "-t", session_name]
@@ -1936,7 +1926,7 @@ class SpaceManager:
             logger.warning(f"Error during session cleanup: {e}")
     
     def _display_created_structure(self, base_path: Path, organizations: List[Dict[str, Any]], total_panes: int = 32, room_count: int = 2) -> None:
-        """Display comprehensive world structure including hierarchy, tasks, and directory mapping"""
+        """Display visual representation of the created structure"""
         from rich.console import Console
         from rich.panel import Panel
         from rich.columns import Columns
@@ -1983,7 +1973,7 @@ class SpaceManager:
         console.print()
     
     def _create_world_hierarchy_tree(self, base_path: Path, organizations: List[Dict[str, Any]], task_assignments: Dict[str, Any]):
-        """Create world hierarchy tree showing logical space structure"""
+        """Create Rich tree for world hierarchy"""
         from rich.tree import Tree
         
         tree = Tree(f"🌍 [bold cyan]World: {base_path.name}[/bold cyan]")
@@ -2136,7 +2126,7 @@ class SpaceManager:
         return tree
     
     def _create_directory_structure_tree(self, base_path: Path, organizations: List[Dict[str, Any]], total_panes: int = 32, room_count: int = 2):
-        """Create directory structure tree"""
+        """Create Rich tree for directory structure"""
         from rich.tree import Tree
         
         tree = Tree(f"📁 [bold cyan]{base_path.name}/[/bold cyan]")
@@ -2185,7 +2175,7 @@ class SpaceManager:
         return tree
     
     def _create_task_assignment_table(self, task_assignments: Dict[str, Any]):
-        """Create task assignment table"""
+        """Create Rich table for task assignments"""
         from rich.table import Table
         
         table = Table(show_header=True, header_style="bold cyan")
@@ -2521,7 +2511,7 @@ class SpaceManager:
         return updated_count
     
     def _get_organization_crd_for_display(self) -> Optional[Dict[str, Any]]:
-        """Get Organization CRD data for display purposes"""
+        """Get the first available Organization CRD for display purposes"""
         try:
             # Try to get Organization CRD from applied resources
             import sys
@@ -2529,39 +2519,15 @@ class SpaceManager:
                 applier = getattr(sys.modules['__main__'], '_current_applier')
                 applied_resources = applier.get_applied_resources()
                 
-                # Find Organization CRD
                 for resource_key, resource in applied_resources.items():
                     if resource_key.startswith("Organization/"):
-                        logger.debug(f"Found Organization CRD for display: {resource.metadata.name}")
                         return resource
-            
-            # Alternative: Try to find and read organization CRD from current directory
-            logger.warning("Could not access Organization CRD via applier, attempting direct file access")
-            
-            # Look for YAML files that might contain Organization CRD
-            yaml_files = glob.glob("*.yaml") + glob.glob("*.yml")
-            for yaml_file in yaml_files:
-                try:
-                    # Use existing parser instead of CRDLoader
-                    from ..core.crd.parser import parse_yaml_file
-                    crds = parse_yaml_file(yaml_file)
-                    
-                    for crd in crds:
-                        if hasattr(crd, 'kind') and crd.kind == 'Organization':
-                            logger.info(f"Found Organization CRD in {yaml_file}: {crd.metadata.name}")
-                            return crd
-                except Exception as e:
-                    logger.debug(f"Failed to load {yaml_file}: {e}")
-                    continue
-            
             return None
-            
-        except Exception as e:
-            logger.warning(f"Could not get Organization CRD for display: {e}")
+        except:
             return None
     
     def _get_department_roles(self, organization_crd, department_id: str) -> Optional[Dict[str, Any]]:
-        """Get roles for specific department from Organization CRD"""
+        """Get roles for a specific department from Organization CRD"""
         try:
             if not organization_crd:
                 return None
@@ -2569,44 +2535,79 @@ class SpaceManager:
             # Find the department
             for dept in organization_crd.spec.hierarchy.departments:
                 if dept.id == department_id:
-                    roles = dept.roles
-                    logger.debug(f"Found {len(roles)} roles for department {department_id}")
-                    
-                    # Extract lead and worker roles
-                    # Return all roles in the order they appear in YAML
-                    # This supports 32-pane structure properly
-                    all_roles = []
-                    
-                    for role in roles:
-                        role_type = getattr(role, 'roleType', '')
-                        title = getattr(role, 'title', '')
-                        agent_id = getattr(role, 'agentId', None)
-                        
-                        logger.debug(f"Processing role: title='{title}', roleType='{role_type}', agentId='{agent_id}'")
-                        all_roles.append(role)
-                    
-                    # Log summary of all roles being returned
-                    logger.debug(f"Returning {len(all_roles)} roles for department {department_id}:")
-                    for idx, role in enumerate(all_roles):
-                        logger.debug(f"  Role[{idx}]: {getattr(role, 'title', 'Unknown')} (agentId: {getattr(role, 'agentId', 'None')})")
-                    
-                    # Return structure that maintains backward compatibility
-                    # but includes all roles
-                    result = {
-                        "all_roles": all_roles,  # All roles in order
-                        "role_objects": all_roles,  # Same as all_roles for compatibility
-                        # Legacy fields for backward compatibility
-                        "lead": all_roles[0] if all_roles else None,
-                        "workers": all_roles[1:4] if len(all_roles) > 1 else [],
-                        "lead_role": all_roles[0] if all_roles else None,
-                        "worker_roles": all_roles[1:4] if len(all_roles) > 1 else []
+                    # Return all roles for this department
+                    return {
+                        "lead_role": next((role for role in dept.roles if "lead" in role.title.lower() or "manager" in role.title.lower()), None),
+                        "worker_roles": [role for role in dept.roles if "lead" not in role.title.lower() and "manager" not in role.title.lower()],
+                        "all_roles": dept.roles
                     }
-                    
-                    return result
             
             return None
-            
         except Exception as e:
             logger.warning(f"Could not get roles for department {department_id}: {e}")
             return None
+    
+    def _get_organization_crd_by_ref(self, organization_ref: str) -> Optional[Dict[str, Any]]:
+        """Get organization CRD object from applied resources by reference name"""
+        try:
+            import sys
+            if hasattr(sys.modules.get('__main__'), '_current_applier'):
+                applier = getattr(sys.modules['__main__'], '_current_applier')
+                applied_resources = applier.get_applied_resources()
+                
+                for resource_key, resource in applied_resources.items():
+                    if resource_key.startswith("Organization/") and resource.metadata.name == organization_ref:
+                        logger.info(f"Found Organization CRD by ref: {organization_ref}")
+                        return resource
+            return None
+        except Exception as e:
+            logger.warning(f"Could not get Organization CRD for ref {organization_ref}: {e}")
+            return None
+    
+    def update_pane_titles_from_org(self, session_name: str, organization_crd: OrganizationCRD):
+        """Update all pane titles in a session based on an Organization CRD."""
+        try:
+            logger.info(f"Updating pane titles for session '{session_name}' using Organization CRD '{organization_crd.metadata.name}'")
+
+            session_config = self.active_sessions.get(session_name)
+            if not session_config:
+                logger.error(f"Session '{session_name}' not found in active sessions.")
+                return
+
+            config = session_config['config']
+            base_path = Path(session_config['base_path'])
+            
+            # Re-generate desk mappings with the provided Organization CRD
+            desk_mappings = self.generate_desk_mappings(
+                organizations=config.get("organizations", []),
+                rooms=config.get("rooms", []),
+                grid=config.get("grid", "8x4"),
+                base_path=base_path,
+                organization_crd=organization_crd
+            )
+
+            desk_distribution = self._distribute_desks_to_windows(desk_mappings)
+
+            for room_id, desks_in_room in desk_distribution.items():
+                window_id = self._get_window_id_for_room(room_id)
+                
+                for pane_index, desk_mapping in enumerate(desks_in_room):
+                    agent_id = desk_mapping.get("agent_id")
+                    if not agent_id:
+                        logger.warning(f"Could not determine agent_id for pane {pane_index} in room {room_id}. Skipping title update.")
+                        continue
+
+                    new_title = f"{agent_id} - standby"
+                    
+                    cmd = ["tmux", "select-pane", "-t", f"{session_name}:{window_id}.{pane_index}", "-T", new_title]
+                    result = subprocess.run(cmd, capture_output=True, text=True)
+                    if result.returncode == 0:
+                        logger.debug(f"Updated title for pane {window_id}.{pane_index} to '{new_title}'")
+                    else:
+                        logger.warning(f"Failed to update title for pane {window_id}.{pane_index}: {result.stderr}")
+            logger.info(f"Successfully updated pane titles for session '{session_name}'.")
+        except Exception as e:
+            logger.error(f"Error updating pane titles: {e}")
+            import traceback
+            logger.debug(f"Stack trace: {traceback.format_exc()}")
  
