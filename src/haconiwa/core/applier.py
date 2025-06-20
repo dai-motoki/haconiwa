@@ -75,7 +75,7 @@ class CRDApplier:
         loggers_to_quiet = [
             'haconiwa.task.manager', 
             'haconiwa.space.manager', 
-            'haconiwa.core.applier',
+            # 'haconiwa.core.applier',  # Keep this for debugging
             'haconiwa.agent.claude_integration',
             'haconiwa.legal.framework'
         ]
@@ -153,11 +153,9 @@ class CRDApplier:
                         
                         # Track Space CRDs for later pane updates
                         if isinstance(crd, SpaceCRD) and result:
-                            company = crd.spec.nations[0].cities[0].villages[0].companies[0]
-                            space_sessions.append({
-                                "session_name": company.name,
-                                "space_ref": company.name
-                            })
+                            # Space CRD processed successfully - companies are now stored
+                            # Don't try to access companies from CRD here - they'll be collected later
+                            pass
                         
                         # Update progress
                         progress.update(current_task, completed=1)
@@ -177,7 +175,15 @@ class CRDApplier:
                     
                     progress.remove_task(current_task)
             
-            # Post-processing phase
+            # Post-processing phase - collect space sessions from stored company names
+            if hasattr(self, '_space_company_names') and self._space_company_names:
+                # Build space_sessions from stored company names
+                for company_name in self._space_company_names:
+                    space_sessions.append({
+                        "session_name": company_name,
+                        "space_ref": company_name
+                    })
+                
             if space_sessions:
                 console.print()
                 console.print(Panel.fit(
@@ -335,83 +341,95 @@ class CRDApplier:
             from ..space.manager import SpaceManager
             space_manager = SpaceManager()
             
-            # Convert CRD to internal configuration
-            config = space_manager.convert_crd_to_config(crd)
-            logger.info(f"Converted CRD to config: {config['name']} with {len(config.get('organizations', []))} organizations")
+            # Convert CRD to internal configurations (multiple companies)
+            configs = space_manager.convert_crd_to_configs(crd)
+            logger.info(f"Converted CRD to {len(configs)} company configs")
             
-            # Handle Git repository if specified
-            if config.get("git_repo"):
-                git_config = config["git_repo"]
-                logger.info(f"Git repository specified: {git_config['url']} (will be handled by SpaceManager)")
+            # Store company names for post-processing (now that configFile has been resolved)
+            if not hasattr(self, '_space_company_names'):
+                self._space_company_names = []
+            for config in configs:
+                self._space_company_names.append(config['name'])
+                logger.info(f"Registered company for post-processing: {config['name']}")
             
-            # Apply Hierarchical Legal Framework if enabled
-            logger.info("📋 About to check Hierarchical Legal Framework...")
-            self._apply_hierarchical_legal_framework(crd, config)
-            
-            # IMPORTANT: Get TaskManager tasks and pass to SpaceManager for agent assignment
-            from ..task.manager import TaskManager
-            task_manager = TaskManager()
-            
-            # Set default branch from Space configuration
-            if config.get("git_repo") and config["git_repo"].get("defaultBranch"):
-                default_branch = config["git_repo"]["defaultBranch"]
-                task_manager.set_default_branch(default_branch)
-                logger.info(f"Set TaskManager default branch to: {default_branch}")
-            
-            # Pass task assignments to SpaceManager
-            task_assignments = {}
-            for task_name, task_data in task_manager.tasks.items():
-                assignee = task_data["config"].get("assignee")
-                space_ref = task_data["config"].get("space_ref")
-                if assignee and space_ref == config['name']:
-                    task_assignments[assignee] = {
-                        "name": task_name,
-                        "worktree_path": f"tasks/{task_name}",
-                        "config": task_data["config"]
-                    }
-            
-            # Display task assignments if any exist
-            if task_assignments:
-                from rich.console import Console
-                from rich.table import Table
+            # Process each company configuration
+            for config in configs:
+                logger.info(f"Processing company: {config['name']}")
                 
-                console = Console()
-                console.print("    [bold green]🎯 Agent Task Assignments[/bold green]")
+                # Handle Git repository if specified
+                if config.get("git_repo"):
+                    git_config = config["git_repo"]
+                    logger.info(f"Git repository specified: {git_config['url']} (will be handled by SpaceManager)")
                 
-                assign_table = Table(show_header=True, header_style="bold cyan")
-                assign_table.add_column("Agent ID", style="yellow")
-                assign_table.add_column("Task", style="green")
-                assign_table.add_column("Description", style="dim")
+                # Apply Hierarchical Legal Framework if enabled
+                logger.info("📋 About to check Hierarchical Legal Framework...")
+                self._apply_hierarchical_legal_framework(crd, config)
                 
-                for assignee, task_info in task_assignments.items():
-                    description = task_info["config"].get("description", "")[:50]
-                    if len(description) > 47:
-                        description = description[:47] + "..."
-                    assign_table.add_row(assignee, task_info["name"], description)
+                # IMPORTANT: Get TaskManager tasks and pass to SpaceManager for agent assignment
+                from ..task.manager import TaskManager
+                task_manager = TaskManager()
                 
-                console.print(assign_table)
-                logger.info(f"Passing {len(task_assignments)} task assignments to SpaceManager")
-            else:
-                logger.info("No existing task assignments found for this space")
+                # Set default branch from Space configuration
+                if config.get("git_repo") and config["git_repo"].get("defaultBranch"):
+                    default_branch = config["git_repo"]["defaultBranch"]
+                    task_manager.set_default_branch(default_branch)
+                    logger.info(f"Set TaskManager default branch to: {default_branch}")
+                
+                # Pass task assignments to SpaceManager
+                task_assignments = {}
+                for task_name, task_data in task_manager.tasks.items():
+                    assignee = task_data["config"].get("assignee")
+                    space_ref = task_data["config"].get("space_ref")
+                    if assignee and space_ref == config['name']:
+                        task_assignments[assignee] = {
+                            "name": task_name,
+                            "worktree_path": f"tasks/{task_name}",
+                            "config": task_data["config"]
+                        }
+                
+                # Display task assignments if any exist
+                if task_assignments:
+                    from rich.console import Console
+                    from rich.table import Table
+                    
+                    console = Console()
+                    console.print("    [bold green]🎯 Agent Task Assignments[/bold green]")
+                    
+                    assign_table = Table(show_header=True, header_style="bold cyan")
+                    assign_table.add_column("Agent ID", style="yellow")
+                    assign_table.add_column("Task", style="green")
+                    assign_table.add_column("Description", style="dim")
+                    
+                    for assignee, task_info in task_assignments.items():
+                        description = task_info["config"].get("description", "")[:50]
+                        if len(description) > 47:
+                            description = description[:47] + "..."
+                        assign_table.add_row(assignee, task_info["name"], description)
+                    
+                    console.print(assign_table)
+                    logger.info(f"Passing {len(task_assignments)} task assignments to SpaceManager")
+                else:
+                    logger.info("No existing task assignments found for this space")
+                
+                # Set task assignments in SpaceManager
+                space_manager.set_task_assignments(task_assignments)
+                
+                # Create space infrastructure (32-pane tmux session with task-centric structure)
+                logger.info(f"Creating 32-pane tmux session for company: {config['name']}")
+                
+                # Pass force_clone flag to SpaceManager
+                space_manager._force_clone = self.force_clone
+                
+                result = space_manager.create_multiroom_session(config)
+                
+                if result:
+                    # Simple success message - details are shown by SpaceManager's Rich display
+                    logger.info(f"✅ Company {config['name']} session created successfully")
+                else:
+                    logger.error(f"❌ Failed to create session for company {config['name']}")
             
-            # Set task assignments in SpaceManager
-            space_manager.set_task_assignments(task_assignments)
-            
-            # Create space infrastructure (32-pane tmux session with task-centric structure)
-            logger.info("32ペイン tmuxセッションをtasks/ディレクトリ構造で作成中...")
-            
-            # Pass force_clone flag to SpaceManager
-            space_manager._force_clone = self.force_clone
-            
-            result = space_manager.create_multiroom_session(config)
-            
-            if result:
-                # Simple success message - details are shown by SpaceManager's Rich display
-                logger.info(f"✅ Space CRD {crd.metadata.name} の適用が成功しました")
-            else:
-                logger.error(f"❌ Space CRD {crd.metadata.name} の適用に失敗しました")
-            
-            return result
+            logger.info(f"✅ Space CRD {crd.metadata.name} processed {len(configs)} companies")
+            return True
             
         except Exception as e:
             logger.error(f"Space CRD {crd.metadata.name} 適用中に例外が発生: {e}")

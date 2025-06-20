@@ -143,6 +143,7 @@ class CompanyConfig(BaseModel):
     legalFramework: Optional[CompanyLegalFramework] = None
     gitRepo: Optional[GitRepoConfig] = None
     organizationRef: Optional[str] = Field(None, description="Reference to Organization CRD")
+    configFile: Optional[str] = Field(None, description="Path to external configuration file containing Organization, AICodeConfig, and Task definitions")
     organizations: List[OrganizationConfig] = []
     buildings: List[BuildingConfig] = []
     agentDefaults: Optional[AgentDefaultsConfig] = None

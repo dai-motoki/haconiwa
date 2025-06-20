@@ -336,13 +336,27 @@ class SpaceManager:
         
         return mappings
     
-    def convert_crd_to_config(self, crd: SpaceCRD) -> Dict[str, Any]:
-        """Convert Space CRD to internal configuration"""
+    def convert_crd_to_configs(self, crd: SpaceCRD) -> List[Dict[str, Any]]:
+        """Convert Space CRD to internal configurations for multiple companies"""
         # Store the current Space CRD for reference
         self._current_space_crd = crd
         
-        # Navigate through the CRD structure to get company config
-        company = crd.spec.nations[0].cities[0].villages[0].companies[0]
+        configs = []
+        companies = crd.spec.nations[0].cities[0].villages[0].companies
+        
+        for company in companies:
+            config = self._convert_single_company_to_config(crd, company)
+            configs.append(config)
+        
+        return configs
+    
+    def convert_crd_to_config(self, crd: SpaceCRD) -> Dict[str, Any]:
+        """Convert Space CRD to internal configuration (single company - for backward compatibility)"""
+        configs = self.convert_crd_to_configs(crd)
+        return configs[0] if configs else {}
+    
+    def _convert_single_company_to_config(self, crd: SpaceCRD, company) -> Dict[str, Any]:
+        """Convert single company configuration from CRD"""
         
         # Use world name as base path if basePath is not specified
         base_path = company.basePath
@@ -403,6 +417,11 @@ class SpaceManager:
                 "default_branch": company.gitRepo.defaultBranch,
                 "auth": company.gitRepo.auth
             }
+        
+        # Load external configuration file if specified
+        config_file = getattr(company, 'configFile', None)
+        if config_file:
+            self._load_external_config_file(config_file, company.name)
         
         # Get organization reference and fetch organization data
         organization_ref = getattr(company, 'organizationRef', None)
@@ -511,6 +530,48 @@ class SpaceManager:
             return [
                 {"id": "01", "name": organization_ref or "default-org", "department_id": "default"}
             ]
+    
+    def _load_external_config_file(self, config_file_path: str, company_name: str):
+        """Load and apply external configuration file"""
+        try:
+            from pathlib import Path
+            import sys
+            from ..core.crd.parser import CRDParser
+            
+            logger.info(f"Loading external config file: {config_file_path} for company: {company_name}")
+            
+            # Resolve file path
+            file_path = Path(config_file_path)
+            if not file_path.is_absolute():
+                # Make relative to current working directory
+                file_path = Path.cwd() / file_path
+            
+            if not file_path.exists():
+                logger.warning(f"Config file not found: {file_path}")
+                return
+            
+            # Parse multi-document YAML
+            parser = CRDParser()
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            crds = parser.parse_multi_yaml(content)
+            logger.info(f"Loaded {len(crds)} CRDs from {config_file_path}")
+            
+            # Apply the CRDs using the current applier instance
+            # Get applier from the global state (set during apply command)
+            if hasattr(sys.modules.get('__main__'), '_current_applier'):
+                applier = getattr(sys.modules['__main__'], '_current_applier')
+                for crd in crds:
+                    applier.apply(crd)
+                    logger.info(f"Applied {crd.kind}/{crd.metadata.name} from config file {config_file_path}")
+            else:
+                logger.warning("No current applier found, cannot apply CRDs from config file")
+        
+        except Exception as e:
+            logger.error(f"Failed to load config file {config_file_path}: {e}")
+            import traceback
+            logger.debug(f"Stack trace: {traceback.format_exc()}")
     
     def _create_tmux_session(self, session_name: str, base_path: Path = None):
         """Create tmux session with optional working directory"""
@@ -1050,32 +1111,47 @@ class SpaceManager:
             assigned_task_dir = None
             task_info = None
             
-            for task_dir in tasks_path.iterdir():
-                if task_dir.is_dir() and task_dir.name != "main":
-                    log_file = task_dir / ".haconiwa" / "agent_assignment.json"
-                    if log_file.exists():
-                        try:
-                            with open(log_file, 'r', encoding='utf-8') as f:
-                                assignments = json.load(f)
-                                if not isinstance(assignments, list):
-                                    assignments = [assignments]
-                                
-                                # Check if this agent is assigned to this task
-                                for assignment in assignments:
-                                    if (assignment.get("agent_id") == agent_id and 
-                                        assignment.get("space_session") == session_name and
-                                        assignment.get("status") == "active"):
-                                        
-                                        assigned_task_dir = task_dir
-                                        task_info = assignment
-                                        logger.info(f"Found task assignment: {agent_id} → {task_dir.name}")
-                                        break
-                                
-                                if assigned_task_dir:
-                                    break
+            # Get all task directories - support both flat and nested structures
+            task_dirs = []
+            if tasks_path.exists():
+                # First level: tasks/task_name or tasks/main
+                for item in tasks_path.iterdir():
+                    if item.is_dir() and item.name != "main":
+                        task_dirs.append(item)
+                
+                # Second level: tasks/category/task_name (for feature/, bugfix/, etc.)
+                for category_dir in tasks_path.iterdir():
+                    if category_dir.is_dir() and category_dir.name != "main":
+                        for task_dir in category_dir.iterdir():
+                            if task_dir.is_dir():
+                                task_dirs.append(task_dir)
+            
+            # Search through all collected task directories
+            for task_dir in task_dirs:
+                log_file = task_dir / ".haconiwa" / "agent_assignment.json"
+                if log_file.exists():
+                    try:
+                        with open(log_file, 'r', encoding='utf-8') as f:
+                            assignments = json.load(f)
+                            if not isinstance(assignments, list):
+                                assignments = [assignments]
+                            
+                            # Check if this agent is assigned to this task
+                            for assignment in assignments:
+                                if (assignment.get("agent_id") == agent_id and 
+                                    assignment.get("space_session") == session_name and
+                                    assignment.get("status") == "active"):
                                     
-                        except Exception as e:
-                            logger.warning(f"Could not read assignment log {log_file}: {e}")
+                                    assigned_task_dir = task_dir
+                                    task_info = assignment
+                                    logger.info(f"Found task assignment: {agent_id} → {task_dir.name}")
+                                    break
+                            
+                            if assigned_task_dir:
+                                break
+                                    
+                    except Exception as e:
+                        logger.warning(f"Could not read assignment log {log_file}: {e}")
             
             # If agent has task assignment, move to task directory
             if assigned_task_dir and task_info:
@@ -1096,11 +1172,11 @@ class SpaceManager:
             agent_id = task_info["agent_id"]
             task_name = task_info["task_name"]
             
-            # Always use absolute path but make it cleaner with ~ if possible
+            # Use tilde path without quotes 
             absolute_path = str(task_dir.absolute())
             home_path = str(Path.home())
             
-            # Try to use ~ prefix for paths under home directory
+            # Use ~ prefix for paths under home directory
             if absolute_path.startswith(home_path):
                 task_path = "~" + absolute_path[len(home_path):]
             else:

@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.6.3] - 2025-06-20
+
+### リリース版
+
+- バージョン 0.6.3 をリリース
+
+## [0.6.4] - 2025-06-20
+
+### リリース版
+
+- バージョン 0.6.4 をリリース
+
+## [0.6.4-dev] - 2025-06-20
+
+### 開発版
+
+- バージョン 0.6.4-dev をリリース
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
