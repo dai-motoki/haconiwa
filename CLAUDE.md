@@ -2,6 +2,54 @@
 
 ## Important Guidelines
 
+### 【最重要】音声通知必須ルール
+**すべてのタスク完了時は必ず音声通知を実行してください。例外はありません。**
+
+- **ルール**: どんなタスクでも、作業完了後は必ずTTS音声通知を出すこと
+- **理由**: ユーザーがタスク完了に気付くのが遅れることを防ぐため
+- **実行方法**: `python voice-systems/gemini-tts/quick_tts_test.py "完了メッセージ"`
+- **通知内容**: 何の作業を完了したかを具体的に説明すること
+- **必須事項**: この音声通知を忘れることは絶対に許されません
+
+```bash
+# 例：ファイル編集完了時
+python voice-systems/gemini-tts/quick_tts_test.py "ファイル編集が完了しました"
+
+# 例：ビルド完了時  
+python voice-systems/gemini-tts/quick_tts_test.py "パッケージのビルドが完了しました"
+
+# 例：調査完了時
+python voice-systems/gemini-tts/quick_tts_test.py "調査が完了し、問題の原因を特定しました"
+```
+
+### 【重要】エラー発生時の説明ルール
+**エラーが発生した場合は、必ずエラーの原因と対処法を詳しく説明してください。**
+
+- **ルール**: エラーメッセージを確認し、根本原因を分析して説明すること
+- **説明内容**: 
+  - 何が原因でエラーが発生したのか
+  - どのような依存関係や設定が不足しているのか
+  - 問題解決のための具体的な手順
+- **音声通知**: エラー内容と解決策も音声で説明すること
+
+```bash
+# 例：依存関係エラーの場合
+python voice-systems/gemini-tts/quick_tts_test.py "cryptographyパッケージが不足しているため、haconiwaコマンドが実行できませんでした。pyproject.tomlに依存関係を追加して修正します"
+
+# 例：設定エラーの場合
+python voice-systems/gemini-tts/quick_tts_test.py "設定ファイルが見つからないエラーです。指定されたパスに設定ファイルを作成する必要があります"
+```
+
+### 【必須】Gitプッシュ前のブランチ戦略確認
+**Gitプッシュする前に、必ずブランチ戦略とCI/CD設定を確認してください。**
+
+- **確認ファイル**: [`docs/DEVELOPMENT_STRATEGY.md`](docs/DEVELOPMENT_STRATEGY.md)
+- **確認事項**: 
+  - 現在のブランチが適切なCI/CDワークフローを使用しているか
+  - インストール方法（`pip install -e .` vs `pip install haconiwa==x.x.x`）が正しいか
+  - バージョン更新が必要な場合は `scripts/bump_version.py` を使用したか
+- **重要**: ブランチ別の戦略に従わないと、CI/CDが失敗する可能性があります
+
 ### Path References
 - **NEVER use full paths** in documentation or code comments
 - Use relative paths or descriptive references instead

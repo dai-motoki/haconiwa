@@ -1,0 +1,131 @@
+name: CI Release
+
+on:
+  push:
+    branches: [ "release/*" ]
+  pull_request:
+    branches: [ "release/*" ]
+
+jobs:
+  test-release:
+    name: "Release Tests"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tmux git
+
+      - name: Install release candidate version (development)
+        run: |
+          python -m pip install --upgrade pip
+          # Release branch uses development install for pre-release testing
+          pip install -e .[dev]
+          pip install build twine bandit safety
+
+      - name: Check code formatting
+        run: black --check .
+
+      - name: Lint with flake8
+        run: flake8 .
+
+      - name: Type check with mypy
+        run: mypy .
+
+      - name: Security check with bandit
+        run: bandit -r src/haconiwa
+
+      - name: Check dependencies with safety
+        run: safety check
+
+      - name: Test haconiwa --help command (release candidate)
+        run: |
+          echo "🚀 Testing haconiwa --help from release candidate on Python ${{ matrix.python-version }}"
+          haconiwa --help
+          echo "✅ haconiwa --help executed successfully on Python ${{ matrix.python-version }}"
+
+      - name: Run comprehensive tests
+        run: |
+          pytest --cov=haconiwa tests/
+          coverage xml
+
+      - name: Test all scenario configurations
+        run: |
+          echo "Testing all YAML configurations for release"
+          haconiwa apply -f haconiwa-world.yaml --force-clone --no-attach
+          haconiwa apply -f test_cases/minimal_config.yaml --force-clone --no-attach
+
+      - name: Build and verify package
+        run: |
+          python -m build
+          twine check dist/*
+          # Test wheel installation
+          pip install dist/*.whl --force-reinstall
+          haconiwa --help
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: true  # Release branch requires coverage
+
+  tmux-integration-release:
+    name: "Release Tmux Integration Test"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install system dependencies (including Tmux)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tmux git curl wget
+          tmux -V
+
+      - name: Install release candidate
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Download YAML configuration from GitHub
+        run: |
+          echo "📥 Downloading haconiwa-dev-company.yaml from GitHub..."
+          curl -O https://raw.githubusercontent.com/dai-motoki/haconiwa/main/haconiwa-dev-company.yaml
+          ls -la haconiwa-dev-company.yaml
+
+      - name: Test full Haconiwa workflow (release candidate)
+        run: |
+          echo "🚀 Testing complete Haconiwa workflow for release..."
+          
+          echo "Step 1: Apply configuration"
+          haconiwa apply -f haconiwa-dev-company.yaml --no-attach
+          
+          echo "Step 2: List and verify spaces"
+          haconiwa space list
+          haconiwa space list | grep "haconiwa-dev-company - active"
+          
+          echo "Step 3: Clean up"
+          haconiwa space delete -c haconiwa-dev-company --clean-dirs --force
+          
+          echo "✅ Release candidate Tmux integration test passed on Python ${{ matrix.python-version }}"

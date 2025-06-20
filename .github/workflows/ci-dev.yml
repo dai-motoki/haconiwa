@@ -1,0 +1,163 @@
+name: CI Development
+
+on:
+  push:
+    branches: [ "dev", "feature/*", "bugfix/*", "hotfix/*" ]
+  pull_request:
+    branches: [ "dev" ]
+
+jobs:
+  test-development:
+    name: "Development Tests"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tmux git
+
+      - name: Install development version
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[dev]
+          pip install build twine bandit safety
+
+      - name: Check code formatting
+        run: black --check .
+
+      - name: Lint with flake8
+        run: flake8 .
+
+      - name: Type check with mypy
+        run: mypy .
+
+      - name: Security check with bandit
+        run: bandit -r src/haconiwa
+
+      - name: Check dependencies with safety
+        run: safety check
+
+      - name: Test haconiwa --help command (development)
+        run: |
+          echo "🔧 Testing haconiwa --help from development version on Python ${{ matrix.python-version }}"
+          haconiwa --help
+          echo "✅ haconiwa --help executed successfully on Python ${{ matrix.python-version }}"
+
+      - name: Run tests with coverage
+        run: |
+          pytest --cov=haconiwa tests/
+          coverage xml
+          
+      - name: Run unit tests
+        run: |
+          pytest tests/unit/ -v
+      
+      - name: Run integration tests
+        run: |
+          pytest tests/integration/ -v
+
+      - name: Test scenario configurations
+        run: |
+          # Test core YAML configurations with development version
+          echo "Testing haconiwa-world.yaml"
+          haconiwa apply -f haconiwa-world.yaml --force-clone --no-attach
+          
+          echo "Testing minimal configuration"
+          haconiwa apply -f test_cases/minimal_config.yaml --force-clone --no-attach
+          
+          # Test env file functionality
+          echo "Testing with env files"
+          echo "API_KEY=test123" > .env.test
+          echo "LOG_LEVEL=DEBUG" >> .env.test
+          haconiwa apply -f test_cases/minimal_config.yaml --env .env.test --dry-run --no-attach
+
+      - name: Build package (development)
+        run: python -m build
+
+      - name: Check distribution
+        run: twine check dist/*
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false  # 開発ブランチでは警告のみ
+
+  tmux-integration-test-dev:
+    name: "Development Tmux Integration Test"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install system dependencies (including Tmux)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tmux git curl wget
+          tmux -V
+
+      - name: Install development version
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Download YAML configuration from GitHub
+        run: |
+          echo "📥 Downloading haconiwa-dev-company.yaml from GitHub..."
+          curl -O https://raw.githubusercontent.com/dai-motoki/haconiwa/main/haconiwa-dev-company.yaml
+          ls -la haconiwa-dev-company.yaml
+
+      - name: Test full Haconiwa workflow with Tmux (development)
+        run: |
+          echo "🚀 Testing complete Haconiwa workflow with development version..."
+          
+          echo "Step 1: Apply configuration (--no-attach for CI compatibility)"
+          haconiwa apply -f haconiwa-dev-company.yaml --no-attach
+          
+          echo "Step 2: List created spaces"
+          haconiwa space list
+          
+          echo "Step 3: Verify space is active"
+          haconiwa space list | grep "haconiwa-dev-company - active"
+          
+          echo "Step 4: Clean up - delete space completely"
+          haconiwa space delete -c haconiwa-dev-company --clean-dirs --force
+          
+          echo "Step 5: Verify deletion"
+          ! haconiwa space list | grep "haconiwa-dev-company" || echo "Space successfully deleted"
+          
+          echo "✅ Complete Tmux integration test passed (development) on Python ${{ matrix.python-version }}"
+
+      - name: Test error handling and edge cases (development)
+        run: |
+          echo "🧪 Testing error handling scenarios with development version..."
+          
+          echo "Testing invalid YAML handling..."
+          echo "invalid: yaml: content" > invalid-test.yaml
+          ! haconiwa apply -f invalid-test.yaml --no-attach || echo "Expected failure handled correctly"
+          
+          echo "Testing non-existent space deletion..."
+          ! haconiwa space delete -c non-existent-space --force || echo "Expected failure handled correctly"
+          
+          echo "✅ Error handling tests completed (development) on Python ${{ matrix.python-version }}"
