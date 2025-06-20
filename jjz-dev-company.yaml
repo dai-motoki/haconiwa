@@ -1,11 +1,11 @@
 apiVersion: haconiwa.dev/v1
 kind: Organization
 metadata:
-  name: haconiwa-dev-company-org
+  name: jjz-dev-company-org
 spec:
-  companyName: "Haconiwa Development Company"
+  companyName: "JJZ Development Company"
   industry: "AI Development Tools & Infrastructure"
-  basePath: "./haconiwa-dev-company"
+  basePath: "./jjz-dev-company"
   hierarchy:
     departments:
     - id: "executive"
@@ -14,112 +14,112 @@ spec:
       roles:
       - roleType: "management"
         title: "Chief Executive Officer"
-        agentId: "ceo-motoki"
+        agentId: "ceo-jackson"
         responsibilities:
           - "Strategic vision and direction"
           - "Company-wide decision making"
           - "Stakeholder relations"
       - roleType: "management"
         title: "Chief Technology Officer"
-        agentId: "cto-yamada"
+        agentId: "cto-james"
         responsibilities:
           - "Technology strategy and innovation"
           - "Technical architecture oversight"
           - "R&D direction"
       - roleType: "management"
         title: "Chief Financial Officer"
-        agentId: "cfo-tanaka"
+        agentId: "cfo-zoe"
         responsibilities:
           - "Financial planning and analysis"
           - "Budget management"
           - "Investment strategies"
       - roleType: "management"
         title: "VP of Engineering"
-        agentId: "vpe-sato"
+        agentId: "vpe-johnson"
         responsibilities:
           - "Engineering team leadership"
           - "Development process optimization"
           - "Technical talent management"
       - roleType: "management"
         title: "VP of Product"
-        agentId: "vpp-suzuki"
+        agentId: "vpp-zhang"
         responsibilities:
           - "Product strategy and roadmap"
           - "User experience vision"
           - "Market analysis"
       - roleType: "management"
         title: "VP of Operations"
-        agentId: "vpo-watanabe"
+        agentId: "vpo-jones"
         responsibilities:
           - "Operations strategy"
           - "Process optimization"
           - "Resource management"
       - roleType: "engineering"
         title: "Senior AI Engineer"
-        agentId: "ai-lead-nakamura"
+        agentId: "ai-lead-jordan"
         responsibilities:
           - "AI/ML model development"
           - "Algorithm optimization"
           - "Research implementation"
       - roleType: "engineering"
         title: "Senior Backend Engineer"
-        agentId: "backend-lead-kobayashi"
+        agentId: "backend-lead-jenkins"
         responsibilities:
           - "Core backend architecture"
           - "API design and implementation"
           - "Database optimization"
       - roleType: "engineering"
         title: "Senior Frontend Engineer"
-        agentId: "frontend-lead-ishii"
+        agentId: "frontend-lead-zhao"
         responsibilities:
           - "UI/UX implementation"
           - "Frontend architecture"
           - "Performance optimization"
       - roleType: "engineering"
         title: "Senior DevOps Engineer"
-        agentId: "devops-lead-matsui"
+        agentId: "devops-lead-jefferson"
         responsibilities:
           - "Infrastructure automation"
           - "CI/CD pipeline management"
           - "Cloud architecture"
       - roleType: "engineering"
         title: "Security Engineer"
-        agentId: "security-lead-inoue"
+        agentId: "security-lead-zhou"
         responsibilities:
           - "Security architecture"
           - "Threat assessment"
           - "Compliance management"
       - roleType: "engineering"
         title: "Data Engineer"
-        agentId: "data-lead-kimura"
+        agentId: "data-lead-zhu"
         responsibilities:
           - "Data pipeline development"
           - "Analytics infrastructure"
           - "Data quality assurance"
       - roleType: "management"
         title: "QA Manager"
-        agentId: "qa-manager-hayashi"
+        agentId: "qa-manager-julia"
         responsibilities:
           - "Quality assurance strategy"
           - "Testing framework design"
           - "Release validation"
       - roleType: "engineering"
         title: "Documentation Lead"
-        agentId: "docs-lead-yamamoto"
+        agentId: "docs-lead-jack"
         responsibilities:
           - "Technical documentation"
           - "API documentation"
           - "User guides"
       - roleType: "management"
         title: "Community Manager"
-        agentId: "community-ito"
+        agentId: "community-jade"
         responsibilities:
           - "Developer community engagement"
           - "Open source strategy"
           - "Technical evangelism"
       - roleType: "engineering"
         title: "Platform Engineer"
-        agentId: "platform-kato"
+        agentId: "platform-jerry"
         responsibilities:
           - "Developer platform tools"
           - "Internal tooling"
@@ -231,36 +231,35 @@ spec:
 apiVersion: haconiwa.dev/v1
 kind: AICodeConfig
 metadata:
-  name: haconiwa-claude-config
+  name: jjz-claude-config
 spec:
   provider: "claude"
   claude:
     settingsFile: "./claude-settings/settings.local.json"
     guidelinesFile: "./claude-settings/CLAUDE.md"
-  targetCompany: "haconiwa-dev-company"
-
+  targetCompany: "jjz-dev-company"
 
 ---
 # Executive Room Tasks - Strategic initiatives
 apiVersion: haconiwa.dev/v1
 kind: Task
 metadata:
-  name: feature/01_ai_strategy
+  name: jjz_ai_strategy_01
 spec:
-  taskId: feature/01_ai_strategy
+  taskId: jjz_ai_strategy_01
   title: "AI Strategy Development"
   description: |
     ## AI Strategy Development
     
-    Develop comprehensive AI strategy for Haconiwa platform.
+    Develop comprehensive AI strategy for JJZ platform.
     
     ### Requirements:
     - Market analysis
     - Technology roadmap
     - Competitive analysis
     - Investment planning
-  assignee: "ceo-motoki"
-  spaceRef: "haconiwa-dev-company"
+  assignee: "ceo-jackson"
+  spaceRef: "jjz-dev-company"
   priority: "high"
   worktree: true
   branch: "strategy/ai-roadmap"
@@ -269,9 +268,9 @@ spec:
 apiVersion: haconiwa.dev/v1
 kind: Task
 metadata:
-  name: feature-02_tech_architecture
+  name: jjz_tech_architecture_02
 spec:
-  taskId: feature-02_tech_architecture
+  taskId: jjz_tech_architecture_02
   title: "Technical Architecture Review"
   description: |
     ## Technical Architecture Review
@@ -283,8 +282,8 @@ spec:
     - Performance optimization
     - Scalability planning
     - Technology stack evaluation
-  assignee: "cto-yamada"
-  spaceRef: "haconiwa-dev-company"
+  assignee: "cto-james"
+  spaceRef: "jjz-dev-company"
   priority: "high"
   worktree: true
   branch: "architecture/system-review"
@@ -293,9 +292,9 @@ spec:
 apiVersion: haconiwa.dev/v1
 kind: Task
 metadata:
-  name: feature_03_financial_planning
+  name: jjz_financial_planning_03
 spec:
-  taskId: feature_03_financial_planning
+  taskId: jjz_financial_planning_03
   title: "Financial Planning & Analysis"
   description: |
     ## Financial Planning & Analysis
@@ -307,8 +306,8 @@ spec:
     - Cost analysis
     - Investment planning
     - Financial reporting
-  assignee: "cfo-tanaka"
-  spaceRef: "haconiwa-dev-company"
+  assignee: "cfo-zoe"
+  spaceRef: "jjz-dev-company"
   priority: "high"
   worktree: true
   branch: "finance/planning-model"
@@ -317,9 +316,9 @@ spec:
 apiVersion: haconiwa.dev/v1
 kind: Task
 metadata:
-  name: bugfix/04_product_roadmap
+  name: jjz_product_roadmap_04
 spec:
-  taskId: bugfix/04_product_roadmap
+  taskId: jjz_product_roadmap_04
   title: "Product Roadmap Development"
   description: |
     ## Product Roadmap Development
@@ -331,8 +330,8 @@ spec:
     - User research analysis
     - Market requirements
     - Timeline planning
-  assignee: "vpp-suzuki"
-  spaceRef: "haconiwa-dev-company"
+  assignee: "vpp-zhang"
+  spaceRef: "jjz-dev-company"
   priority: "high"
   worktree: true
   branch: "product/roadmap-2025"
@@ -341,9 +340,9 @@ spec:
 apiVersion: haconiwa.dev/v1
 kind: Task
 metadata:
-  name: hotfix/05_ai_core_engine
+  name: jjz_ai_core_engine_05
 spec:
-  taskId: hotfix/05_ai_core_engine
+  taskId: jjz_ai_core_engine_05
   title: "AI Core Engine Enhancement"
   description: |
     ## AI Core Engine Enhancement
@@ -355,8 +354,8 @@ spec:
     - Context sharing
     - Performance optimization
     - Memory management
-  assignee: "ai-lead-nakamura"
-  spaceRef: "haconiwa-dev-company"
+  assignee: "ai-lead-jordan"
+  spaceRef: "jjz-dev-company"
   priority: "high"
   worktree: true
   branch: "ai/core-engine"
@@ -365,9 +364,9 @@ spec:
 apiVersion: haconiwa.dev/v1
 kind: Task
 metadata:
-  name: enhancement/06_backend_optimization
+  name: jjz_backend_optimization_06
 spec:
-  taskId: enhancement/06_backend_optimization
+  taskId: jjz_backend_optimization_06
   title: "Backend Performance Optimization"
   description: |
     ## Backend Performance Optimization
@@ -379,8 +378,8 @@ spec:
     - API performance
     - Caching strategy
     - Load balancing
-  assignee: "backend-lead-kobayashi"
-  spaceRef: "haconiwa-dev-company"
+  assignee: "backend-lead-jenkins"
+  spaceRef: "jjz-dev-company"
   priority: "high"
   worktree: true
   branch: "backend/performance-opt"
@@ -389,9 +388,9 @@ spec:
 apiVersion: haconiwa.dev/v1
 kind: Task
 metadata:
-  name: refactor/07_frontend_innovation
+  name: jjz_frontend_innovation_07
 spec:
-  taskId: refactor/07_frontend_innovation
+  taskId: jjz_frontend_innovation_07
   title: "Frontend Innovation Research"
   description: |
     ## Frontend Innovation Research
@@ -403,8 +402,8 @@ spec:
     - Web Components integration
     - Performance benchmarking
     - Innovation proposals
-  assignee: "frontend-lead-ishii"
-  spaceRef: "haconiwa-dev-company"
+  assignee: "frontend-lead-zhao"
+  spaceRef: "jjz-dev-company"
   priority: "medium"
   worktree: true
   branch: "frontend/innovation-research"
@@ -413,9 +412,9 @@ spec:
 apiVersion: haconiwa.dev/v1
 kind: Task
 metadata:
-  name: docs/08_devops_automation
+  name: jjz_devops_automation_08
 spec:
-  taskId: docs/08_devops_automation
+  taskId: jjz_devops_automation_08
   title: "DevOps Automation Enhancement"
   description: |
     ## DevOps Automation Enhancement
@@ -427,8 +426,8 @@ spec:
     - Automated testing integration
     - Deployment automation
     - Monitoring automation
-  assignee: "devops-lead-matsui"
-  spaceRef: "haconiwa-dev-company"
+  assignee: "devops-lead-jefferson"
+  spaceRef: "jjz-dev-company"
   priority: "high"
   worktree: true
   branch: "devops/automation-enhancement"
@@ -437,9 +436,9 @@ spec:
 apiVersion: haconiwa.dev/v1
 kind: Task
 metadata:
-  name: test/09_security_audit
+  name: jjz_security_audit_09
 spec:
-  taskId: test/09_security_audit
+  taskId: jjz_security_audit_09
   title: "Security Architecture Audit"
   description: |
     ## Security Architecture Audit
@@ -451,8 +450,8 @@ spec:
     - Security architecture review
     - Compliance evaluation
     - Security roadmap development
-  assignee: "security-lead-inoue"
-  spaceRef: "haconiwa-dev-company"
+  assignee: "security-lead-zhou"
+  spaceRef: "jjz-dev-company"
   priority: "high"
   worktree: true
   branch: "security/architecture-audit"
@@ -461,9 +460,9 @@ spec:
 apiVersion: haconiwa.dev/v1
 kind: Task
 metadata:
-  name: perf/10_data_platform
+  name: jjz_data_platform_10
 spec:
-  taskId: perf/10_data_platform
+  taskId: jjz_data_platform_10
   title: "Data Platform Development"
   description: |
     ## Data Platform Development
@@ -475,152 +474,8 @@ spec:
     - Real-time streaming
     - Analytics dashboard
     - ML pipeline integration
-  assignee: "data-lead-kimura"
-  spaceRef: "haconiwa-dev-company"
+  assignee: "data-lead-zhu"
+  spaceRef: "jjz-dev-company"
   priority: "high"
   worktree: true
   branch: "data/platform-development"
-
----
-apiVersion: haconiwa.dev/v1
-kind: Task
-metadata:
-  name: feature/11_qa_framework
-spec:
-  taskId: feature/11_qa_framework
-  title: "QA Framework Modernization"
-  description: |
-    ## QA Framework Modernization
-    
-    Modernize testing and quality assurance framework.
-    
-    ### Requirements:
-    - Automated testing strategy
-    - CI/CD integration
-    - Test coverage improvement
-    - Quality metrics dashboard
-  assignee: "qa-manager-hayashi"
-  spaceRef: "haconiwa-dev-company"
-  priority: "high"
-  worktree: true
-  branch: "qa/framework-modernization"
-
----
-apiVersion: haconiwa.dev/v1
-kind: Task
-metadata:
-  name: feature/12_documentation_system
-spec:
-  taskId: feature/12_documentation_system
-  title: "Documentation System Enhancement"
-  description: |
-    ## Documentation System Enhancement
-    
-    Build comprehensive documentation system for developers.
-    
-    ### Requirements:
-    - Interactive documentation
-    - API reference generation
-    - Tutorial system
-    - Documentation automation
-  assignee: "docs-lead-yamamoto"
-  spaceRef: "haconiwa-dev-company"
-  priority: "medium"
-  worktree: true
-  branch: "docs/system-enhancement"
-
----
-apiVersion: haconiwa.dev/v1
-kind: Task
-metadata:
-  name: feature/13_community_platform
-spec:
-  taskId: feature/13_community_platform
-  title: "Community Platform Development"
-  description: |
-    ## Community Platform Development
-    
-    Develop platform for developer community engagement.
-    
-    ### Requirements:
-    - Community portal
-    - Developer resources
-    - Collaboration tools
-    - Knowledge sharing system
-  assignee: "community-ito"
-  spaceRef: "haconiwa-dev-company"
-  priority: "medium"
-  worktree: true
-  branch: "community/platform-development"
-
----
-apiVersion: haconiwa.dev/v1
-kind: Task
-metadata:
-  name: feature/14_developer_tools
-spec:
-  taskId: feature/14_developer_tools
-  title: "Developer Tools Enhancement"
-  description: |
-    ## Developer Tools Enhancement
-    
-    Enhance internal developer tools and productivity.
-    
-    ### Requirements:
-    - CLI tools improvement
-    - IDE integrations
-    - Debug tools
-    - Performance profiling
-  assignee: "platform-kato"
-  spaceRef: "haconiwa-dev-company"
-  priority: "medium"
-  worktree: true
-  branch: "tools/developer-enhancement"
-
----
-apiVersion: haconiwa.dev/v1
-kind: Task
-metadata:
-  name: feature/15_operations_optimization
-spec:
-  taskId: feature/15_operations_optimization
-  title: "Operations Process Optimization"
-  description: |
-    ## Operations Process Optimization
-    
-    Optimize operational processes and workflows.
-    
-    ### Requirements:
-    - Process automation
-    - Workflow optimization
-    - Resource allocation
-    - Efficiency metrics
-  assignee: "vpo-watanabe"
-  spaceRef: "haconiwa-dev-company"
-  priority: "high"
-  worktree: true
-  branch: "ops/process-optimization"
-
----
-apiVersion: haconiwa.dev/v1
-kind: Task
-metadata:
-  name: feature/16_engineering_excellence
-spec:
-  taskId: feature/16_engineering_excellence
-  title: "Engineering Excellence Initiative"
-  description: |
-    ## Engineering Excellence Initiative
-    
-    Drive engineering excellence across all teams.
-    
-    ### Requirements:
-    - Best practices standardization
-    - Code quality improvement
-    - Team productivity optimization
-    - Technical debt management
-  assignee: "vpe-sato"
-  spaceRef: "haconiwa-dev-company"
-  priority: "high"
-  worktree: true
-  branch: "engineering/excellence-initiative" 
