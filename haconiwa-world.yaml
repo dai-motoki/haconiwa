@@ -78,7 +78,7 @@ spec:
               PYTHONPATH: "./src"
           gitRepo:
             url: "https://github.com/KandaQuantum1123/kamui_v3"
-            defaultBranch: "main"
+            defaultBranch: "sub_main_0617"
             auth: "https"
           buildings:
           - id: "hq-tower"

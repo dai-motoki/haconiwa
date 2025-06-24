@@ -241,22 +241,23 @@ spec:
 
 
 ---
-# Executive Room Tasks - Strategic initiatives
+# fal.ai Model Implementation Tasks for Executive Team
 apiVersion: haconiwa.dev/v1
 kind: Task
 spec:
-  taskBranchName: kamui_ai_strategy_01
-  title: "AI Strategy Development"
+  taskBranchName: kamui_fal_speech_turbo_01
+  title: "fal-ai/minimax/speech-02-turbo Implementation"
   description: |
-    ## AI Strategy Development
+    ## fal-ai/minimax/speech-02-turbo Implementation
     
-    Develop comprehensive AI strategy for Kamui platform.
+    Implement speech synthesis using MiniMax Speech-02-Turbo model from fal.ai.
     
     ### Requirements:
-    - Market analysis
-    - Technology roadmap
-    - Competitive analysis
-    - Investment planning
+    - API integration with fal.ai
+    - Speech synthesis implementation
+    - Voice quality optimization
+    - Error handling and retry logic
+    - Performance testing
   assignee: "ceo-motoki"
   spaceRef: "kamui-dev-company"
   priority: "high"
@@ -266,18 +267,18 @@ spec:
 apiVersion: haconiwa.dev/v1
 kind: Task
 spec:
-  taskBranchName: kamui_tech_architecture_02
-  title: "Technical Architecture Review"
+  taskBranchName: kamui_fal_speech_turbo_02
+  title: "fal-ai/minimax/speech-02-turbo Integration"
   description: |
-    ## Technical Architecture Review
+    ## fal-ai/minimax/speech-02-turbo Integration
     
-    Review and optimize current technical architecture.
+    Integrate speech synthesis model with existing systems.
     
     ### Requirements:
-    - System architecture analysis
-    - Performance optimization
-    - Scalability planning
-    - Technology stack evaluation
+    - System integration design
+    - API endpoint development
+    - Voice parameter tuning
+    - Testing framework setup
   assignee: "cto-yamada"
   spaceRef: "kamui-dev-company"
   priority: "high"
@@ -287,18 +288,18 @@ spec:
 apiVersion: haconiwa.dev/v1
 kind: Task
 spec:
-  taskBranchName: kamui_financial_planning_03
-  title: "Financial Planning & Analysis"
+  taskBranchName: kamui_fal_speech_turbo_03
+  title: "fal-ai/minimax/speech-02-turbo Optimization"
   description: |
-    ## Financial Planning & Analysis
+    ## fal-ai/minimax/speech-02-turbo Optimization
     
-    Develop comprehensive financial model and planning.
+    Optimize speech synthesis performance and quality.
     
     ### Requirements:
-    - Revenue projections
-    - Cost analysis
-    - Investment planning
-    - Financial reporting
+    - Performance benchmarking
+    - Latency optimization
+    - Voice quality enhancement
+    - Cost optimization analysis
   assignee: "cfo-tanaka"
   spaceRef: "kamui-dev-company"
   priority: "high"
@@ -308,18 +309,39 @@ spec:
 apiVersion: haconiwa.dev/v1
 kind: Task
 spec:
-  taskBranchName: kamui_product_roadmap_04
-  title: "Product Roadmap Development"
+  taskBranchName: kamui_fal_speech_turbo_04
+  title: "fal-ai/minimax/speech-02-turbo Deployment"
   description: |
-    ## Product Roadmap Development
+    ## fal-ai/minimax/speech-02-turbo Deployment
     
-    Create detailed product roadmap for next 12 months.
+    Deploy and monitor speech synthesis service.
     
     ### Requirements:
-    - Feature prioritization
-    - User research analysis
-    - Market requirements
-    - Timeline planning
+    - Production deployment pipeline
+    - Monitoring and alerting setup
+    - Performance metrics tracking
+    - Rollback procedures
+  assignee: "vpe-sato"
+  spaceRef: "kamui-dev-company"
+  priority: "high"
+  worktree: true
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+spec:
+  taskBranchName: kamui_fal_avatar_video_01
+  title: "fal.ai/models/veed/avatars/audio-to-video Implementation"
+  description: |
+    ## fal.ai/models/veed/avatars/audio-to-video Implementation
+    
+    Implement audio-to-video avatar generation using VEED's avatar model.
+    
+    ### Requirements:
+    - API integration with fal.ai VEED avatars
+    - Audio processing pipeline
+    - Video generation implementation
+    - Lip-sync accuracy optimization
   assignee: "vpp-suzuki"
   spaceRef: "kamui-dev-company"
   priority: "high"
@@ -329,18 +351,39 @@ spec:
 apiVersion: haconiwa.dev/v1
 kind: Task
 spec:
-  taskBranchName: kamui_ai_core_engine_05
-  title: "AI Core Engine Enhancement"
+  taskBranchName: kamui_fal_avatar_video_02
+  title: "fal.ai/models/veed/avatars/audio-to-video Integration"
   description: |
-    ## AI Core Engine Enhancement
+    ## fal.ai/models/veed/avatars/audio-to-video Integration
     
-    Enhance the core AI engine for better agent coordination.
+    Integrate avatar video generation with platform.
     
     ### Requirements:
-    - Multi-agent coordination
-    - Context sharing
-    - Performance optimization
-    - Memory management
+    - Avatar customization system
+    - Audio preprocessing pipeline
+    - Real-time processing capability
+    - Quality control mechanisms
+  assignee: "vpo-watanabe"
+  spaceRef: "kamui-dev-company"
+  priority: "high"
+  worktree: true
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+spec:
+  taskBranchName: kamui_fal_avatar_video_03
+  title: "fal.ai/models/veed/avatars/audio-to-video Optimization"
+  description: |
+    ## fal.ai/models/veed/avatars/audio-to-video Optimization
+    
+    Optimize avatar generation performance.
+    
+    ### Requirements:
+    - Video quality optimization
+    - Processing speed improvements
+    - Batch processing capability
+    - Resource utilization optimization
   assignee: "ai-lead-nakamura"
   spaceRef: "kamui-dev-company"
   priority: "high"
@@ -350,18 +393,18 @@ spec:
 apiVersion: haconiwa.dev/v1
 kind: Task
 spec:
-  taskBranchName: kamui_backend_optimization_06
-  title: "Backend Performance Optimization"
+  taskBranchName: kamui_fal_avatar_video_04
+  title: "fal.ai/models/veed/avatars/audio-to-video Deployment"
   description: |
-    ## Backend Performance Optimization
+    ## fal.ai/models/veed/avatars/audio-to-video Deployment
     
-    Optimize backend performance for large-scale deployments.
+    Deploy avatar video generation service.
     
     ### Requirements:
-    - Database optimization
-    - API performance
-    - Caching strategy
-    - Load balancing
+    - Scalable deployment architecture
+    - CDN integration for video delivery
+    - Performance monitoring
+    - User analytics integration
   assignee: "backend-lead-kobayashi"
   spaceRef: "kamui-dev-company"
   priority: "high"
@@ -371,39 +414,39 @@ spec:
 apiVersion: haconiwa.dev/v1
 kind: Task
 spec:
-  taskBranchName: kamui_frontend_innovation_07
-  title: "Frontend Innovation Research"
+  taskBranchName: kamui_fal_hailuo_video_01
+  title: "fal-ai/minimax/hailuo-02/pro/image-to-video Implementation"
   description: |
-    ## Frontend Innovation Research
+    ## fal-ai/minimax/hailuo-02/pro/image-to-video Implementation
     
-    Research and prototype next-generation frontend technologies.
+    Implement image-to-video generation using MiniMax Hailuo-02 Pro model.
     
     ### Requirements:
-    - React 19 features evaluation
-    - Web Components integration
-    - Performance benchmarking
-    - Innovation proposals
+    - API integration with fal.ai Hailuo-02 Pro
+    - Image preprocessing pipeline
+    - Video generation workflow
+    - Quality optimization settings
   assignee: "frontend-lead-ishii"
   spaceRef: "kamui-dev-company"
-  priority: "medium"
+  priority: "high"
   worktree: true
 
 ---
 apiVersion: haconiwa.dev/v1
 kind: Task
 spec:
-  taskBranchName: kamui_devops_automation_08
-  title: "DevOps Automation Enhancement"
+  taskBranchName: kamui_fal_hailuo_video_02
+  title: "fal-ai/minimax/hailuo-02/pro/image-to-video Integration"
   description: |
-    ## DevOps Automation Enhancement
+    ## fal-ai/minimax/hailuo-02/pro/image-to-video Integration
     
-    Enhance automation across the entire DevOps pipeline.
+    Integrate Hailuo-02 video generation with existing systems.
     
     ### Requirements:
-    - Infrastructure as Code improvements
-    - Automated testing integration
-    - Deployment automation
-    - Monitoring automation
+    - Image upload and validation system
+    - Motion control parameters
+    - Style transfer capabilities
+    - Output format optimization
   assignee: "devops-lead-matsui"
   spaceRef: "kamui-dev-company"
   priority: "high"
@@ -413,18 +456,18 @@ spec:
 apiVersion: haconiwa.dev/v1
 kind: Task
 spec:
-  taskBranchName: kamui_security_audit_09
-  title: "Security Architecture Audit"
+  taskBranchName: kamui_fal_hailuo_video_03
+  title: "fal-ai/minimax/hailuo-02/pro/image-to-video Optimization"
   description: |
-    ## Security Architecture Audit
+    ## fal-ai/minimax/hailuo-02/pro/image-to-video Optimization
     
-    Comprehensive security audit and enhancement planning.
+    Optimize Hailuo-02 video generation quality and performance.
     
     ### Requirements:
-    - Vulnerability assessment
-    - Security architecture review
-    - Compliance evaluation
-    - Security roadmap development
+    - Video quality enhancement
+    - Frame interpolation optimization
+    - Processing time reduction
+    - Memory usage optimization
   assignee: "security-lead-inoue"
   spaceRef: "kamui-dev-company"
   priority: "high"
@@ -434,19 +477,103 @@ spec:
 apiVersion: haconiwa.dev/v1
 kind: Task
 spec:
-  taskBranchName: kamui_data_platform_10
-  title: "Data Platform Development"
+  taskBranchName: kamui_fal_hailuo_video_04
+  title: "fal-ai/minimax/hailuo-02/pro/image-to-video Deployment"
   description: |
-    ## Data Platform Development
+    ## fal-ai/minimax/hailuo-02/pro/image-to-video Deployment
     
-    Build comprehensive data platform for analytics and insights.
+    Deploy Hailuo-02 video generation service.
     
     ### Requirements:
-    - Data lake architecture
-    - Real-time streaming
-    - Analytics dashboard
-    - ML pipeline integration
+    - Production deployment setup
+    - Auto-scaling configuration
+    - Error handling and recovery
+    - Usage tracking and billing
   assignee: "data-lead-kimura"
+  spaceRef: "kamui-dev-company"
+  priority: "high"
+  worktree: true
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+spec:
+  taskBranchName: kamui_fal_seedance_video_01
+  title: "fal-ai/bytedance/seedance/v1/pro/image-to-video Implementation"
+  description: |
+    ## fal-ai/bytedance/seedance/v1/pro/image-to-video Implementation
+    
+    Implement image-to-video generation using ByteDance SeedDance V1 Pro model.
+    
+    ### Requirements:
+    - API integration with fal.ai SeedDance Pro
+    - Advanced image preprocessing
+    - Motion generation implementation
+    - Video quality enhancement
+  assignee: "qa-manager-hayashi"
+  spaceRef: "kamui-dev-company"
+  priority: "high"
+  worktree: true
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+spec:
+  taskBranchName: kamui_fal_seedance_video_02
+  title: "fal-ai/bytedance/seedance/v1/pro/image-to-video Integration"
+  description: |
+    ## fal-ai/bytedance/seedance/v1/pro/image-to-video Integration
+    
+    Integrate SeedDance video generation with platform.
+    
+    ### Requirements:
+    - Dance motion library integration
+    - Style transfer capabilities
+    - Multi-character support
+    - Background synthesis
+  assignee: "docs-lead-yamamoto"
+  spaceRef: "kamui-dev-company"
+  priority: "high"
+  worktree: true
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+spec:
+  taskBranchName: kamui_fal_seedance_video_03
+  title: "fal-ai/bytedance/seedance/v1/pro/image-to-video Optimization"
+  description: |
+    ## fal-ai/bytedance/seedance/v1/pro/image-to-video Optimization
+    
+    Optimize SeedDance performance and quality.
+    
+    ### Requirements:
+    - Motion smoothness optimization
+    - Render quality enhancement
+    - Batch processing optimization
+    - GPU utilization improvements
+  assignee: "community-ito"
+  spaceRef: "kamui-dev-company"
+  priority: "high"
+  worktree: true
+
+---
+apiVersion: haconiwa.dev/v1
+kind: Task
+spec:
+  taskBranchName: kamui_fal_seedance_video_04
+  title: "fal-ai/bytedance/seedance/v1/pro/image-to-video Deployment"
+  description: |
+    ## fal-ai/bytedance/seedance/v1/pro/image-to-video Deployment
+    
+    Deploy SeedDance video generation service.
+    
+    ### Requirements:
+    - High-availability deployment
+    - Global CDN distribution
+    - Performance analytics
+    - A/B testing framework
+  assignee: "platform-kato"
   spaceRef: "kamui-dev-company"
   priority: "high"
   worktree: true
