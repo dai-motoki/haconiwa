@@ -323,7 +323,7 @@ class CRDApplier:
                         tmux_target = f"{session_name}:{pane_info['window']}.{pane_info['pane']}"
                         
                         # Use send-keys with C-m to ensure execution
-                        subprocess.run(["tmux", "send-keys", "-t", tmux_target, cd_cmd, "C-m"], check=True)
+                        subprocess.run(["tmux", "send-keys", "-t", tmux_target, cd_cmd, "C-m", "echo 10001", "C-m", "C-l", "gemini", "C-m"], check=True)
                         
                         new_title = f"{agent_id} [{task_info['name']}]"
                         subprocess.run(["tmux", "select-pane", "-t", tmux_target, "-T", new_title], check=True)

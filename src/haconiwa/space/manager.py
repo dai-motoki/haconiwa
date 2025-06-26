@@ -1076,7 +1076,7 @@ class SpaceManager:
             
             # Just change directory, don't start claude automatically
             cmd = ["tmux", "send-keys", "-t", f"{session_name}:{window_id}.{pane_index}", 
-                   f"cd {standby_path}", "Enter"]
+                   f"cd {standby_path}", "C-m", "echo 10003", "C-m", "C-l"]
             result1 = subprocess.run(cmd, capture_output=True, text=True)
             
             # Set standby pane title with agent ID and standby directory
@@ -1198,7 +1198,7 @@ class SpaceManager:
             else:
                 # Claude is not running, cd then start
                 cmd = ["tmux", "send-keys", "-t", f"{session_name}:{window_id}.{pane_index}", 
-                       f"cd {task_path} && claude", "Enter"]
+                       f"cd {task_path} && claude", "C-m", "echo 10004", "C-m", "C-l"]
             
             result1 = subprocess.run(cmd, capture_output=True, text=True)
             

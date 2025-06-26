@@ -513,9 +513,9 @@ class TaskSubmitter:
         # Convert to absolute path
         abs_worktree_path = str(Path(worktree_path).absolute())
         
-        # Send cd command to the pane
+        # Send cd command to the pane and clear the screen
         cmd = ["tmux", "send-keys", "-t", f"{session}:{window_id}.{pane_index}",
-               f"cd {abs_worktree_path}", "C-m"]
+               f"cd {abs_worktree_path}", "C-m", "echo 10002", "C-m", "C-l"]
         result = subprocess.run(cmd, capture_output=True, text=True)
         
         if result.returncode != 0:
